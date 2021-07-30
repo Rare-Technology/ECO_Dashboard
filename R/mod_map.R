@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-#' @importFrom leaflet leafletOutput renderLeaflet leaflet addTiles addMarkers
+#' @importFrom leaflet leafletOutput renderLeaflet leaflet addProviderTiles addMarkers
 mapUI <- function(id){
   ns <- NS(id)
   tagList(
@@ -18,14 +18,14 @@ mapUI <- function(id){
 #' map Server Functions
 #'
 #' @noRd 
-mapServer <- function(id){
+mapServer <- function(id, rv){
   ns <- NS(id)
   # points <- cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
 
   moduleServer( id, function(input, output, session){
     output$map_holder <- renderUI({
         m <- leaflet() %>%
-          addTiles()
+          addProviderTiles(rv$basemap)
         output$map <- renderLeaflet(m)
         leafletOutput(ns('map'))
       })

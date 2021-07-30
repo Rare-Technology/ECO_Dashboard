@@ -70,12 +70,16 @@ sidebarDisplayServer <- function(id, rv){
                       "Ocean basemap"= providers$Esri.OceanBasemap,
                       "Satellite basemap"= providers$Esri.WorldImagery,
                       "World Topo basemap" = providers$Esri.WorldTopoMap),
-            selected = providers$Esri.OceanBasemap
+            selected = rv$basemap
           ) # selectInput
         ) # div
       } # if
       ui
     }) # renderUI
+    
+    observeEvent(input$basemap, {
+      rv$basemap <- input$basemap
+    })
   }) # modServer
 } # server
     
