@@ -14,7 +14,9 @@ sidebarGeoUI <- function(id){
     selectInput(
       ns('sel_country'),
       'Country',
-      choices = month.name
+      choices = fish.surveys %>%
+        dplyr::select(country) %>%
+        unique()
     ),
     pickerInput(
       ns('sel_subnational'),
