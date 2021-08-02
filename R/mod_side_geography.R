@@ -14,15 +14,17 @@ sidebarGeoUI <- function(id){
     selectInput(
       ns('sel_country'),
       'Country',
-      choices = fish.surveys %>%
-        dplyr::select(country) %>%
-        unique()
+      choices = fish.surveys$country %>% unique() 
     ),
     pickerInput(
       ns('sel_subnational'),
       'Subnational government',
-      choices = LETTERS,
-      selected = LETTERS,
+      choices = fish.surveys$level1_name %>%
+        unique() %>%
+        as.vector(),
+      selected = fish.surveys$level1_name %>% 
+        unique() %>% 
+        as.vector(),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -32,8 +34,12 @@ sidebarGeoUI <- function(id){
     pickerInput(
       ns('sel_local'),
       'Local government',
-      choices = letters,
-      selected = letters,
+      choices = fish.surveys$level2_name %>% 
+        unique() %>% 
+        as.vector(),
+      selected = fish.surveys$level2_name %>% 
+        unique() %>% 
+        as.vector(),
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -43,7 +49,9 @@ sidebarGeoUI <- function(id){
     pickerInput(
       ns('sel_maa'),
       'Managed access area',
-      choices = month.abb,
+      choices = fish.surveys$ma_name %>% 
+        unique() %>% 
+        as.vector(),
       selected = NULL,
       multiple = TRUE,
       options = list(
