@@ -10,11 +10,11 @@ app_server <- function( input, output, session ) {
   mainServer('mainUI', rv)
   
   sidebarServer('sidebarUI')
-  sidebarGeoServer('sidebarGeoUI')
+  sidebarGeoServer('sidebarGeoUI', rv)
   sidebarDisplayServer('sidebarDisplayUI', rv)
   # TODO add other sidebar servers
   
-  plotServer('plotUI')
+  plotServer('plotUI', rv)
   # mangroveServer('mangroveUI') # have to write from scratch
   mapServer('mapUI', rv)
   # reportServer('reportUI') this isn't implemented correctly on the original dashboard

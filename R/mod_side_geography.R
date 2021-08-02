@@ -58,17 +58,25 @@ sidebarGeoUI <- function(id){
         `actions-box` = TRUE,
         `selected-text-format` = "count > 2"
       )
-    )
-  )
-}
+    ) # pickerInput
+  ) # tagList
+} #sidebarGeoUI
     
 #' side_geography Server Functions
 #'
 #' @noRd 
-sidebarGeoServer <- function(id){
+sidebarGeoServer <- function(id, rv){
+  ns <- NS(id)
   moduleServer( id, function(input, output, session){
-    ns <- session$ns
- 
+    observeEvent(input$sel_maa, {
+      rv$data_filtered <- rv$data_full %>%
+        dplyr::filter(
+          country %in% input$sel_country,
+          level1_name %in% input$sel_subnational,
+          level2_name %in% input$sel_local,
+          ma_name %in% input$sel_maa
+        )
+    })
   })
 }
     
