@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinyWidgets pickerInput
+#' @importFrom shinyWidgets pickerInput updatePickerInput
 sidebarGeoUI <- function(id){
   ns <- NS(id)
   tagList(
@@ -68,6 +68,24 @@ sidebarGeoUI <- function(id){
 sidebarGeoServer <- function(id, rv){
   ns <- NS(id)
   moduleServer( id, function(input, output, session){
+    observeEvent(input$sel_country, {
+      rv$sel_country <- input$sel_country
+      rv$data_filtered <- rv$data_full %>% 
+        dplyr::filter(country == input$sel_country)
+      rv$subnational_choices <- rv$data_filtered %>% 
+        dplyr::pull(level1_name) %>%
+        unique() %>% 
+        as.vector() %>% 
+        sort()
+      updatePickerInput(
+        session,
+        'sel_subnational',
+        choices = rv$subnational_choices,
+        selected = rv$subnational_choices
+      )
+    },
+    ignoreInit = TRUE
+    )
     observeEvent(input$sel_maa, {
       rv$data_filtered <- rv$data_full %>%
         dplyr::filter(
