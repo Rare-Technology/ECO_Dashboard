@@ -8,26 +8,19 @@
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom shinyWidgets pickerInput updatePickerInput
-sidebarGeoUI <- function(id){
+sidebarGeoUI <- function(id, INIT){
   ns <- NS(id)
   tagList(
     selectInput(
       ns('sel_country'),
       'Country',
-      choices = c("Honduras" = "HND",
-                  "Indonesia" = "IDN",
-                  "Mozambique" = "MOZ",
-                  "Philippines" = "PHL")
+      choices = INIT$COUNTRY_CHOICES
     ),
     pickerInput(
       ns('sel_subnational'),
       'Subnational government',
-      choices = fish.surveys$level1_name %>%
-        unique() %>%
-        as.vector(),
-      selected = fish.surveys$level1_name %>% 
-        unique() %>% 
-        as.vector(),
+      choices = INIT$SUBNATIONAL_CHOICES,
+      selected = INIT$SUBNATIONAL_CHOICES,
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -37,12 +30,8 @@ sidebarGeoUI <- function(id){
     pickerInput(
       ns('sel_local'),
       'Local government',
-      choices = fish.surveys$level2_name %>% 
-        unique() %>% 
-        as.vector(),
-      selected = fish.surveys$level2_name %>% 
-        unique() %>% 
-        as.vector(),
+      choices = INIT$LOCAL_CHOICES,
+      selected = INIT$LOCAL_CHOICES,
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -52,9 +41,7 @@ sidebarGeoUI <- function(id){
     pickerInput(
       ns('sel_maa'),
       'Managed access area',
-      choices = fish.surveys$ma_name %>% 
-        unique() %>% 
-        as.vector(),
+      choices = INIT$MAA_CHOICES,
       selected = NULL,
       multiple = TRUE,
       options = list(
@@ -73,13 +60,9 @@ sidebarGeoServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     observeEvent(input$sel_country, {
       rv$sel_country <- input$sel_country
-      rv$data_filtered <- rv$data_full %>% 
+      rv$data_filtered <- rv$data_full %>%
         dplyr::filter(country == input$sel_country)
-      rv$subnational_choices <- rv$data_filtered %>% 
-        dplyr::pull(level1_name) %>%
-        unique() %>% 
-        as.vector() %>% 
-        sort()
+      rv$subnational_choices <- get_choices(rv$data_filtered, 'level1_name')
       updatePickerInput(
         session,
         'sel_subnational',
@@ -89,14 +72,38 @@ sidebarGeoServer <- function(id, rv){
     },
     ignoreInit = TRUE
     )
+    observeEvent(input$sel_subnational, {
+      rv$sel_subnational <- input$sel_subnational
+      rv$data_filtered <- rv$data_filtered %>%
+        dplyr::filter(level1_name %in% input$sel_subnational)
+      rv$local_choices <- get_choices(rv$data_filtered, 'level2_name')
+      updatePickerInput(
+        session,
+        'sel_local',
+        choices = rv$local_choices,
+        selected = rv$local_choices
+      )
+    },
+    ignoreInit=TRUE
+    )
+    observeEvent(input$sel_local, {
+      rv$sel_local <- input$sel_local
+      rv$data_filtered <- rv$data_filtered %>%
+        dplyr::filter(level2_name %in% input$sel_local)
+      rv$maa_choices <- get_choices(rv$data_filtered, 'ma_name')
+      updatePickerInput(
+        session,
+        'sel_maa',
+        choices = rv$maa_choices,
+        selected = NULL
+      )
+    },
+    ignoreInit=TRUE
+    )
     observeEvent(input$sel_maa, {
+      rv$sel_maa <- input$sel_maa
       rv$data_filtered <- rv$data_full %>%
-        dplyr::filter(
-          country %in% input$sel_country,
-          level1_name %in% input$sel_subnational,
-          level2_name %in% input$sel_local,
-          ma_name %in% input$sel_maa
-        )
+        dplyr::filter(ma_name %in% input$sel_maa)
     })
   })
 }

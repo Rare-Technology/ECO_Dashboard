@@ -5,10 +5,12 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
+  INIT <- initialize_geo()
+  
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-    mainUI('mainUI')
+    mainUI('mainUI', INIT)
   )
 }
 

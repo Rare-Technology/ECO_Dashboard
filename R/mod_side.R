@@ -7,13 +7,13 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-sidebarUI <- function(id){
+sidebarUI <- function(id, INIT){
   ns <- NS(id)
   tagList(
     sidebarPanel(
       class = "sidebar",
       tabsetPanel(
-        tabPanel("Geography", sidebarGeoUI('sidebarGeoUI')),
+        tabPanel("Geography", sidebarGeoUI('sidebarGeoUI', INIT)),
         tabPanel("Display", sidebarDisplayUI('sidebarDisplayUI'))
       )
     ) # sidebarPanel
