@@ -14,7 +14,10 @@ sidebarGeoUI <- function(id){
     selectInput(
       ns('sel_country'),
       'Country',
-      choices = fish.surveys$country %>% unique() 
+      choices = c("Honduras" = "HND",
+                  "Indonesia" = "IDN",
+                  "Mozambique" = "MOZ",
+                  "Philippines" = "PHL")
     ),
     pickerInput(
       ns('sel_subnational'),
