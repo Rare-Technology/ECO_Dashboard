@@ -26,7 +26,11 @@ plotServer <- function(id, rv){
       # p <- result$p
       
       p <- ggplot2::ggplot(
-        data = rv$data_filtered,
+        data = rv$data_full %>% 
+          # dplyr::filter(country == rv$sel_country) %>% 
+          # dplyr::filter(level1_name %in% rv$sel_subnational) %>% 
+          # dplyr::filter(level2_name %in% rv$sel_local) %>% 
+          dplyr::filter(ma_name %in% rv$sel_maa),
         aes(location_status, biomass_kg_ha),
         na.rm = TRUE) +
         geom_bar(aes(fill = location_status), position=position_dodge(),

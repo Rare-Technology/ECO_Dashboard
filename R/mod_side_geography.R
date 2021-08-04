@@ -74,7 +74,7 @@ sidebarGeoServer <- function(id, rv){
     )
     observeEvent(input$sel_subnational, {
       rv$sel_subnational <- input$sel_subnational
-      rv$data_filtered <- rv$data_filtered %>%
+      rv$data_filtered <- rv$data_full %>%
         dplyr::filter(level1_name %in% input$sel_subnational)
       rv$local_choices <- get_choices(rv$data_filtered, 'level2_name')
       updatePickerInput(
@@ -88,7 +88,7 @@ sidebarGeoServer <- function(id, rv){
     )
     observeEvent(input$sel_local, {
       rv$sel_local <- input$sel_local
-      rv$data_filtered <- rv$data_filtered %>%
+      rv$data_filtered <- rv$data_full %>%
         dplyr::filter(level2_name %in% input$sel_local)
       rv$maa_choices <- get_choices(rv$data_filtered, 'ma_name')
       updatePickerInput(
