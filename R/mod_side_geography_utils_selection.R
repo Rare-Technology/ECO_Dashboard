@@ -23,3 +23,8 @@ initialize_geo <- function() {
   
   out
 }
+
+get_biomass <- function(data_filtered) {
+  aggregate(biomass_kg_ha ~ country + level1_name + level2_name + ma_name +
+              location_name + location_status, data=data_filtered, FUN=sum)
+}

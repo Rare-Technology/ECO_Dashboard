@@ -103,7 +103,18 @@ sidebarGeoServer <- function(id, rv){
     observeEvent(input$sel_maa, {
       rv$sel_maa <- input$sel_maa
       rv$data_filtered <- rv$data_full %>%
-        dplyr::filter(ma_name %in% input$sel_maa)
+        dplyr::filter(country == input$sel_country,
+                      level1_name %in% input$sel_subnational,
+                      level2_name %in% input$sel_local,
+                      ma_name %in% input$sel_maa)
+      rv$data_map <- aggregate(cbind(lat, lon) ~
+                                 country +
+                                 level1_name +
+                                 level2_name +
+                                 ma_name +
+                                 location_name,
+                               data = rv$data_filtered,
+                               FUN = mean, na.rm = TRUE)
     })
   })
 }

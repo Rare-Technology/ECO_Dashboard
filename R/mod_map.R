@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-#' @importFrom leaflet leafletOutput renderLeaflet leaflet addProviderTiles addMarkers
+#' @importFrom leaflet leafletOutput renderLeaflet leaflet addProviderTiles addCircleMarkers
 mapUI <- function(id){
   ns <- NS(id)
   tagList(
@@ -24,8 +24,15 @@ mapServer <- function(id, rv){
 
   moduleServer( id, function(input, output, session){
     output$map_holder <- renderUI({
-        m <- leaflet() %>%
-          addProviderTiles(rv$basemap)
+        m <- leaflet(data = rv$data_map) %>%
+          addProviderTiles(rv$basemap) %>% 
+          addCircleMarkers(lng = rv$data_map$lon,
+                           lat = rv$data_map$lat,
+                           radius = ~runif(100,1,1),
+                           color = 'darkred',
+                           fillOpacity = 0.5,
+                           popup = popupText(rv$data_filtered)
+          )
         output$map <- renderLeaflet(m)
         leafletOutput(ns('map'))
       })
