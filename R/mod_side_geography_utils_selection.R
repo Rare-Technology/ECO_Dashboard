@@ -25,6 +25,28 @@ initialize_geo <- function() {
 }
 
 get_biomass <- function(data_filtered) {
-  aggregate(biomass_kg_ha ~ country + level1_name + level2_name + ma_name +
-              location_name + location_status, data=data_filtered, FUN=sum)
+  # add up the biomass of all fish at each transect, then take the means across
+  # transects for each location, then take the means across locations for each
+  # managed access area-location status combination
+  
+  aggregate(biomass_kg_ha ~ country + ma_name + location_status + location_name +
+              transect_no, data=data_filtered, FUN=sum)
+}
+
+summarySE <- function(data_aggreg, metric) {
+  
+  data_loc_means <- aggregate(biomass_kg_ha ~ country + ma_name + location_status +
+                             location_name, data=data_aggreg, FUN=mean)
+  
+  data_summary <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
+                            data=data_loc_means, FUN=mean)
+  data_summary$N <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
+                               data=data_loc_means, FUN=length) %>% 
+                      dplyr::pull(biomass_kg_ha)
+  data_summary$SD <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
+                               data=data_loc_means, FUN=sd) %>% 
+                      dplyr::pull(biomass_kg_ha)
+  data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
+  
+  return(data_summary)
 }

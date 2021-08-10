@@ -22,19 +22,21 @@ plotServer <- function(id, rv){
   ns <- NS(id)
   moduleServer( id, function(input, output, session){
     output$plot_holder <- renderUI({
-      # result <- plot_func()
-      # p <- result$p
+      
+      # data_aggreg <- rv$data_filtered %>% get_biomass()
+      # data_summary <- summarySE(data_aggreg = rv$)
       
       p <- ggplot2::ggplot(
-        data = rv$data_filtered %>% 
-          get_biomass(),
+        data = summarySE(data_aggreg = rv$data_filtered %>% get_biomass(),
+                         metric = biomass_kg_ha),
         aes(location_status, biomass_kg_ha),
         na.rm = TRUE) +
+        facet_wrap('ma_name') +
         geom_bar(aes(fill = location_status), position=position_dodge(),
                  stat = 'identity')
       output$plot <- renderPlot(p)
       plotOutput(ns('plot'))
-      
+
     }) # renderUI
 
   }) #moduleServer
