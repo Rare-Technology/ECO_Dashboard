@@ -42,7 +42,7 @@ sidebarGeoUI <- function(id, INIT){
       ns('sel_maa'),
       'Managed access area',
       choices = INIT$MAA_CHOICES,
-      selected = NULL,
+      selected = INIT$SEL_MAA,
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,

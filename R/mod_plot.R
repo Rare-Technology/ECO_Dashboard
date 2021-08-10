@@ -31,7 +31,10 @@ plotServer <- function(id, rv){
             na.rm = TRUE) +
         facet_wrap('ma_name') +
         geom_bar(aes(fill = location_status), position=position_dodge(),
-                 stat = 'identity')
+                 stat = 'identity') +
+        geom_errorbar(aes(ymin=biomass_kg_ha - SE, ymax=biomass_kg_ha + SE),
+                      position=position_dodge(), width=0.2, na.rm=TRUE) +
+        ggtitle("Mean Fish Biomass")
       output$plot <- renderPlot(p)
       plotOutput(ns('plot'))
 
