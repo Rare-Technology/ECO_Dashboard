@@ -23,14 +23,12 @@ plotServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     output$plot_holder <- renderUI({
       
-      # data_aggreg <- rv$data_filtered %>% get_biomass()
-      # data_summary <- summarySE(data_aggreg = rv$)
+      data_aggreg <- rv$data_filtered %>% get_biomass(., 'biomass_kg_ha')
+      data_summary <- summarySE(data_aggreg, 'biomass_kg_ha')
       
-      p <- ggplot2::ggplot(
-        data = summarySE(data_aggreg = rv$data_filtered %>% get_biomass(),
-                         metric = biomass_kg_ha),
-        aes(location_status, biomass_kg_ha),
-        na.rm = TRUE) +
+      p <- ggplot2::ggplot(data=data_summary,
+            aes(location_status, biomass_kg_ha),
+            na.rm = TRUE) +
         facet_wrap('ma_name') +
         geom_bar(aes(fill = location_status), position=position_dodge(),
                  stat = 'identity')

@@ -24,29 +24,49 @@ initialize_geo <- function() {
   out
 }
 
-get_biomass <- function(data_filtered) {
-  # add up the biomass of all fish at each transect, then take the means across
-  # transects for each location, then take the means across locations for each
-  # managed access area-location status combination
+get_biomass <- function(data_filtered, metric) {
+  # add up the biomass of all fish at each transect
   
-  aggregate(biomass_kg_ha ~ country + ma_name + location_status + location_name +
-              transect_no, data=data_filtered, FUN=sum)
+  groupvars <- c('country', 'ma_name', 'location_status', 'location_name',
+              'transect_no')
+  formula_str = paste(metric, paste(groupvars, collapse=" + "), sep=" ~ ")
+  
+  aggregate(formula=as.formula(formula_str), data=data_filtered, FUN=sum)
 }
 
 summarySE <- function(data_aggreg, metric) {
   
-  data_loc_means <- aggregate(biomass_kg_ha ~ country + ma_name + location_status +
-                             location_name, data=data_aggreg, FUN=mean)
+  groupvars1 <- c('country', 'ma_name', 'location_status', 'location_name')
+  groupvars2 <- groupvars1[-length(groupvars1)]
   
-  data_summary <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
-                            data=data_loc_means, FUN=mean)
-  data_summary$N <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
-                               data=data_loc_means, FUN=length) %>% 
-                      dplyr::pull(biomass_kg_ha)
-  data_summary$SD <- aggregate(biomass_kg_ha ~ country + ma_name + location_status,
-                               data=data_loc_means, FUN=sd) %>% 
-                      dplyr::pull(biomass_kg_ha)
+  # metric ~ country + ma_name + location_status + location_name
+  formula1 <- paste(metric, paste(groupvars1, collapse=" + "), sep=" ~ ") %>% 
+                as.formula()
+  # metric ~ country + ma_name + location_status
+  formula2 <- paste(metric, paste(groupvars2, collapse=" + "), sep=" ~ ") %>% 
+                as.formula()
+  
+  data_loc_means <- aggregate(formula1, data=data_aggreg, FUN=mean)
+  data_summary <- aggregate(formula2, data=data_loc_means, FUN=mean)
+  data_summary$N <- aggregate(formula2, data=data_loc_means, FUN=length) %>% 
+                      dplyr::pull(metric)
+  data_summary$SD <- aggregate(formula2, data=data_loc_means, FUN=sd) %>% 
+                      dplyr::pull(metric)
   data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
+  
+  return(data_summary)
+  # data_loc_means <- aggregate(metric ~ country + ma_name + location_status +
+  #                            location_name, data=data_aggreg, FUN=mean)
+  # 
+  # data_summary <- aggregate(metric ~ country + ma_name + location_status,
+  #                           data=data_loc_means, FUN=mean)
+  # data_summary$N <- aggregate(metric ~ country + ma_name + location_status,
+  #                              data=data_loc_means, FUN=length) %>% 
+  #                     dplyr::pull(metric)
+  # data_summary$SD <- aggregate(metric ~ country + ma_name + location_status,
+  #                              data=data_loc_means, FUN=sd) %>% 
+  #                     dplyr::pull(metric)
+  # data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
   
   return(data_summary)
 }
