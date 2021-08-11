@@ -23,8 +23,8 @@ plotServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     output$plot_holder <- renderUI({
       
-      data_aggreg <- rv$data_filtered %>% get_biomass(., 'biomass_kg_ha')
-      data_summary <- summarySE(data_aggreg, 'biomass_kg_ha')
+      # data_aggreg <- rv$data_filtered %>% get_biomass(., 'biomass_kg_ha')
+      data_summary <- summarySE(rv$data_aggreg, 'biomass_kg_ha')
       
       p <- ggplot2::ggplot(data=data_summary,
             aes(location_status, biomass_kg_ha),

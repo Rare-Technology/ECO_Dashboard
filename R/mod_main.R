@@ -7,10 +7,10 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
-mainUI <- function(id, INIT){
+mainUI <- function(id){
   ns <- NS(id)
   fixedPage(sidebarLayout(
-    sidebarUI('sidebarUI', INIT),
+    sidebarUI('sidebarUI'),
     mainPanel(
       tabsetPanel(
         id = ns('tabs'),

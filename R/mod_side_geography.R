@@ -8,7 +8,7 @@
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom shinyWidgets pickerInput updatePickerInput
-sidebarGeoUI <- function(id, INIT){
+sidebarGeoUI <- function(id){
   ns <- NS(id)
   tagList(
     selectInput(
@@ -48,7 +48,8 @@ sidebarGeoUI <- function(id, INIT){
         `actions-box` = TRUE,
         `selected-text-format` = "count > 2"
       )
-    ) # pickerInput
+    ), # pickerInput
+    uiOutput(ns('display'))
   ) # tagList
 } #sidebarGeoUI
     
@@ -62,7 +63,7 @@ sidebarGeoServer <- function(id, rv){
       rv$sel_country <- input$sel_country
       rv$data_filtered <- rv$data_full %>%
         dplyr::filter(country == input$sel_country)
-      rv$subnational_choices <- get_choices(rv$data_filtered, 'level1_name')
+      rv$subnational_choices <- get_geo_choices(rv$data_filtered, 'level1_name')
       updatePickerInput(
         session,
         'sel_subnational',
@@ -76,7 +77,7 @@ sidebarGeoServer <- function(id, rv){
       rv$sel_subnational <- input$sel_subnational
       rv$data_filtered <- rv$data_full %>%
         dplyr::filter(level1_name %in% input$sel_subnational)
-      rv$local_choices <- get_choices(rv$data_filtered, 'level2_name')
+      rv$local_choices <- get_geo_choices(rv$data_filtered, 'level2_name')
       updatePickerInput(
         session,
         'sel_local',
@@ -90,7 +91,7 @@ sidebarGeoServer <- function(id, rv){
       rv$sel_local <- input$sel_local
       rv$data_filtered <- rv$data_full %>%
         dplyr::filter(level2_name %in% input$sel_local)
-      rv$maa_choices <- get_choices(rv$data_filtered, 'ma_name')
+      rv$maa_choices <- get_geo_choices(rv$data_filtered, 'ma_name')
       updatePickerInput(
         session,
         'sel_maa',

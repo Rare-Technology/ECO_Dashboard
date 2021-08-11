@@ -28,8 +28,11 @@ sidebarDisplayServer <- function(id, rv){
         ui <- tagList(
           selectInput(ns('sel_metric'),
                       'Metric',
+                      # todo: habitat diversity, habitat cover
+                      # habitat diversity only worked for IDN in Abel's code
+                      # habitat cover didn't work at all
                       choices = c('Fish Biomass', 'Fish Density', 'Fish Diversity',
-                                  'Fish Size', 'Habitat Cover', 'Habitat Diversity')
+                                  'Fish Size')
           ),
           radioButtons(ns('sel_plot_type'),
                        'Plot Type',
@@ -41,22 +44,23 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = LETTERS,
+                      choices = get_geo_choices(rv$data_filtered, 'family'),
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
                       ),
                       multiple = TRUE
-          ),
-          pickerInput(ns('sel_species'),
-                      'Fish species',
-                      choices = LETTERS,
-                      options = list(
-                        `actions-box` = TRUE,
-                        `selected-text-format` = "count > 2"
-                      ),
-                      multiple = TRUE
           )
+          # don't need this right now
+          # pickerInput(ns('sel_species'),
+          #             'Fish species',
+          #             choices = LETTERS,
+          #             options = list(
+          #               `actions-box` = TRUE,
+          #               `selected-text-format` = "count > 2"
+          #             ),
+          #             multiple = TRUE
+          # )
         ) # tagList
       } # if
       
@@ -79,6 +83,17 @@ sidebarDisplayServer <- function(id, rv){
     
     observeEvent(input$basemap, {
       rv$basemap <- input$basemap
+    })
+    
+    observeEvent(input$sel_family, {
+      rv$sel_family <- input$sel_family
+      # rv$data_filtered <- rv$data_full %>% 
+      #   dplyr::filter(ma_name %in% rv$sel_maa,
+      #                 family %in% input$sel_family)
+      rv$data_aggreg <- get_biomass(rv$data_filtered %>% 
+                                      dplyr::filter(family %in% rv$sel_family),
+                                    'biomass_kg_ha')
+      rv$data_map <- get_biomass_loc(rv$data_aggreg)
     })
   }) # modServer
 } # server
