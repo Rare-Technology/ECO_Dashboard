@@ -107,14 +107,16 @@ sidebarGeoServer <- function(id, rv){
           # country == input$sel_country,
         #               level1_name %in% input$sel_subnational,
         #               level2_name %in% input$sel_local,
-      rv$data_map <- aggregate(cbind(lat, lon) ~
-                                 country +
-                                 level1_name +
-                                 level2_name +
-                                 ma_name +
-                                 location_name,
-                               data = rv$data_filtered,
-                               FUN = mean, na.rm = TRUE)
+      rv$data_aggreg <- get_biomass(rv$data_filtered, 'biomass_kg_ha')
+      rv$data_map <- get_biomass_loc(rv$data_aggreg)
+      # rv$data_map <- aggregate(cbind(lat, lon) ~
+      #                            country +
+      #                            level1_name +
+      #                            level2_name +
+      #                            ma_name +
+      #                            location_name,
+      #                          data = rv$data_filtered,
+      #                          FUN = mean, na.rm = TRUE)
     })
   })
 }

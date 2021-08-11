@@ -31,8 +31,8 @@ mapServer <- function(id, rv){
                            radius = ~runif(100,1,1),
                            color = 'darkred',
                            fillOpacity = 0.5,
-                           popup = popupText(rv$data_filtered),
-                           label = paste("Location :", rv$data_filtered$location_name)
+                           popup = popupText(rv$data_map),
+                           label = paste("Location :", rv$data_map$location_name)
           )
         output$map <- renderLeaflet(m)
         leafletOutput(ns('map'))
