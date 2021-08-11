@@ -5,8 +5,8 @@
 #' @import shiny
 #' @noRd
 app_server <- function( input, output, session ) {
-  rv <- initialize_rv()
-  
+  rv <- initialize_rv(INIT)
+
   mainServer('mainUI', rv)
   
   sidebarServer('sidebarUI')
