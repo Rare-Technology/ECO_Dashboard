@@ -31,7 +31,8 @@ plotServer <- function(id, rv){
       } else {
         p <- switch(rv$sel_metric,
               "Fish Biomass" = plot_biomass(data_filtered, sel_family),
-              "Fish Density" = plot_density(data_filtered, sel_family)
+              "Fish Density" = plot_density(data_filtered, sel_family),
+              "Fish Diversity" = plot_diversity(data_filtered, sel_family)
         )
         output$plot <- renderPlot(p)
         plotOutput(ns('plot'))
