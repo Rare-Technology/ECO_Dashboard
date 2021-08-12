@@ -42,7 +42,7 @@ sidebarGeoUI <- function(id){
       ns('sel_maa'),
       'Managed access area',
       choices = INIT$MAA_CHOICES,
-      selected = INIT$SEL_MAA,
+      selected = NULL,
       multiple = TRUE,
       options = list(
         `actions-box` = TRUE,
@@ -61,9 +61,9 @@ sidebarGeoServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     observeEvent(input$sel_country, {
       rv$sel_country <- input$sel_country
-      rv$data_filtered <- rv$data_full %>%
+      data_country <- rv$data_full %>%
         dplyr::filter(country == input$sel_country)
-      rv$subnational_choices <- get_geo_choices(rv$data_filtered, 'level1_name')
+      rv$subnational_choices <- get_geo_choices(data_country, 'level1_name')
       updatePickerInput(
         session,
         'sel_subnational',
@@ -75,9 +75,9 @@ sidebarGeoServer <- function(id, rv){
     )
     observeEvent(input$sel_subnational, {
       rv$sel_subnational <- input$sel_subnational
-      rv$data_filtered <- rv$data_full %>%
+      data_subnational <- rv$data_full %>%
         dplyr::filter(level1_name %in% input$sel_subnational)
-      rv$local_choices <- get_geo_choices(rv$data_filtered, 'level2_name')
+      rv$local_choices <- get_geo_choices(data_subnational, 'level2_name')
       updatePickerInput(
         session,
         'sel_local',
@@ -89,9 +89,9 @@ sidebarGeoServer <- function(id, rv){
     )
     observeEvent(input$sel_local, {
       rv$sel_local <- input$sel_local
-      rv$data_filtered <- rv$data_full %>%
+      data_local <- rv$data_full %>%
         dplyr::filter(level2_name %in% input$sel_local)
-      rv$maa_choices <- get_geo_choices(rv$data_filtered, 'ma_name')
+      rv$maa_choices <- get_geo_choices(data_local, 'ma_name')
       updatePickerInput(
         session,
         'sel_maa',
@@ -104,8 +104,7 @@ sidebarGeoServer <- function(id, rv){
     observeEvent(input$sel_maa, {
       rv$sel_maa <- input$sel_maa
       rv$data_filtered <- rv$data_full %>%
-        dplyr::filter(ma_name %in% input$sel_maa,
-                      family %in% rv$sel_family)
+        dplyr::filter(ma_name %in% input$sel_maa)
           # country == input$sel_country,
         #               level1_name %in% input$sel_subnational,
         #               level2_name %in% input$sel_local,

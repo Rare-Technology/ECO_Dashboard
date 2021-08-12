@@ -44,7 +44,8 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = get_display_choices(rv$sel_country, rv$data_filtered),
+                      choices = get_display_choices(rv$sel_country, rv$data_full),
+                      selected = get_display_choices(rv$sel_country, rv$data_full),
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
@@ -85,11 +86,19 @@ sidebarDisplayServer <- function(id, rv){
       rv$basemap <- input$basemap
     })
     
+    observeEvent(rv$sel_maa, {
+      updatePickerInput(
+        session,
+        ns('sel_family'),
+        choices = get_display_choices(rv$sel_maa, rv$data_full)
+      )
+    })
+    
     observeEvent(input$sel_family, {
       rv$sel_family <- input$sel_family
-      rv$data_filtered <- rv$data_full %>%
-        dplyr::filter(ma_name %in% rv$sel_maa,
-                      family %in% input$sel_family)
+      # rv$data_filtered <- rv$data_full %>%
+      #   dplyr::filter(ma_name %in% rv$sel_maa,
+      #                 family %in% input$sel_family)
       # rv$data_aggreg <- get_biomass(rv$data_filtered %>% 
       #                                 dplyr::filter(family %in% rv$sel_family),
       #                               'biomass_kg_ha')

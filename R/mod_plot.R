@@ -23,12 +23,18 @@ plotServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     output$plot_holder <- renderUI({
       data_filtered <- rv$data_filtered
-      p <- switch(rv$sel_metric,
-            "Fish Biomass" = plot_biomass(data_filtered)
-      )
-      output$plot <- renderPlot(p)
-      plotOutput(ns('plot'))
-
+      sel_family <- rv$sel_family
+      sel_maa <- rv$sel_maa
+      
+      if (is.null(sel_maa)) {
+        div(class="warning_message", "No managed access area selected.")
+      } else {
+        p <- switch(rv$sel_metric,
+              "Fish Biomass" = plot_biomass(data_filtered, sel_family)
+        )
+        output$plot <- renderPlot(p)
+        plotOutput(ns('plot'))
+      }
     }) # renderUI
 
   }) #moduleServer

@@ -1,5 +1,7 @@
-plot_biomass <- function(data_filtered) {
-  data_aggreg <- data_filtered %>% get_biomass(., 'biomass_kg_ha')
+plot_biomass <- function(data_filtered, sel_family) {
+  data_aggreg <- data_filtered %>% 
+                  dplyr::filter(family %in% sel_family) %>% 
+                  get_biomass(., 'biomass_kg_ha')
   data_summary <- summarySE(data_aggreg, 'biomass_kg_ha')
 
   ggplot2::ggplot(data=data_summary,
