@@ -38,9 +38,11 @@ sidebarDisplayServer <- function(id, rv){
                        'Plot Type',
                        choices = c('Bar plots', 'Range plots')
           ),
-          radioButtons(ns('sel_yaxis'),
+          radioButtons(ns('sel_yscale'),
                        'Y-axis',
-                       choices = c('Free', 'Fixed')
+                       choices = c('Free'=TRUE,
+                                   'Fixed'=FALSE),
+                       selected = TRUE
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
@@ -104,6 +106,10 @@ sidebarDisplayServer <- function(id, rv){
       )
     }, ignoreInit = TRUE)
     
+    observeEvent(input$sel_yscale, {
+      rv$sel_yscale <- as.logical(input$sel_yscale)
+    })
+    
     observeEvent(input$sel_family, {
       rv$sel_family <- input$sel_family
       # rv$data_filtered <- rv$data_full %>%
@@ -115,10 +121,6 @@ sidebarDisplayServer <- function(id, rv){
       # rv$data_map <- get_biomass_loc(rv$data_aggreg)
     }, ignoreInit = TRUE
     )
-    
-    observeEvent(input$sel_metric, {
-      rv$sel_metric <- input$sel_metric
-    }, ignoreInit = TRUE)
   }) # modServer
 } # server
     

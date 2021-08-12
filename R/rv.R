@@ -3,6 +3,7 @@ initialize_rv <- function(INIT) {
     current_tab = INIT$CURRENT_TAB,
     sel_country = INIT$SEL_COUNTRY,
     sel_metric = INIT$SEL_METRIC,
+    sel_yscale = INIT$SEL_YSCALE,
     sel_family = INIT$SEL_FAMILY,
     basemap = INIT$BASEMAP,
     # there is a fish family that is blank. currently, selecting that will crash

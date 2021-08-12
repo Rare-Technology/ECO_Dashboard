@@ -25,6 +25,7 @@ plotServer <- function(id, rv){
       data_filtered <- rv$data_filtered
       sel_family <- rv$sel_family
       sel_maa <- rv$sel_maa
+      y_scale <- rv$sel_yscale
       
       if (is.null(sel_maa)) {
         div(class="warning_message", "No managed access area selected.")
@@ -35,6 +36,7 @@ plotServer <- function(id, rv){
               "Fish Diversity" = plot_diversity(data_filtered, sel_family),
               "Fish Size" = plot_size(data_filtered, sel_family)
         )
+        p$facet$params$free$y <- y_scale
         output$plot <- renderPlot(p)
         plotOutput(ns('plot'))
       }
