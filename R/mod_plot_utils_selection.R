@@ -1,11 +1,15 @@
 aggregate_data <- function(data_filtered, metric) {
   # add up the biomass of all fish at each transect
   if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
-    groupvars <- c('country', 'ma_name', 'location_status', 'location_name', 'transect_no')
+    groupvars <- c('country', 'ma_name', 'location_status', 'location_name',
+                   'transect_no')
     formula_str <- paste(metric, paste(groupvars, collapse = ' + '), sep = ' ~ ')
     aggregate(as.formula(formula_str), data=data_filtered, FUN=sum)
     
   } else if (metric == 'species') {
+    # note that unlike biomss and density, the data for species is aggregated
+    # up to location_name. This is accounted for in later functions
+    # such as get_map_data
     aggregate(species ~ country + ma_name + location_status +
                 location_name,
                 data=data_filtered, FUN=count_unique)

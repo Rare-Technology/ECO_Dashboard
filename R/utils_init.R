@@ -24,4 +24,8 @@
 # INIT$MAA_CHOICES <-  get_geo_choices(INIT$DATA_FILTERED, 'ma_name')
 # INIT$SEL_FAMILY <- get_geo_choices(INIT$DATA_FILTERED, 'family')
 # INIT$BASEMAP <- providers$Esri.OceanBasemap
+# INIT$COORDS <- aggregate(cbind(lon, lat) ~ location_name,
+#                           data=INIT$DATA_FULL, FUN=mean)
 # usethis::use_data(INIT, overwrite=TRUE)
+# devtools::document()
+
