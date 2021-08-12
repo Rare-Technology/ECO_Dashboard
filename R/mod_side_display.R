@@ -44,8 +44,8 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = get_display_choices(rv$sel_country, rv$data_full),
-                      selected = get_display_choices(rv$sel_country, rv$data_full),
+                      choices = get_display_choices(rv$sel_maa, rv$data_full),
+                      selected = get_display_choices(rv$sel_maa, rv$data_full),
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
@@ -89,8 +89,9 @@ sidebarDisplayServer <- function(id, rv){
     observeEvent(rv$sel_maa, {
       updatePickerInput(
         session,
-        ns('sel_family'),
-        choices = get_display_choices(rv$sel_maa, rv$data_full)
+        'sel_family',
+        choices = get_display_choices(rv$sel_maa, rv$data_full),
+        selected = get_display_choices(rv$sel_maa, rv$data_full)
       )
     })
     
