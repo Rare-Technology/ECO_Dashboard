@@ -105,8 +105,6 @@ sidebarGeoServer <- function(id, rv){
       rv$sel_maa <- input$sel_maa
       rv$data_filtered <- rv$data_full %>%
         dplyr::filter(ma_name %in% input$sel_maa)
-      rv$data_aggreg <- get_biomass(rv$data_filtered, 'biomass_kg_ha')
-      rv$data_map <- get_biomass_loc(rv$data_aggreg)
       # rv$data_map <- aggregate(cbind(lat, lon) ~
       #                            country +
       #                            level1_name +

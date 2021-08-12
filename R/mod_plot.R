@@ -30,7 +30,8 @@ plotServer <- function(id, rv){
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(rv$sel_metric,
-              "Fish Biomass" = plot_biomass(data_filtered, sel_family)
+              "Fish Biomass" = plot_biomass(data_filtered, sel_family),
+              "Fish Density" = plot_density(data_filtered, sel_family)
         )
         output$plot <- renderPlot(p)
         plotOutput(ns('plot'))

@@ -38,6 +38,13 @@ mapServer <- function(id, rv){
         leafletOutput(ns('map'))
       })
     
+    ### need a bit of an overhaul on how to pass data through for mapping --
+    ### unlike plots, we need all the metrics pass through in one pipeline together!
+    observeEvent(rv$sel_maa, {
+      rv$data_aggreg <- aggregate_data(rv$data_filtered, 'biomass_kg_ha')
+      rv$data_map <- get_biomass_loc(rv$data_aggreg)
+    })
+    
   })
 }
     

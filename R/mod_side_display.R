@@ -95,6 +95,15 @@ sidebarDisplayServer <- function(id, rv){
       )
     })
     
+    observeEvent(input$sel_metric, {
+      rv$sel_metric <- input$sel_metric
+      updateSelectInput(
+        session,
+        'sel_metric',
+        selected = input$sel_metric
+      )
+    }, ignoreInit = TRUE)
+    
     observeEvent(input$sel_family, {
       rv$sel_family <- input$sel_family
       # rv$data_filtered <- rv$data_full %>%
