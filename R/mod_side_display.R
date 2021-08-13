@@ -34,9 +34,9 @@ sidebarDisplayServer <- function(id, rv){
                       choices = c('Fish Biomass', 'Fish Density', 'Fish Diversity',
                                   'Fish Size')
           ),
-          radioButtons(ns('sel_plot_type'),
+          radioButtons(ns('sel_geom'),
                        'Plot Type',
-                       choices = c('Bar plots', 'Range plots')
+                       choices = c('Bar plots', 'Distribution plots')
           ),
           radioButtons(ns('sel_yscale'),
                        'Y-axis',
@@ -105,6 +105,10 @@ sidebarDisplayServer <- function(id, rv){
         selected = input$sel_metric
       )
     }, ignoreInit = TRUE)
+    
+    observeEvent(input$sel_geom, {
+      rv$sel_geom <- input$sel_geom
+    })
     
     observeEvent(input$sel_yscale, {
       rv$sel_yscale <- as.logical(input$sel_yscale)

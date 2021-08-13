@@ -17,8 +17,8 @@ get_map_data <- function(data_filtered, coords_filtered) {
     dplyr::select(ma_name, location_name, species)
   
   map_data <- merge(biomass_map, density_map) %>% 
-                merge(., diversity_map) %>% 
-                merge(., coords_filtered)
+                  merge(., diversity_map) %>% 
+                  merge(., coords_filtered)
 }
 
 popupText <- function(data_map) {

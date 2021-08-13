@@ -21,6 +21,20 @@ aggregate_data <- function(data_filtered, metric) {
   }
 }
 
+get_local_data <- function(data_aggreg, metric) {
+  # this is only needed for biomass, density, and size, since in aggregate_data(),
+  # aggregation by transects is already given for diversity
+  
+  if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
+    groupvars <- c('country', 'ma_name', 'location_status', 'location_name')
+    formula <- paste(metric, paste(groupvars, collapse=" + "), sep=" ~ ") %>% 
+      as.formula()
+    aggregate(formula, data=data_aggreg, FUN=mean)
+  } else { # sizeclass
+    aggregate(density_ind_ha ~ country + ma_name + location_status +
+                location_name + sizeclass, data=data_aggreg, FUN=mean)
+  }
+}
 summarySE <- function(data_aggreg, metric, for.size=FALSE) {
   
   groupvars1 <- c('country', 'ma_name', 'location_status', 'location_name')

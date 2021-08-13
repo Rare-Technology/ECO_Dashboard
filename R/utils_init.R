@@ -8,6 +8,7 @@
 # INIT <-  list()
 # INIT$CURRENT_TAB <- 'Coral Reefs'
 # INIT$SEL_METRIC <- 'Fish Biomass'
+# INIT$SEL_GEOM <- "Bar plots"
 # INIT$SEL_YSCALE <- TRUE
 # INIT$COUNTRY_CHOICES <-  c("Honduras" = "HND",
 #                          "Indonesia" = "IDN",
@@ -28,7 +29,7 @@
 # INIT$COORDS <- aggregate(cbind(lon, lat) ~ location_name,
 #                           data=INIT$DATA_FULL, FUN=mean)
 # usethis::use_data(INIT, overwrite=TRUE)
-#
+
 #
 # note: do not put devtools::document here and think you can update init, usethis::use_data,
 # and devtools::document all in one go.... because devtools::document is in this file, it will
