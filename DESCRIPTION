@@ -11,6 +11,7 @@ License: What license is it under?
 Imports: 
     attempt,
     config (>= 0.3.1),
+    dplyr,
     DT,
     ggplot2,
     glue,
