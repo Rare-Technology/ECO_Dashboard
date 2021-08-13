@@ -38,11 +38,24 @@ plotServer <- function(id, rv){
               "Fish Size" = plot_size(data_filtered, sel_family, sel_geom)
         )
         p$facet$params$free$y <- y_scale
+        rv$current_plot <- p
         output$plot <- renderPlot(p)
-        plotOutput(ns('plot'))
+        
+        ui_out <- list(list(br()))
+        ui_out <- append(ui_out, list(downloadButton(ns("downloadPlot"),
+                                                     class = "download-button",
+                                                     'Download Plot')))
+        ui_out <- append(ui_out, list(plotOutput(ns('plot'))))
+        ui_out
       }
     }) # renderUI
-
+    
+    output$downloadPlot <- downloadHandler(
+      filename = function(){paste0("plot_", tolower(gsub(" ", "_", rv$metric)), ".png")},
+      content = function(file){
+        ggsave(file,plot=rv$current_plot, width = 27, height = 20, units = "cm")
+      })
+    
   }) #moduleServer
 }
     
