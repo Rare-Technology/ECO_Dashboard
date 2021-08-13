@@ -20,7 +20,7 @@ plot_diversity <- function(data_filtered, sel_family, sel_geom) {
                     aes(location_status, species),
                     na.rm = TRUE) +
       facet_wrap('ma_name') +
-      geom_jitter(aes(fill=location_status), width=0.05, height=0, alpha=0.5, size=2) +
+      geom_jitter(aes(fill=location_status), width=0.1, height=0, alpha=0.5, size=2) +
       stat_summary(aes(col=location_status), na.rm=TRUE, fun.data = "mean_se",
                    geom = "pointrange", size = .4, position=position_dodge(width=1)) +
       ggtitle("Mean Number of Species")
