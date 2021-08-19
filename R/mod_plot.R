@@ -21,6 +21,8 @@ plotUI <- function(id){
 plotServer <- function(id, rv){
   ns <- NS(id)
   moduleServer( id, function(input, output, session){
+    theme_update(plot.title = element_text(hjust = 0.5))
+    
     output$plot_holder <- renderUI({
       data_filtered <- rv$data_filtered
       sel_family <- rv$sel_family
