@@ -35,7 +35,7 @@ mapServer <- function(id, rv){
                            label = paste("Location :", rv$data_map$location_name)
           )
         output$map <- renderLeaflet(m)
-        leafletOutput(ns('map'))
+        leafletOutput(ns('map'), width = "100%", height = 800)
       })
     
     ### need a bit of an overhaul on how to pass data through for mapping --

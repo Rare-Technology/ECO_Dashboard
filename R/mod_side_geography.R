@@ -11,6 +11,7 @@
 sidebarGeoUI <- function(id){
   ns <- NS(id)
   tagList(
+    div(class="sidetitle", "Geography"),
     selectInput(
       ns('sel_country'),
       'Country',
@@ -64,34 +65,37 @@ sidebarGeoServer <- function(id, rv){
       data_country <- rv$data_full %>%
         dplyr::filter(country == input$sel_country)
       rv$subnational_choices <- get_geo_choices(data_country, 'level1_name')
+      
       updatePickerInput(
         session,
         'sel_subnational',
         choices = rv$subnational_choices,
         selected = rv$subnational_choices
       )
-    },
-    ignoreInit = TRUE
+    }, ignoreInit = TRUE
     )
+    
     observeEvent(input$sel_subnational, {
       rv$sel_subnational <- input$sel_subnational
       data_subnational <- rv$data_full %>%
         dplyr::filter(level1_name %in% input$sel_subnational)
       rv$local_choices <- get_geo_choices(data_subnational, 'level2_name')
+      
       updatePickerInput(
         session,
         'sel_local',
         choices = rv$local_choices,
         selected = rv$local_choices
       )
-    },
-    ignoreInit=TRUE
+    }, ignoreInit=TRUE
     )
+    
     observeEvent(input$sel_local, {
       rv$sel_local <- input$sel_local
       data_local <- rv$data_full %>%
         dplyr::filter(level2_name %in% input$sel_local)
       rv$maa_choices <- get_geo_choices(data_local, 'ma_name')
+      
       updatePickerInput(
         session,
         'sel_maa',
@@ -101,6 +105,7 @@ sidebarGeoServer <- function(id, rv){
     },
     ignoreInit=TRUE
     )
+    
     observeEvent(input$sel_maa, {
       rv$sel_maa <- input$sel_maa
       rv$data_filtered <- rv$data_full %>%

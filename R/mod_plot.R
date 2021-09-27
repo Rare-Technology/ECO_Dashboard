@@ -41,7 +41,7 @@ plotServer <- function(id, rv){
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p
-        output$plot <- renderPlot(p)
+        output$plot <- renderPlot(p, height=600)
         
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(downloadButton(ns("downloadPlot"),
@@ -50,15 +50,14 @@ plotServer <- function(id, rv){
         ui_out <- append(ui_out, list(plotOutput(ns('plot'))))
         ui_out
       }
-    }) # renderUI
+    })
     
     output$downloadPlot <- downloadHandler(
-      filename = function(){paste0("plot_", tolower(gsub(" ", "_", rv$metric)), ".png")},
+      filename = function(){paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".png")},
       content = function(file){
         ggsave(file,plot=rv$current_plot, width = 27, height = 20, units = "cm")
       })
-    
-  }) #moduleServer
+  })
 }
     
 ## To be copied in the UI

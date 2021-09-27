@@ -21,6 +21,7 @@ Imports:
     magrittr,
     pkgload,
     shiny (>= 1.6.0),
+    shinyjs,
     shinyWidgets
 Encoding: UTF-8
 LazyData: true

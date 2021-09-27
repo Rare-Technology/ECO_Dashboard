@@ -14,6 +14,7 @@ app_server <- function( input, output, session ) {
   sidebarDisplayServer('sidebarDisplayUI', rv)
   # TODO add other sidebar servers
   
+  startServer('startUI')
   plotServer('plotUI', rv)
   # mangroveServer('mangroveUI') # have to write from scratch
   mapServer('mapUI', rv)

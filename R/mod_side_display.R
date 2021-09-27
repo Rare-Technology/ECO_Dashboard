@@ -26,6 +26,7 @@ sidebarDisplayServer <- function(id, rv){
       
       if (rv$current_tab == 'Coral Reefs') {
         ui <- tagList(
+          div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
                       'Metric',
                       # todo: habitat diversity, habitat cover
@@ -69,7 +70,8 @@ sidebarDisplayServer <- function(id, rv){
       
       if (current_tab == 'Map') {
         
-        ui <- div(
+        ui <- tagList(
+          div(class="sidetitle", "Map"),
           selectInput(ns('basemap'),
             'Select Basemap',
             choices= c("Gray Canvas basemap" = providers$Esri.WorldGrayCanvas,
@@ -78,11 +80,12 @@ sidebarDisplayServer <- function(id, rv){
                       "Satellite basemap"= providers$Esri.WorldImagery,
                       "World Topo basemap" = providers$Esri.WorldTopoMap),
             selected = rv$basemap
-          ) # selectInput
-        ) # div
-      } # if
+          )
+        )
+      }
+      
       ui
-    }) # renderUI
+    })
     
     observeEvent(input$basemap, {
       rv$basemap <- input$basemap
