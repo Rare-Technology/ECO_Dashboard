@@ -27,7 +27,10 @@ golem::add_module("start")
 ## Add helper functions ----
 ## Creates fct_* and utils_*
 golem::add_fct( "helpers" )
-golem::add_utils( "helpers" )
+golem::add_utils( "mangrove_plot_density" )
+golem::add_utils("mangrove_plot_diversity")
+golem::add_utils("mangrove_plot_size")
+
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -37,7 +40,7 @@ golem::add_css_file( "custom" )
 
 ## Add internal datasets ----
 ## If you have data in your package
-usethis::use_data_raw( name = "my_dataset", open = FALSE )
+usethis::use_data_raw( name = "mangroves", open = TRUE )
 
 ## Tests ----
 ## Add one line by test you want to create

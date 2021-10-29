@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinyWidgets pickerInput multiInput
+#' @importFrom shinyWidgets pickerInput multiInput switchInput
 #' @importFrom leaflet providers
 sidebarDisplayUI <- function(id){
   ns <- NS(id)
@@ -24,7 +24,7 @@ sidebarDisplayServer <- function(id, rv){
       ui <- NULL #list()
       current_tab <- rv$current_tab
       
-      if (rv$current_tab == 'Coral Reefs') {
+      if (current_tab == 'Coral Reefs') {
         ui <- tagList(
           div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
@@ -47,14 +47,16 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = get_display_choices(rv$sel_maa, rv$data_full),
-                      selected = get_display_choices(rv$sel_maa, rv$data_full),
+                      choices = get_display_choices(rv$sel_maa, rv$data_full$fish),
+                      selected = get_display_choices(rv$sel_maa, rv$data_full$fish),
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
                       ),
                       multiple = TRUE
-          )
+          ),
+          # switchInput(ns("sel_date"),
+          #             "Plot dates")
           # don't need this right now
           # pickerInput(ns('sel_species'),
           #             'Fish species',
@@ -66,7 +68,25 @@ sidebarDisplayServer <- function(id, rv){
           #             multiple = TRUE
           # )
         ) # tagList
-      } # if
+      } else if(current_tab == "Mangrove Forests") {
+        ui <- tagList(
+          div(class = "sidetitle", "Plotting"),
+          selectInput(ns("sel_metric"),
+                      "Metric",
+                      choices = c("Tree Size", "Tree Diversity", "Tree Density")
+          ),
+          radioButtons(ns('sel_geom'),
+                       'Plot Type',
+                       choices = c('Bar plots', 'Distribution plots')
+          ),
+          radioButtons(ns('sel_yscale'),
+                       'Y-axis',
+                       choices = c('Free'=TRUE,
+                                   'Fixed'=FALSE),
+                       selected = TRUE
+          )
+        )
+      }
       
       if (current_tab == 'Map') {
         
@@ -95,8 +115,8 @@ sidebarDisplayServer <- function(id, rv){
       updatePickerInput(
         session,
         'sel_family',
-        choices = get_display_choices(rv$sel_maa, rv$data_full),
-        selected = get_display_choices(rv$sel_maa, rv$data_full)
+        choices = get_display_choices(rv$sel_maa, rv$data_full$fish),
+        selected = get_display_choices(rv$sel_maa, rv$data_full$fish)
       )
     })
     
@@ -128,8 +148,8 @@ sidebarDisplayServer <- function(id, rv){
       # rv$data_map <- get_biomass_loc(rv$data_aggreg)
     }, ignoreInit = TRUE
     )
-  }) # modServer
-} # server
+  })
+}
     
 ## To be copied in the UI
 # mod_side_plot_ui("side_plot_ui_1")

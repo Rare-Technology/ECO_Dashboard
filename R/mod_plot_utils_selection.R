@@ -7,12 +7,28 @@ aggregate_data <- function(data_filtered, metric) {
     aggregate(as.formula(formula_str), data=data_filtered, FUN=sum)
     
   } else if (metric == 'species') {
-    # note that unlike biomss and density, the data for species is aggregated
+    # note that unlike biomass and density, the data for species is aggregated
     # up to location_name. This is accounted for in later functions
     # such as get_map_data
-    aggregate(species ~ country + ma_name + location_status +
-                location_name,
+    aggregate(species ~ country + ma_name + location_status + location_name,
                 data=data_filtered, FUN=count_unique)
+  } else if (metric == "tree_species") {
+    # looks just like aggregating fish species but may have to do something later
+    # regarding adult vs sapling. if that's not the case, consider changing
+    # the column name tree_species to simply species
+    aggregate(tree_species ~ country + ma_name + location_status + location_name,
+              data = data_filtered, FUN = count_unique)
+  }else if (metric == "dbh_cm") {
+    data_filtered <- data_filtered %>% # these lines may change depending on how
+      dplyr::filter(age == "adult") # age is implemented in other metrics
+    aggregate(dbh_cm ~ country + ma_name + location_status + location_name +
+                transect_no + plot_no,
+              data = data_filtered,
+              FUN = mean) %>% 
+      aggregate(dbh_cm ~ country + ma_name + location_status + location_name +
+                  transect_no,
+                data = .,
+                FUN = mean)
   } else if (metric == 'sizeclass') {
     # idea: for each size class, you can expect to see `density_ind_ha` many 
     # fish per hectare.
@@ -25,7 +41,7 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
   # this is only needed for biomass, density, and size, since in aggregate_data(),
   # aggregation by transects is already given for diversity
   
-  if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
+  if (metric %in% c('biomass_kg_ha', 'density_ind_ha', 'dbh_cm')) {
     groupvars <- c('country', 'ma_name', 'location_status', 'location_name')
     if (for.size) {
       groupvars <- append(groupvars, 'sizeclass')
@@ -38,7 +54,7 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
                 location_name + sizeclass, data=data_aggreg, FUN=mean)
   }
 }
-summarySE <- function(data_aggreg, metric, for.size=FALSE) {
+summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   
   groupvars1 <- c('country', 'ma_name', 'location_status', 'location_name')
   groupvars2 <- groupvars1[-length(groupvars1)]
@@ -59,7 +75,7 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE) {
   formula2 <- paste(metric, paste(groupvars2, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
   
-  if (metric == 'species') {
+  if (metric %in%  c("species", "tree_species")) {
     # in this case, data_aggreg is already aggregated by location,
     # by count_unique instead of mean
     data_loc <- data_aggreg

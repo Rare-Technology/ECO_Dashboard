@@ -37,7 +37,7 @@ mainUI <- function(id){
       id = ns('tabs'),
       tabPanel("Start", startUI("startUI")),
       tabPanel('Coral Reefs', plotUI('plotUI')),
-      # tabPanel('Mangrove Forests', mangroveUI('mangroveUI')),
+      tabPanel('Mangrove Forests', mangroveUI('mangroveUI')),
       tabPanel('Map', mapUI('mapUI'))
       # tabPanel('Report', reportUI('reportUI'))
     )

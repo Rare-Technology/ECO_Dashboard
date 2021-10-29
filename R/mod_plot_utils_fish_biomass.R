@@ -14,7 +14,7 @@ plot_biomass <- function(data_filtered, sel_family, sel_geom) {
       geom_errorbar(aes(ymin=biomass_kg_ha - SE, ymax=biomass_kg_ha + SE),
                     position=position_dodge(), width=0.2, na.rm=TRUE) +
       ggtitle("Mean Fish Biomass")
-  } else {
+  } else if (sel_geom == "Distribution plots") {
     data_local <- get_local_data(data_aggreg, 'biomass_kg_ha')
     ggplot2::ggplot(data=data_local,
                     aes(location_status, biomass_kg_ha),

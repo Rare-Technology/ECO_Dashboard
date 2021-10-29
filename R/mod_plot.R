@@ -24,11 +24,12 @@ plotServer <- function(id, rv){
     theme_update(plot.title = element_text(hjust = 0.5))
     
     output$plot_holder <- renderUI({
-      data_filtered <- rv$data_filtered
+      data_filtered <- rv$data_filtered$fish
       sel_family <- rv$sel_family
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
+      sel_dates <- rv$sel_dates
       
       if (is.null(sel_maa)) {
         div(class="warning_message", "No managed access area selected.")
