@@ -29,6 +29,6 @@ plot_tree_diversity <- function(data_filtered, sel_geom) {
       geom_jitter(aes(fill = location_status), width=0.1, height=0, alpha=0.5, size=2) +
       stat_summary(aes(col = location_status), na.rm=TRUE, fun.data = "mean_se",
                    geom = "pointrange", size = .4, position=position_dodge(width=1)) +
-      ggtitle("Mean Number of Species")
+      ggtitle("Distribution of number of species by survey site")
   }
 }

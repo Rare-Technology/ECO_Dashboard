@@ -11,26 +11,28 @@ mangroves_sapling <- read.csv("https://query.data.world/s/gn6c3qvsjqyz4moo6edltk
 mangroves_adult <- read.csv("https://query.data.world/s/3w4azkfn7dwmfzdtfvn7iu3hu36k4r", header=TRUE, stringsAsFactors=FALSE);
 
 # geographic info https://data.world/raremozambique/mangrove-surveys/workspace/file?filename=Coordenate+dataBase_18.02.2021.xlsx
-GET("https://query.data.world/s/do73rt2rha43vbagracxgy6xovbq6h", write_disk(tf <- tempfile(fileext = ".xlsx")))
-geo <- read_excel(tf)
+# GET("https://query.data.world/s/do73rt2rha43vbagracxgy6xovbq6h", write_disk(tf <- tempfile(fileext = ".xlsx")))
+# geo <- read_excel(tf)
 
-mangroves_adult[mangroves_adult==""] <- NA
-mangroves_adult <- mangroves_adult[!apply(mangroves_adult, 1, function (x) all(is.na(x))),]
 mangroves_adult <- mangroves_adult %>%
   mutate(age = "adult", quadrat_no = NA)
 mangroves_adult <- mangroves_adult %>% select(country,
-                        level1_name,
-                        level2_name,
-                        ma_name = level4_name,
-                        location_name = survey_location,
-                        location_status,
-                        transect_no,
-                        plot_no,
-                        quadrat_no,
-                        count = tree_no, # to get density
-                        tree_species, # to get diversity
-                        dbh_cm,
-                        age) # to get diameter
+                                              level1_name,
+                                              level2_name,
+                                              ma_name = level4_name,
+                                              location_name = survey_location,
+                                              location_status,
+                                              transect_no,
+                                              plot_no,
+                                              quadrat_no,
+                                              count = tree_no, # to get density
+                                              tree_species, # to get diversity
+                                              dbh_cm,
+                                              age) # to get diameter
+mangroves_adult[mangroves_adult==""] <- NA
+mangroves_adult <- mangroves_adult[!apply(mangroves_adult, 1, function (x) all(is.na(x))),]
+mangroves_adult$location_name[mangroves_adult$location_name == "Isla2 " &
+                                !is.na(mangroves_adult$location_name)] <- "Isla2"
 mangroves_adult <- mangroves_adult %>% filter(dbh_cm >= 4)
 
 mangroves_sapling <- mangroves_sapling %>%
