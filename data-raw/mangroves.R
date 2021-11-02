@@ -31,10 +31,13 @@ mangroves_adult <- mangroves_adult %>% select(country,
                         tree_species, # to get diversity
                         dbh_cm,
                         age) # to get diameter
+mangroves_adult <- mangroves_adult %>% filter(dbh_cm >= 4)
 
 mangroves_sapling <- mangroves_sapling %>%
   mutate(age = "sapling", dbh_cm = NA)
 mangroves_sapling[mangroves_sapling == ""] <- NA
+mangroves_sapling[mangroves_sapling$plot_no == "`1" & !is.na(mangroves_sapling$plot_no), "plot_no"] <- 1
+mangroves_sapling$plot_no <- as.integer(mangroves_sapling$plot_no)
 mangroves_sapling <- mangroves_sapling %>% select(country,
                               level1_name,
                               level2_name,

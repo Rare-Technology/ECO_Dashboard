@@ -73,7 +73,7 @@ sidebarDisplayServer <- function(id, rv){
           div(class = "sidetitle", "Plotting"),
           selectInput(ns("sel_metric"),
                       "Metric",
-                      choices = c("Tree Size", "Tree Diversity", "Tree Density")
+                      choices = c("Tree Size", "Tree Diversity", "Sapling Density")
           ),
           radioButtons(ns('sel_geom'),
                        'Plot Type',

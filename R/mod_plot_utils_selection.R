@@ -12,13 +12,15 @@ aggregate_data <- function(data_filtered, metric) {
     # such as get_map_data
     aggregate(species ~ country + ma_name + location_status + location_name,
                 data=data_filtered, FUN=count_unique)
+    
   } else if (metric == "tree_species") {
     # looks just like aggregating fish species but may have to do something later
     # regarding adult vs sapling. if that's not the case, consider changing
     # the column name tree_species to simply species
     aggregate(tree_species ~ country + ma_name + location_status + location_name,
               data = data_filtered, FUN = count_unique)
-  }else if (metric == "dbh_cm") {
+    
+  } else if (metric == "dbh_cm") {
     data_filtered <- data_filtered %>% # these lines may change depending on how
       dplyr::filter(age == "adult") # age is implemented in other metrics
     aggregate(dbh_cm ~ country + ma_name + location_status + location_name +
@@ -29,6 +31,26 @@ aggregate_data <- function(data_filtered, metric) {
                   transect_no,
                 data = .,
                 FUN = mean)
+    
+  } else if (metric == "sapling_tree_density_ind_m2") {
+    # first sum up the trees in a quadrat, relabel this quantity to sapling_tree_density_ind_m2,
+    # then take the mean across the quadrats, then the mean across the plots.
+    data_filtered <- data_filtered %>%
+      dplyr::filter(age == "sapling")
+    aggregate(count ~ country + ma_name + location_status + location_name +
+                transect_no + plot_no + quadrat_no,
+              data = data_filtered,
+              FUN = sum) %>% 
+      dplyr::rename(sapling_tree_density_ind_m2 = count) %>%
+      aggregate(sapling_tree_density_ind_m2 ~ country + ma_name + location_status + location_name +
+                  transect_no + plot_no,
+                data = .,
+                FUN = mean) %>% 
+      aggregate(sapling_tree_density_ind_m2 ~ country + ma_name + location_status + location_name +
+                  transect_no,
+                data = .,
+                FUN = mean)
+    
   } else if (metric == 'sizeclass') {
     # idea: for each size class, you can expect to see `density_ind_ha` many 
     # fish per hectare.

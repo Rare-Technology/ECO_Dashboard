@@ -33,7 +33,7 @@ mangroveServer <- function(id, rv){
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(sel_metric,
-                    "Tree Density" = plot_tree_density(data_filtered, sel_geom),
+                    "Sapling Density" = plot_sapling_tree_density(data_filtered, sel_geom),
                     "Tree Diversity" = plot_tree_diversity(data_filtered, sel_geom),
                     "Tree Size" = plot_tree_size(data_filtered, sel_geom))
         p$facet$params$free$y <- y_scale
