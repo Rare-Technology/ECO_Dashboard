@@ -22,7 +22,7 @@ sidebarGeoServer <- function(id, rv){
     output$geo <- renderUI({
       current_tab <- rv$current_tab
       
-      if (current_tab %in% c("Start", "Coral Reefs", "Map")) {
+      if (current_tab %in% c("Start", "Fish", "Map")) {
         init_country_choices <- INIT$COUNTRY_CHOICES$FISH
         init_subnational_choices <- INIT$SUBNATIONAL_CHOICES$FISH
         init_local_choices <- INIT$LOCAL_CHOICES$FISH
@@ -65,7 +65,7 @@ sidebarGeoServer <- function(id, rv){
         ),
         pickerInput(
           ns('sel_maa'),
-          'Managed access area',
+          'Community',
           choices = init_maa_choices,
           selected = NULL,
           multiple = TRUE,
@@ -96,7 +96,7 @@ sidebarGeoServer <- function(id, rv){
     
     observeEvent(input$sel_country, {
       rv$sel_country <- input$sel_country
-      if (rv$current_tab %in% c("Start", "Coral Reefs", "Map")) {
+      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
         data_country <- rv$data_full$fish %>%
           dplyr::filter(country == input$sel_country)
       } else if (rv$current_tab == "Mangrove Forests") {
@@ -115,7 +115,7 @@ sidebarGeoServer <- function(id, rv){
     
     observeEvent(input$sel_subnational, {
       rv$sel_subnational <- input$sel_subnational
-      if (rv$current_tab %in% c("Start", "Coral Reefs", "Map")) {
+      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
         data_subnational <- rv$data_full$fish %>%
           dplyr::filter(level1_name %in% input$sel_subnational)
       } else if (rv$current_tab == "Mangrove Forests") {
@@ -134,7 +134,7 @@ sidebarGeoServer <- function(id, rv){
     
     observeEvent(input$sel_local, {
       rv$sel_local <- input$sel_local
-      if (rv$current_tab %in% c("Start", "Coral Reefs", "Map")) {
+      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
         data_local <- rv$data_full$fish %>%
           dplyr::filter(level2_name %in% input$sel_local)
       } else if (rv$current_tab == "Mangrove Forests") {
@@ -155,7 +155,7 @@ sidebarGeoServer <- function(id, rv){
     
     observeEvent(input$sel_maa, {
       rv$sel_maa <- input$sel_maa
-      if (rv$current_tab %in% c("Start", "Coral Reefs", "Map")) {
+      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
         rv$data_filtered$fish <- rv$data_full$fish %>%
           dplyr::filter(ma_name %in% input$sel_maa)
       } else if (rv$current_tab == "Mangrove Forests") {

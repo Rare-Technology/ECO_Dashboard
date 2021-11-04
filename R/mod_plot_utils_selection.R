@@ -51,11 +51,11 @@ aggregate_data <- function(data_filtered, metric) {
                 data = .,
                 FUN = mean)
     
-  } else if (metric == 'sizeclass') {
+  } else if (metric == 'size_class') {
     # idea: for each size class, you can expect to see `density_ind_ha` many 
     # fish per hectare.
     aggregate(density_ind_ha ~ country + ma_name + location_status + location_name + 
-                transect_no + sizeclass, data=data_filtered, FUN=sum)
+                transect_no + size_class, data=data_filtered, FUN=sum)
   }
 }
 
@@ -66,14 +66,14 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
   if (metric %in% c("biomass_kg_ha", "density_ind_ha", "dbh_cm", "sapling_tree_density_ind_m2")) {
     groupvars <- c('country', 'ma_name', 'location_status', 'location_name')
     if (for.size) {
-      groupvars <- append(groupvars, 'sizeclass')
+      groupvars <- append(groupvars, 'size_class')
     }
     formula <- paste(metric, paste(groupvars, collapse=" + "), sep=" ~ ") %>% 
       as.formula()
     aggregate(formula, data=data_aggreg, FUN=mean)
-  } else { # sizeclass
+  } else { # size_class
     aggregate(density_ind_ha ~ country + ma_name + location_status +
-                location_name + sizeclass, data=data_aggreg, FUN=mean)
+                location_name + size_class, data=data_aggreg, FUN=mean)
   }
 }
 summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
@@ -81,12 +81,12 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   groupvars1 <- c('country', 'ma_name', 'location_status', 'location_name')
   groupvars2 <- groupvars1[-length(groupvars1)]
   if (for.size) {
-    groupvars1 <- append(groupvars1, 'sizeclass')
-    groupvars2 <- append(groupvars2, 'sizeclass')
+    groupvars1 <- append(groupvars1, 'size_class')
+    groupvars2 <- append(groupvars2, 'size_class')
     # changing metric to 'count' to use in the following aggregates w/o changing
     # the code much. maybe clunky to do so and it may be better to just set metric
     # to 'count' from the beginning, but from a readability/comprehension standpoint,
-    # I think it makes sense to keep metric as 'sizeclass' in the beginning,
+    # I think it makes sense to keep metric as 'size_class' in the beginning,
     # as it makes it very clear that the surrounding code is in regard to fish size
   }
   
@@ -108,7 +108,7 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   # take mean across locations
   data_summary <- aggregate(formula2, data=data_loc, FUN=mean)
   
-  if (!for.size) { # ie not sizeclass
+  if (!for.size) { # ie not size_class
     data_summary$N <- aggregate(formula2, data=data_loc, FUN=length) %>% 
       dplyr::pull(metric)
     data_summary$SD <- aggregate(formula2, data=data_loc, FUN=sd) %>% 

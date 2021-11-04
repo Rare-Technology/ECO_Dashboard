@@ -29,16 +29,16 @@ plotServer <- function(id, rv){
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
-      sel_dates <- rv$sel_dates
+      sel_year <- rv$sel_year
       
       if (is.null(sel_maa)) {
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(rv$sel_metric,
-              "Fish Biomass" = plot_biomass(data_filtered, sel_family, sel_geom),
-              "Fish Density" = plot_density(data_filtered, sel_family, sel_geom),
-              "Fish Diversity" = plot_diversity(data_filtered, sel_family, sel_geom),
-              "Fish Size" = plot_size(data_filtered, sel_family, sel_geom)
+              "Fish Biomass" = plot_biomass(data_filtered, sel_year, sel_family, sel_geom),
+              "Fish Density" = plot_density(data_filtered, sel_year, sel_family, sel_geom),
+              "Fish Diversity" = plot_diversity(data_filtered, sel_year, sel_family, sel_geom),
+              "Fish Size" = plot_size(data_filtered, sel_year, sel_family, sel_geom)
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p

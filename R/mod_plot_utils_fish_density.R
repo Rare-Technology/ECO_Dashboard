@@ -1,7 +1,8 @@
-plot_density <- function(data_filtered, sel_family, sel_geom) {
+plot_density <- function(data_filtered, sel_year, sel_family, sel_geom) {
   data_aggreg <- data_filtered %>% 
-                  dplyr::filter(family %in% sel_family) %>% 
-                  aggregate_data(., 'density_ind_ha')
+    dplyr::filter(family %in% sel_family) %>% 
+    dplyr::filter(year == sel_year) %>% 
+    aggregate_data(., 'density_ind_ha')
   if (sel_geom == 'Bar plots') {
     data_summary <- summarySE(data_aggreg, 'density_ind_ha')
    

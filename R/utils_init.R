@@ -6,7 +6,7 @@
 #'
 #' @noRd
 # INIT <-  list()
-# INIT$CURRENT_TAB <- 'Coral Reefs'
+# INIT$CURRENT_TAB <- 'Start'
 # INIT$SEL_METRIC <- 'Fish Biomass'
 # INIT$SEL_GEOM <- "Bar plots"
 # INIT$SEL_YSCALE <- TRUE
@@ -21,6 +21,10 @@
 #   FISH = "HND",
 #   MANGROVES = "Mozambique"
 # )
+# INIT$SEL_YEAR <- fish.surveys %>%
+#   filter(country == INIT$SEL_COUNTRY$FISH) %>%
+#   pull(year) %>%
+#   max()
 # INIT$DATA_FULL <- list(
 #   FISH = fish.surveys %>% dplyr::filter(family != ""),
 #   MANGROVES = mangroves

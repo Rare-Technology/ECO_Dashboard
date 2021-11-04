@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinyWidgets pickerInput multiInput switchInput
+#' @importFrom shinyWidgets pickerInput multiInput switchInput radioGroupButtons
 #' @importFrom leaflet providers
 sidebarDisplayUI <- function(id){
   ns <- NS(id)
@@ -24,7 +24,7 @@ sidebarDisplayServer <- function(id, rv){
       ui <- NULL #list()
       current_tab <- rv$current_tab
       
-      if (current_tab == 'Coral Reefs') {
+      if (current_tab == 'Fish') {
         ui <- tagList(
           div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
@@ -54,20 +54,8 @@ sidebarDisplayServer <- function(id, rv){
                         `selected-text-format` = "count > 3"
                       ),
                       multiple = TRUE
-          ),
-          # switchInput(ns("sel_date"),
-          #             "Plot dates")
-          # don't need this right now
-          # pickerInput(ns('sel_species'),
-          #             'Fish species',
-          #             choices = LETTERS,
-          #             options = list(
-          #               `actions-box` = TRUE,
-          #               `selected-text-format` = "count > 2"
-          #             ),
-          #             multiple = TRUE
-          # )
-        ) # tagList
+          )
+        )
       } else if(current_tab == "Mangrove Forests") {
         ui <- tagList(
           div(class = "sidetitle", "Plotting"),
@@ -87,6 +75,14 @@ sidebarDisplayServer <- function(id, rv){
           )
         )
       }
+      ui <- tagList(ui,
+        radioGroupButtons(
+          ns("sel_year"),
+          "Year",
+          choices = get_year_choices(rv$sel_country, rv$data_full$fish),
+          selected = max(get_year_choices(rv$sel_country, rv$data_full$fish))
+        )
+      )
       
       if (current_tab == 'Map') {
         
@@ -146,6 +142,11 @@ sidebarDisplayServer <- function(id, rv){
       #                                 dplyr::filter(family %in% rv$sel_family),
       #                               'biomass_kg_ha')
       # rv$data_map <- get_biomass_loc(rv$data_aggreg)
+    }, ignoreInit = TRUE
+    )
+    
+    observeEvent(input$sel_year, {
+      rv$sel_year <- input$sel_year
     }, ignoreInit = TRUE
     )
   })
