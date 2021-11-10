@@ -189,4 +189,155 @@ df <- df %>% dplyr::select(names(fish.surveys))
 # 5
 fish.surveys <- rbind(fish.surveys, df)
 
+
+## 2021 PHL data
+library(readxl)
+library(rfishbase)
+
+data_path <- "../data/PHL_fish_data_2021.xlsx"
+df1 <- read_xlsx(data_path, sheet = 1)
+df2 <- read_xlsx(data_path, sheet = 2)
+df3 <- read_xlsx(data_path, sheet = 3)
+
+# survey_date for df3 is not parsed correctly; almost all of the dates appear as
+# character of an integer representing the number of days since a certain date in 1900
+# eg "44332", "44317"
+
+df2 <- df2 %>% 
+  dplyr::rename(transect_no = "Transect number",
+                transect_area = "Transect area")
+
+df3 <- df3 %>% 
+  dplyr::rename(transect_no = Transect,
+                length = "length (cm)",
+                transect_area = "Transect area (m2)")
+
+clean_df <- function(df) {
+  df %>% 
+    dplyr::select(
+      country,
+      level1_name,
+      level2_name,
+      ma_name,
+      location_name,
+      location_status,
+      lat = Latitude,
+      lon = Longitude,
+      transect_no,
+      transect_area, # need to compute values of density_ind_ha
+      count = Count,
+      species = Species,
+      length,
+      survey_date,
+      size_class
+    ) %>% 
+    dplyr::mutate(
+      survey_date = as.character(survey_date), # save effort on fixing df3 problem
+      density_ind_ha = count / transect_area * 10000 # m2 to ha
+    )
+}
+
+df1 <- clean_df(df1)
+df2 <- clean_df(df2)
+df3 <- clean_df(df3)
+
+df <- rbind(df1, rbind(df2, df3))
+
+
+# now that we have the three sheets combined into one data frame, we need to calculate the biomass
+# to do this, we need the weight for each fish (weight_kg)
+# to get the weight, we need to use the length-weight formula and thus need the a and b parameters
+# to get those parameters, we pull from some tables we have.
+# Not every species in df has an a or b value in the tables, so we impute missing values using
+# the genus means of a/b.
+
+# first, create a column for the genus. while we're at it, set the survey years
+genus_regex <-  "^[A-Za-z]*"
+df <- df %>% 
+  dplyr::mutate(
+    year = 2021,
+    genus = stringr::str_extract(species, pattern = genus_regex)
+  )
+
+# a few records have genus Archamia but they were reclassified as Taeniamia in 2013
+df[df$genus == "Archamia",]$genus <- "Taeniamia"
+# fix some typos
+df[df$species == "Stethjulis trilineata",]$genus <- "Stethojulis"
+df[df$species == "chaetodon octofasciatus",]$genus <- "Chaetodon"
+
+
+# read in the tables for a/b parameters
+ab_old <- read.csv("https://query.data.world/s/adbk2l66cdg7vhd6h4ejq6n32ekq7a", header=TRUE, stringsAsFactors=FALSE);
+ab <- read.csv("../data/fish_ab.csv")
+ab <- ab %>% 
+  dplyr::mutate(species = paste(Genus, Species)) %>% 
+  dplyr::select(
+    species,
+    a = Biomass.Constant.A,
+    b = Biomass.Constant.B
+)
+
+ab_old <- ab_old %>% 
+  dplyr::select(
+    species,
+    a,
+    b
+  ) %>% 
+  dplyr::filter(
+    !(species %in% unique(ab$species))
+)
+
+ab <- rbind(ab, ab_old)
+
+ab_species <- ab %>% 
+  dplyr::filter(!is.na(a) & !is.na(b)) %>% 
+  dplyr::group_by(species) %>%
+  dplyr::mutate(a_species = mean(a), b_species = mean(b)) %>% # there is one species with two records, this line is for that
+  dplyr::ungroup() %>%
+  dplyr::select(species, a_species, b_species) %>% 
+  dplyr::distinct()
+
+ab_genus <- ab_species %>% 
+  dplyr::mutate(genus = stringr::str_extract(species, pattern = genus_regex)) %>% 
+  dplyr::group_by(genus) %>% 
+  dplyr::mutate(a_genus = mean(a_species), b_genus = mean(b_species)) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(genus, a_genus, b_genus) %>% 
+  dplyr::distinct()
+
+genfam <- fishbase %>%
+  dplyr::select(genus = Genus, family = Family) %>% 
+  dplyr::distinct()
+
+df <- dplyr::left_join(df, ab_genus, by = "genus") %>% 
+  dplyr::left_join(., ab_species, by = "species") %>% 
+  dplyr::mutate(
+    a = ifelse(is.na(a_species),
+      a_genus,
+      a_species),
+    b = ifelse(is.na(b_species),
+      b_genus,
+      b_species),
+    a_species = NULL,
+    a_genus = NULL,
+    b_species = NULL,
+    b_genus = NULL
+  ) %>% 
+  dplyr::left_join(., genfam, by = "genus")
+
+df <- df %>% 
+  dplyr::mutate(
+    weight_kg = a * length^b / 1000,
+    biomass_kg_ha = density_ind_ha * weight_kg,
+    transect_area = NULL,
+    a = NULL,
+    b = NULL,
+    genus = NULL,
+  ) %>% 
+  dplyr::mutate(
+    weight_kg = NULL
+  )
+
+fish.surveys <- rbind(fish.surveys, df)
+
 usethis::use_data(fish.surveys, overwrite = TRUE)

@@ -1,7 +1,7 @@
 aggregate_data <- function(data_filtered, metric) {
   # add up the biomass of all fish at each transect
   if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
-    groupvars <- c('country', 'ma_name', 'location_status', 'location_name',
+    groupvars <- c('country', 'ma_name', 'year',  'location_status', 'location_name',
                    'transect_no')
     formula_str <- paste(metric, paste(groupvars, collapse = ' + '), sep = ' ~ ')
     aggregate(as.formula(formula_str), data=data_filtered, FUN=sum)
@@ -78,7 +78,7 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
 }
 summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   
-  groupvars1 <- c('country', 'ma_name', 'location_status', 'location_name')
+  groupvars1 <- c('country', 'ma_name', 'year', 'location_status', 'location_name')
   groupvars2 <- groupvars1[-length(groupvars1)]
   if (for.size) {
     groupvars1 <- append(groupvars1, 'size_class')
