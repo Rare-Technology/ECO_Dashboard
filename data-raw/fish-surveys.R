@@ -106,7 +106,7 @@ fish.surveys <- fish.surveys %>%
 # 2020 survey
 fish.surveys$year[fish.surveys$country == "MOZ" & fish.surveys$year == 2021] <- 2020
 
-## New IDN dataset
+#### New IDN dataset
 # Raymond provided an updated dataset that has the 2021 survey as well has historical records for 2019 and 2017
 # This dataset includes the community site name for the survey sites; NTZ and UTZ correspond to Teluk Kolono
 # Teluk Kolono in turn belongs to the LGU Konawe Selatan, which then belongs to SNU South East Sulawesi
@@ -190,7 +190,7 @@ df <- df %>% dplyr::select(names(fish.surveys))
 fish.surveys <- rbind(fish.surveys, df)
 
 
-## 2021 PHL data
+#### 2021 PHL data
 library(readxl)
 library(rfishbase)
 
@@ -339,5 +339,20 @@ df <- df %>%
   )
 
 fish.surveys <- rbind(fish.surveys, df)
+
+#### transform country names
+
+iso3_to_full <- function(x) {
+  switch(x,
+         "HND" = "Honduras",
+         "IDN" = "Indonesia",
+         "MOZ" = "Mozambique",
+         "PHL" = "Philippines")
+}
+
+fish.surveys$country <- as.character(sapply(fish.surveys$country, iso3_to_full))
+
+
+
 
 usethis::use_data(fish.surveys, overwrite = TRUE)

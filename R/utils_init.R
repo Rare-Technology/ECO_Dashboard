@@ -10,29 +10,34 @@
 # INIT$SEL_METRIC <- 'Fish Biomass'
 # INIT$SEL_GEOM <- "Bar plots"
 # INIT$SEL_YSCALE <- TRUE
-# INIT$COUNTRY_CHOICES <- list(
-#   FISH = c("Honduras" = "HND",
-#            "Indonesia" = "IDN",
-#            "Mozambique" = "MOZ",
-#            "Philippines" = "PHL"),
-#   MANGROVES = c("Mozambique")
-# )
-# INIT$SEL_COUNTRY <- list(
-#   FISH = "HND",
-#   MANGROVES = "Mozambique"
-# )
-# INIT$SEL_YEAR <- fish.surveys %>%
-#   filter(country == INIT$SEL_COUNTRY$FISH) %>%
-#   pull(year) %>%
-#   max()
 # INIT$DATA_FULL <- list(
-#   FISH = fish.surveys %>% dplyr::filter(family != ""),
+#   FISH = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
 #   MANGROVES = mangroves
 # )
-# INIT$DATA_FILTERED <- list(
-#   FISH = INIT$DATA_FULL$FISH %>% dplyr::filter(country == INIT$SEL_COUNTRY$FISH),
-#   MANGROVES = INIT$DATA_FULL$MANGROVES %>% dplyr::filter(country == INIT$SEL_COUNTRY$MANGROVES)
+# INIT$YEAR_CHOICES <- list(
+#   FISH = fish.surveys %>% dplyr::pull(year) %>% unique() %>% sort(),
+#   MANGROVES = mangroves %>% dplyr::pull(year) %>% unique() %>% sort()
 # )
+# INIT$SEL_YEAR <- list(
+#   FISH = max(INIT$YEAR_CHOICES$FISH),
+#   MANGROVES = max(INIT$YEAR_CHOICES$MANGROVES)
+# )
+# INIT$DATA_FILTERED <- list(
+#   FISH = INIT$DATA_FULL$FISH %>% dplyr::filter(year == INIT$SEL_YEAR$FISH),
+#   MANGROVES = INIT$DATA_FULL$MANGROVES %>% dplyr::filter(year == INIT$SEL_YEAR$MANGROVES)
+# )
+# INIT$COUNTRY_CHOICES <- list(
+#   FISH = get_geo_choices(INIT$DATA_FILTERED$FISH, "country"),
+#   MANGROVES = get_geo_choices(INIT$DATA_FILTERED$MANGROVES, "country")
+# )
+# INIT$SEL_COUNTRY <- list(
+#   FISH = INIT$COUNTRY_CHOICES$FISH[1],
+#   MANGROVES = INIT$COUNTRY_CHOICES$MANGROVES[1]
+# )
+# INIT$DATA_FILTERED$FISH <- INIT$DATA_FILTERED$FISH %>%
+#   dplyr::filter(country == INIT$SEL_COUNTRY$FISH)
+# INIT$DATA_FILTERED$MANGROVES <- INIT$DATA_FILTERED$MANGROVES %>%
+#   dplyr::filter(country == INIT$SEL_COUNTRY$MANGROVES)
 # INIT$SEL_SUBNATIONAL <-  list(
 #   FISH = get_geo_choices(INIT$DATA_FILTERED$FISH, 'level1_name'),
 #   MANGROVES = get_geo_choices(INIT$DATA_FILTERED$MANGROVES, "level1_name")

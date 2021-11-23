@@ -24,7 +24,7 @@ mainUI <- function(id){
                  style='material-circle'
         ),
         div(style='flex-grow: 1;'),
-        div(id='help-button', icon('question-circle-o'), onclick='tour()'),
+        # div(id='help-button', icon('question-circle-o'), onclick='tour()'),
         div(class = 'fs-button',
             HTML(
               "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' class='bi bi-fullscreen' viewBox='0 0 16 16'>

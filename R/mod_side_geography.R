@@ -18,6 +18,7 @@ sidebarGeoUI <- function(id){
 #' @noRd 
 sidebarGeoServer <- function(id, rv){
   ns <- NS(id)
+  
   moduleServer( id, function(input, output, session){
     output$geo <- renderUI({
       current_tab <- rv$current_tab
@@ -65,7 +66,7 @@ sidebarGeoServer <- function(id, rv){
         ),
         pickerInput(
           ns('sel_maa'),
-          'Community',
+          'Managed Access Area',
           choices = init_maa_choices,
           selected = NULL,
           multiple = TRUE,
@@ -94,59 +95,92 @@ sidebarGeoServer <- function(id, rv){
       ui
     })
     
+    observeEvent(rv$sel_year, {
+      sel_year <- rv$sel_year
+      current_tab <- rv$current_tab
+      
+      if (current_tab %in% FISH_TABS) {
+        data_year <- rv$data_full$fish %>% dplyr::filter(year == sel_year)
+      } else if (current_tab == "Mangrove Forests") {
+        data_year <- rv$data_full$mangroves %>% dplyr::filter(year == sel_year)
+      }
+      country_choices <- get_geo_choices(data_year, "country")
+      updateSelectInput(
+        session,
+        "sel_country",
+        choices = country_choices
+      )
+    }, ignoreInit = TRUE
+    )
+    
     observeEvent(input$sel_country, {
       rv$sel_country <- input$sel_country
-      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
+      current_tab <- rv$current_tab
+      sel_year <- rv$sel_year
+      
+      if (current_tab %in% FISH_TABS) {
         data_country <- rv$data_full$fish %>%
-          dplyr::filter(country == input$sel_country)
-      } else if (rv$current_tab == "Mangrove Forests") {
+          dplyr::filter(year == sel_year,
+                        country == input$sel_country)
+        # rv$data_filtered$fish <- data_filtered
+      } else if (current_tab == "Mangrove Forests") {
         data_country <- rv$data_full$mangroves %>% 
-          dplyr::filter(country == input$sel_country)
+          dplyr::filter(year == sel_year,
+                        country == input$sel_country)
+        # rv$data_filtered$mangroves <- data_filtered
       }
-      rv$subnational_choices <- get_geo_choices(data_country, 'level1_name')
+      subnational_choices <- get_geo_choices(data_country, 'level1_name')
       updatePickerInput(
         session,
         'sel_subnational',
-        choices = rv$subnational_choices,
-        selected = rv$subnational_choices
+        choices = subnational_choices,
+        selected = subnational_choices
       )
     }, ignoreInit = TRUE
     )
     
     observeEvent(input$sel_subnational, {
       rv$sel_subnational <- input$sel_subnational
-      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
+      current_tab <- rv$current_tab
+      sel_year <- rv$sel_year
+      if (current_tab %in% FISH_TABS) {
         data_subnational <- rv$data_full$fish %>%
-          dplyr::filter(level1_name %in% input$sel_subnational)
-      } else if (rv$current_tab == "Mangrove Forests") {
+          dplyr::filter(year == sel_year,
+                        level1_name %in% input$sel_subnational)
+      } else if (current_tab == "Mangrove Forests") {
         data_subnational <- rv$data_full$mangroves %>%
-          dplyr::filter(level1_name %in% input$sel_subnational)
+          dplyr::filter(year == sel_year,
+                        level1_name %in% input$sel_subnational)
       }
-      rv$local_choices <- get_geo_choices(data_subnational, 'level2_name')
+      local_choices <- get_geo_choices(data_subnational, 'level2_name')
       updatePickerInput(
         session,
         'sel_local',
-        choices = rv$local_choices,
-        selected = rv$local_choices
+        choices = local_choices,
+        selected = local_choices
       )
     }, ignoreInit=TRUE
     )
     
     observeEvent(input$sel_local, {
       rv$sel_local <- input$sel_local
-      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
+      current_tab <- rv$current_tab
+      sel_year <- rv$sel_year
+      if (current_tab %in% FISH_TABS) {
         data_local <- rv$data_full$fish %>%
-          dplyr::filter(level2_name %in% input$sel_local)
-      } else if (rv$current_tab == "Mangrove Forests") {
+          dplyr::filter(year == sel_year,
+                        level2_name %in% input$sel_local)
+      } else if (current_tab == "Mangrove Forests") {
         data_local <- rv$data_full$mangroves %>%
-          dplyr::filter(level2_name %in% input$sel_local)
+          dplyr::filter(year == sel_year,
+                        level2_name %in% input$sel_local)
       }
-      rv$maa_choices <- get_geo_choices(data_local, 'ma_name')
+      maa_choices <- get_geo_choices(data_local, 'ma_name')
       
       updatePickerInput(
         session,
         'sel_maa',
-        choices = rv$maa_choices,
+        choices = maa_choices,
         selected = NULL
       )
     },
@@ -155,12 +189,17 @@ sidebarGeoServer <- function(id, rv){
     
     observeEvent(input$sel_maa, {
       rv$sel_maa <- input$sel_maa
-      if (rv$current_tab %in% c("Start", "Fish", "Map")) {
+      current_tab <- rv$current_tab
+      sel_year <- rv$sel_year
+      
+      if (current_tab %in% FISH_TABS) {
         rv$data_filtered$fish <- rv$data_full$fish %>%
-          dplyr::filter(ma_name %in% input$sel_maa)
-      } else if (rv$current_tab == "Mangrove Forests") {
+          dplyr::filter(year == sel_year,
+                        ma_name %in% input$sel_maa)
+      } else if (current_tab == "Mangrove Forests") {
         rv$data_filtered$mangroves <- rv$data_full$mangroves %>%
-          dplyr::filter(ma_name %in% input$sel_maa)
+          dplyr::filter(year == sel_year,
+                        ma_name %in% input$sel_maa)
       }
     }, ignoreInit = TRUE
     )

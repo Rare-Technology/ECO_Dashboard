@@ -21,10 +21,10 @@ sidebarDisplayServer <- function(id, rv){
   ns <- NS(id)
   moduleServer( id, function(input, output, session){
     output$display <- renderUI({
-      ui <- NULL #list()
       current_tab <- rv$current_tab
+      data_filtered <- rv$data_filtered
       
-      if (current_tab == 'Fish') {
+      if (current_tab == "Fish") {
         ui <- tagList(
           div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
@@ -47,8 +47,8 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = get_display_choices(rv$sel_maa, rv$data_full$fish),
-                      selected = get_display_choices(rv$sel_maa, rv$data_full$fish),
+                      choices = get_display_choices(data_filtered$fish),
+                      selected = get_display_choices(data_filtered$fish),
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
@@ -56,7 +56,7 @@ sidebarDisplayServer <- function(id, rv){
                       multiple = TRUE
           )
         )
-      } else if(current_tab == "Mangrove Forests") {
+      } else if (current_tab == "Mangrove Forests") {
         ui <- tagList(
           div(class = "sidetitle", "Plotting"),
           selectInput(ns("sel_metric"),
@@ -75,14 +75,6 @@ sidebarDisplayServer <- function(id, rv){
           )
         )
       }
-      ui <- tagList(ui,
-        radioGroupButtons(
-          ns("sel_year"),
-          "Year",
-          choices = get_year_choices(rv$sel_country, rv$data_full$fish),
-          selected = max(get_year_choices(rv$sel_country, rv$data_full$fish))
-        )
-      )
       
       if (current_tab == 'Map') {
         
@@ -108,12 +100,15 @@ sidebarDisplayServer <- function(id, rv){
     })
     
     observeEvent(rv$sel_maa, {
-      updatePickerInput(
-        session,
-        'sel_family',
-        choices = get_display_choices(rv$sel_maa, rv$data_full$fish),
-        selected = get_display_choices(rv$sel_maa, rv$data_full$fish)
-      )
+      if (rv$current_tab %in% FISH_TABS) {
+        data_fish <- rv$data_filtered$fish
+        updatePickerInput(
+          session,
+          'sel_family',
+          choices = get_display_choices(data_fish),
+          selected = get_display_choices(data_fish)
+        )
+      }
     })
     
     observeEvent(input$sel_metric, {
@@ -135,18 +130,6 @@ sidebarDisplayServer <- function(id, rv){
     
     observeEvent(input$sel_family, {
       rv$sel_family <- input$sel_family
-      # rv$data_filtered <- rv$data_full %>%
-      #   dplyr::filter(ma_name %in% rv$sel_maa,
-      #                 family %in% input$sel_family)
-      # rv$data_aggreg <- get_biomass(rv$data_filtered %>% 
-      #                                 dplyr::filter(family %in% rv$sel_family),
-      #                               'biomass_kg_ha')
-      # rv$data_map <- get_biomass_loc(rv$data_aggreg)
-    }, ignoreInit = TRUE
-    )
-    
-    observeEvent(input$sel_year, {
-      rv$sel_year <- input$sel_year
     }, ignoreInit = TRUE
     )
   })

@@ -1,6 +1,7 @@
 initialize_rv <- function(INIT) {
   reactiveValues(
     current_tab = INIT$CURRENT_TAB,
+    sel_year = 2021,
     sel_country = INIT$SEL_COUNTRY$FISH,
     sel_metric = INIT$SEL_METRIC,
     sel_geom = INIT$SEL_GEOM,
@@ -14,6 +15,10 @@ initialize_rv <- function(INIT) {
       fish = INIT$DATA_FULL$FISH,
       mangroves = INIT$DATA_FULL$MANGROVES
     ),
+    # data_filtered = list(
+    #   fish = INIT$DATA_FILTERED$FISH,
+    #   mangroves = INIT$DATA_FILTERED$MANGROVES
+    # ),
     data_filtered = list(
       fish = INIT$DATA_FILTERED$FISH,
       mangroves = INIT$DATA_FILTERED$MANGROVES

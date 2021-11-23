@@ -17,17 +17,17 @@ aggregate_data <- function(data_filtered, metric) {
     # looks just like aggregating fish species but may have to do something later
     # regarding adult vs sapling. if that's not the case, consider changing
     # the column name tree_species to simply species
-    aggregate(tree_species ~ country + ma_name + location_status + location_name,
+    aggregate(tree_species ~ year + country + ma_name + location_status + location_name,
               data = data_filtered, FUN = count_unique)
     
   } else if (metric == "dbh_cm") {
     data_filtered <- data_filtered %>% # these lines may change depending on how
       dplyr::filter(age == "adult") # age is implemented in other metrics
-    aggregate(dbh_cm ~ country + ma_name + location_status + location_name +
+    aggregate(dbh_cm ~ year + country + ma_name + location_status + location_name +
                 transect_no + plot_no,
               data = data_filtered,
               FUN = mean) %>% 
-      aggregate(dbh_cm ~ country + ma_name + location_status + location_name +
+      aggregate(dbh_cm ~ year + country + ma_name + location_status + location_name +
                   transect_no,
                 data = .,
                 FUN = mean)
@@ -37,16 +37,16 @@ aggregate_data <- function(data_filtered, metric) {
     # then take the mean across the quadrats, then the mean across the plots.
     data_filtered <- data_filtered %>%
       dplyr::filter(age == "sapling")
-    aggregate(count ~ country + ma_name + location_status + location_name +
+    aggregate(count ~ year + country + ma_name + location_status + location_name +
                 transect_no + plot_no + quadrat_no,
               data = data_filtered,
               FUN = sum) %>% 
       dplyr::rename(sapling_tree_density_ind_m2 = count) %>%
-      aggregate(sapling_tree_density_ind_m2 ~ country + ma_name + location_status + location_name +
+      aggregate(sapling_tree_density_ind_m2 ~ year + country + ma_name + location_status + location_name +
                   transect_no + plot_no,
                 data = .,
                 FUN = mean) %>% 
-      aggregate(sapling_tree_density_ind_m2 ~ country + ma_name + location_status + location_name +
+      aggregate(sapling_tree_density_ind_m2 ~ year +country + ma_name + location_status + location_name +
                   transect_no,
                 data = .,
                 FUN = mean)

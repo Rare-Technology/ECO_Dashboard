@@ -23,7 +23,7 @@ mangroveServer <- function(id, rv){
     theme_update(plot.title = element_text(hjust = 0.5))
     
     output$plot_holder <- renderUI({
-      data_filtered <- rv$data_filtered$mangroves
+      data_mangroves <- rv$data_filtered$mangroves
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
@@ -33,23 +33,23 @@ mangroveServer <- function(id, rv){
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(sel_metric,
-                    "Sapling Density" = plot_sapling_tree_density(data_filtered, sel_geom),
-                    "Tree Diversity" = plot_tree_diversity(data_filtered, sel_geom),
-                    "Tree Size" = plot_tree_size(data_filtered, sel_geom))
+                    "Sapling Density" = plot_sapling_tree_density(data_mangroves, sel_geom),
+                    "Tree Diversity" = plot_tree_diversity(data_mangroves, sel_geom),
+                    "Tree Size" = plot_tree_size(data_mangroves, sel_geom))
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p
         output$plot <- renderPlot(p, height = 600)
         
-        ui_out <- list(list(br()))
-        ui_out <- append(ui_out,
-                         list(downloadButton(ns("downloadPlot"),
-                                             class = "download-button",
-                                             "Download Plot"))
+        ui <- tagList(
+          br(),
+          downloadButton(ns("downloadPlot"),
+           class = "download-button",
+           "Download Plot"
+          ),
+          plotOutput(ns("plot"))
         )
-        ui_out <- append(ui_out,
-                         list(plotOutput(ns("plot")))
-        )
-        ui_out
+        
+        ui
       }
     })
     

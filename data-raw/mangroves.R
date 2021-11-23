@@ -55,4 +55,9 @@ mangroves_sapling <- mangroves_sapling %>% select(country,
                               age)
 mangroves <- rbind(mangroves_adult, mangroves_sapling)
 
+
+## Nov 12 2021
+## For future proofing, will hard code the year of the above survey data (2020)
+mangroves$year <- 2020
+
 usethis::use_data(mangroves, overwrite = TRUE)
