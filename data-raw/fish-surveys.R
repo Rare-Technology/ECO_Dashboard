@@ -352,7 +352,21 @@ iso3_to_full <- function(x) {
 
 fish.surveys$country <- as.character(sapply(fish.surveys$country, iso3_to_full))
 
+#### 2021 PHL data compute size_class
+# forgot to do this when first adding the data
 
+get_size_class <- function (x) { # need to fix this for existing fish data, its a mess
+  if (x <= 5) {"0-5"}
+  else if (x > 5 & x <= 10) {"5-10"}
+  else if (x > 10 & x <= 20) {"10-20"}
+  else if (x > 20 & x <= 30) {"20-30"}
+  else if (x > 30 & x <= 40) {"30-40"}
+  else if (x > 40 & x <= 50) {"40-50"}
+  else if (x > 50) {"50+"}
+}
+get_size_class <- Vectorize(get_size_class)
 
+fish.surveys$size_class[fish.surveys$country == "Philippines"] <- 
+  as.character(get_size_class(fish.surveys$length[fish.surveys$country == "Philippines"]))
 
 usethis::use_data(fish.surveys, overwrite = TRUE)

@@ -21,11 +21,19 @@ sidebarDisplayServer <- function(id, rv){
   ns <- NS(id)
   moduleServer( id, function(input, output, session){
     output$display <- renderUI({
+      sel_dataset <- rv$sel_dataset
       current_tab <- rv$current_tab
-      data_filtered <- rv$data_filtered
+      family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                        # sel_country = rv$sel_country,
+                                        # sel_subnational = rv$sel_subnational,
+                                        # sel_local = rv$sel_local,
+                                        sel_maa = rv$sel_maa,
+                                        sel_year = rv$sel_year,
+                                        target = "family")
       
-      if (current_tab == "Fish") {
-        ui <- tagList(
+      ui <- br()
+      if (sel_dataset == "Fish") {
+        ui <- tagList(ui,
           div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
                       'Metric',
@@ -47,8 +55,8 @@ sidebarDisplayServer <- function(id, rv){
           ),
           pickerInput(ns('sel_family'),
                       'Fish family',
-                      choices = get_display_choices(data_filtered$fish),
-                      selected = get_display_choices(data_filtered$fish),
+                      choices = family_choices,
+                      selected = family_choices,
                       options = list(
                         `actions-box` = TRUE,
                         `selected-text-format` = "count > 3"
@@ -56,8 +64,8 @@ sidebarDisplayServer <- function(id, rv){
                       multiple = TRUE
           )
         )
-      } else if (current_tab == "Mangrove Forests") {
-        ui <- tagList(
+      } else if (sel_dataset == "Mangrove Forests") {
+        ui <- tagList(ui,
           div(class = "sidetitle", "Plotting"),
           selectInput(ns("sel_metric"),
                       "Metric",
@@ -78,7 +86,7 @@ sidebarDisplayServer <- function(id, rv){
       
       if (current_tab == 'Map') {
         
-        ui <- tagList(
+        ui <- tagList(ui,
           div(class="sidetitle", "Map"),
           selectInput(ns('basemap'),
             'Select Basemap',
@@ -99,17 +107,42 @@ sidebarDisplayServer <- function(id, rv){
       rv$basemap <- input$basemap
     })
     
-    observeEvent(rv$sel_maa, {
-      if (rv$current_tab %in% FISH_TABS) {
-        data_fish <- rv$data_filtered$fish
-        updatePickerInput(
-          session,
-          'sel_family',
-          choices = get_display_choices(data_fish),
-          selected = get_display_choices(data_fish)
-        )
-      }
-    })
+    # observeEvent(rv$sel_year, {
+    #   if (rv$current_tab %in% FISH_TABS) {
+    #     family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+    #                                       sel_country = rv$sel_country,
+    #                                       sel_subnational = rv$sel_subnational,
+    #                                       sel_local = rv$sel_local,
+    #                                       sel_maa = rv$sel_maa,
+    #                                       sel_year = rv$sel_year,
+    #                                       target = "family")
+    #     updatePickerInput(
+    #       session,
+    #       'sel_family',
+    #       choices = family_choices,
+    #       selected = family_choices
+    #     )
+    #   }
+    # })
+    # 
+    # observeEvent(rv$sel_maa, { # in case a change in maa does not yield a change in year
+    #   if (rv$current_tab %in% FISH_TABS) {
+    #     family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+    #                                       sel_country = rv$sel_country,
+    #                                       sel_subnational = rv$sel_subnational,
+    #                                       sel_local = rv$sel_local,
+    #                                       sel_maa = rv$sel_maa,
+    #                                       sel_year = rv$sel_year,
+    #                                       target = "family")
+    #     updatePickerInput(
+    #       session,
+    #       'sel_family',
+    #       choices = family_choices,
+    #       selected = family_choices
+    #     )
+    #   }
+    # })
+    
     
     observeEvent(input$sel_metric, {
       rv$sel_metric <- input$sel_metric
@@ -129,9 +162,17 @@ sidebarDisplayServer <- function(id, rv){
     })
     
     observeEvent(input$sel_family, {
-      rv$sel_family <- input$sel_family
-    }, ignoreInit = TRUE
-    )
+      if (!setequal(rv$sel_family, input$sel_family)) {
+        rv$sel_family <- input$sel_family
+      }
+      # rv$data_filtered <- INIT$DATA_FULL[[rv$sel_dataset]] %>% 
+      #   dplyr::filter(country == rv$sel_country,
+      #                 level1_name %in% rv$sel_subnational,
+      #                 level2_name %in% rv$sel_local,
+      #                 ma_name %in% rv$sel_maa,
+      #                 year == rv$sel_year,
+      #                 family %in% input$sel_family)
+    }, ignoreInit = TRUE)
   })
 }
     

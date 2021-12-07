@@ -23,7 +23,7 @@ mangroveServer <- function(id, rv){
     theme_update(plot.title = element_text(hjust = 0.5))
     
     output$plot_holder <- renderUI({
-      data_mangroves <- rv$data_filtered$mangroves
+      data_mangroves <- rv$data_filtered
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom

@@ -21,32 +21,26 @@ sidebarGeoServer <- function(id, rv){
   
   moduleServer( id, function(input, output, session){
     output$geo <- renderUI({
-      current_tab <- rv$current_tab
-      
-      if (current_tab %in% c("Start", "Fish", "Map")) {
-        init_country_choices <- INIT$COUNTRY_CHOICES$FISH
-        init_subnational_choices <- INIT$SUBNATIONAL_CHOICES$FISH
-        init_local_choices <- INIT$LOCAL_CHOICES$FISH
-        init_maa_choices <- INIT$MAA_CHOICES$FISH
-      } else if (current_tab == "Mangrove Forests") {
-        init_country_choices <- INIT$COUNTRY_CHOICES$MANGROVES
-        init_subnational_choices <- INIT$SUBNATIONAL_CHOICES$MANGROVES
-        init_local_choices <- INIT$LOCAL_CHOICES$MANGROVES
-        init_maa_choices <- INIT$MAA_CHOICES$MANGROVES
-      }
-        
       ui <- tagList(
+        div(class = "sidetitle", "Data"),
+        selectInput(
+          ns("sel_dataset"),
+          "Data set",
+          choices = INIT$DATASET$CHOICES,
+          selected = INIT$DATASET$SELECTED
+        ),
         div(class="sidetitle", "Geography"),
         selectInput(
           ns('sel_country'),
           'Country',
-          choices = init_country_choices
+          choices = INIT$COUNTRY$CHOICES,
+          selected = INIT$COUNTRY$SELECTED
         ),
         pickerInput(
           ns('sel_subnational'),
           'Subnational government',
-          choices = init_subnational_choices,
-          selected = init_subnational_choices,
+          choices = INIT$SUBNATIONAL$CHOICES,
+          selected = INIT$SUBNATIONA$SELECTED,
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
@@ -56,8 +50,8 @@ sidebarGeoServer <- function(id, rv){
         pickerInput(
           ns('sel_local'),
           'Local government',
-          choices = init_local_choices,
-          selected = init_local_choices,
+          choices = INIT$LOCAL$CHOICES,
+          selected = INIT$LOCAL$SELECTED,
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
@@ -67,8 +61,8 @@ sidebarGeoServer <- function(id, rv){
         pickerInput(
           ns('sel_maa'),
           'Managed Access Area',
-          choices = init_maa_choices,
-          selected = NULL,
+          choices = INIT$MAA$CHOICES,
+          selected = INIT$MAA$SELECTED,
           multiple = TRUE,
           options = list(
             `actions-box` = TRUE,
@@ -95,114 +89,87 @@ sidebarGeoServer <- function(id, rv){
       ui
     })
     
-    observeEvent(rv$sel_year, {
-      sel_year <- rv$sel_year
-      current_tab <- rv$current_tab
-      
-      if (current_tab %in% FISH_TABS) {
-        data_year <- rv$data_full$fish %>% dplyr::filter(year == sel_year)
-      } else if (current_tab == "Mangrove Forests") {
-        data_year <- rv$data_full$mangroves %>% dplyr::filter(year == sel_year)
-      }
-      country_choices <- get_geo_choices(data_year, "country")
+    observeEvent(input$dataset, {
+      rv$sel_dataset <- input$dataset
+      country_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                         target = "country")
+      rv$sel_country <- country_choices[1]
       updateSelectInput(
         session,
         "sel_country",
-        choices = country_choices
+        choices = country_choices,
+        selected = country_choices[1]
       )
-    }, ignoreInit = TRUE
-    )
+    }, ignoreInit = TRUE)
     
     observeEvent(input$sel_country, {
-      rv$sel_country <- input$sel_country
-      current_tab <- rv$current_tab
-      sel_year <- rv$sel_year
-      
-      if (current_tab %in% FISH_TABS) {
-        data_country <- rv$data_full$fish %>%
-          dplyr::filter(year == sel_year,
-                        country == input$sel_country)
-        # rv$data_filtered$fish <- data_filtered
-      } else if (current_tab == "Mangrove Forests") {
-        data_country <- rv$data_full$mangroves %>% 
-          dplyr::filter(year == sel_year,
-                        country == input$sel_country)
-        # rv$data_filtered$mangroves <- data_filtered
+      # update rv$sel_country only as a result of changing input$sel_country,
+      # rather than as a result of updating input$dataset
+      # this prevents unnecessary computation; without this check, every time we
+      # change input$dataset, rv$sel_country will update twice
+      # for this same reason, this check is down for all down stream selectors
+      if (rv$sel_country != input$sel_country) {
+        rv$sel_country <- input$sel_country
       }
-      subnational_choices <- get_geo_choices(data_country, 'level1_name')
+      subnational_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                             sel_country = input$sel_country,
+                                             target = 'level1_name')
+      rv$sel_subnational <- subnational_choices
       updatePickerInput(
         session,
         'sel_subnational',
         choices = subnational_choices,
         selected = subnational_choices
       )
-    }, ignoreInit = TRUE
-    )
+    }, ignoreInit = TRUE)
     
     observeEvent(input$sel_subnational, {
-      rv$sel_subnational <- input$sel_subnational
-      current_tab <- rv$current_tab
-      sel_year <- rv$sel_year
-      if (current_tab %in% FISH_TABS) {
-        data_subnational <- rv$data_full$fish %>%
-          dplyr::filter(year == sel_year,
-                        level1_name %in% input$sel_subnational)
-      } else if (current_tab == "Mangrove Forests") {
-        data_subnational <- rv$data_full$mangroves %>%
-          dplyr::filter(year == sel_year,
-                        level1_name %in% input$sel_subnational)
+      if (!setequal(rv$sel_subnational, input$sel_subnational)) {
+        rv$sel_subnational <- input$sel_subnational
       }
-      local_choices <- get_geo_choices(data_subnational, 'level2_name')
+      local_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                       sel_country = rv$sel_country,
+                                       sel_subnational = rv$sel_subnational,
+                                       target = 'level2_name')
+      rv$sel_local <- local_choices
       updatePickerInput(
         session,
         'sel_local',
         choices = local_choices,
         selected = local_choices
       )
-    }, ignoreInit=TRUE
-    )
+    }, ignoreInit=TRUE)
     
     observeEvent(input$sel_local, {
-      rv$sel_local <- input$sel_local
-      current_tab <- rv$current_tab
-      sel_year <- rv$sel_year
-      if (current_tab %in% FISH_TABS) {
-        data_local <- rv$data_full$fish %>%
-          dplyr::filter(year == sel_year,
-                        level2_name %in% input$sel_local)
-      } else if (current_tab == "Mangrove Forests") {
-        data_local <- rv$data_full$mangroves %>%
-          dplyr::filter(year == sel_year,
-                        level2_name %in% input$sel_local)
+      if (!setequal(rv$sel_local, input$sel_local)) {
+        rv$sel_local <- input$sel_local
       }
-      maa_choices <- get_geo_choices(data_local, 'ma_name')
-      
+      maa_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                     sel_country = rv$sel_country,
+                                     sel_subnational = rv$sel_subnational,
+                                     sel_local = rv$sel_local,
+                                     target = 'ma_name')
+      rv$sel_maa <- NULL
       updatePickerInput(
         session,
         'sel_maa',
         choices = maa_choices,
         selected = NULL
       )
-    },
-    ignoreInit=TRUE
-    )
+    }, ignoreInit=TRUE)
     
     observeEvent(input$sel_maa, {
-      rv$sel_maa <- input$sel_maa
-      current_tab <- rv$current_tab
-      sel_year <- rv$sel_year
-      
-      if (current_tab %in% FISH_TABS) {
-        rv$data_filtered$fish <- rv$data_full$fish %>%
-          dplyr::filter(year == sel_year,
-                        ma_name %in% input$sel_maa)
-      } else if (current_tab == "Mangrove Forests") {
-        rv$data_filtered$mangroves <- rv$data_full$mangroves %>%
-          dplyr::filter(year == sel_year,
-                        ma_name %in% input$sel_maa)
+      if (!setequal(rv$sel_maa, input$sel_maa)) {
+        rv$sel_maa <- input$sel_maa
       }
-    }, ignoreInit = TRUE
-    )
+      # rv$data_filtered <- INIT$DATA_FULL[[rv$sel_dataset]] %>%
+      #   dplyr::filter(country == rv$sel_country,
+      #                 level1_name %in% rv$sel_subnational,
+      #                 level2_name %in% rv$sel_local,
+      #                 ma_name %in% rv$sel_maa,
+      #                 year == rv$sel_year,
+      #                 family %in% rv$sel_family)
+    }, ignoreInit = TRUE, ignoreNULL = FALSE)
   })
 }
     

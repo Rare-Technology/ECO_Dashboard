@@ -10,7 +10,7 @@ aggregate_data <- function(data_filtered, metric) {
     # note that unlike biomass and density, the data for species is aggregated
     # up to location_name. This is accounted for in later functions
     # such as get_map_data
-    aggregate(species ~ country + ma_name + location_status + location_name,
+    aggregate(species ~ year + country + ma_name + location_status + location_name,
                 data=data_filtered, FUN=count_unique)
     
   } else if (metric == "tree_species") {
@@ -54,7 +54,7 @@ aggregate_data <- function(data_filtered, metric) {
   } else if (metric == 'size_class') {
     # idea: for each size class, you can expect to see `density_ind_ha` many 
     # fish per hectare.
-    aggregate(density_ind_ha ~ country + ma_name + location_status + location_name + 
+    aggregate(density_ind_ha ~ year + country + ma_name + location_status + location_name + 
                 transect_no + size_class, data=data_filtered, FUN=sum)
   }
 }

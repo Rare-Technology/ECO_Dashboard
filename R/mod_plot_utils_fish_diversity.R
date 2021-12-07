@@ -1,6 +1,6 @@
 plot_diversity <- function(data_filtered, sel_year, sel_family, sel_geom) {
   data_aggreg <- data_filtered %>% 
-    dplyr::filter(family %in% sel_family) %>% 
+    # dplyr::filter(family %in% sel_family) %>% 
     dplyr::filter(year == sel_year) %>% 
     aggregate_data(., 'species')
   if (sel_geom == 'Bar plots') {

@@ -1,27 +1,19 @@
 initialize_rv <- function(INIT) {
   reactiveValues(
+    sel_dataset = INIT$DATASET$SELECTED,
     current_tab = INIT$CURRENT_TAB,
-    sel_year = 2021,
-    sel_country = INIT$SEL_COUNTRY$FISH,
+    sel_country = INIT$COUNTRY$SELECTED,
+    sel_subnational = INIT$SUBNATIONAL$SELECTED,
+    sel_local = INIT$LOCAL$SELECTED,
+    sel_maa = INIT$MAA$SELECTED,
+    sel_year = INIT$YEAR$SELECTED,
+    sel_family = INIT$FAMILY$SELECTED,
     sel_metric = INIT$SEL_METRIC,
     sel_geom = INIT$SEL_GEOM,
     sel_yscale = INIT$SEL_YSCALE,
-    sel_family = INIT$SEL_FAMILY,
     basemap = INIT$BASEMAP,
     # there is a fish family that is blank. currently, selecting that will crash
     # the app with error Warning: Error in aggregate.data.frame: no rows to aggregate
     # for now, we will just take out the ~600 samples that have this nameles family
-    data_full = list(
-      fish = INIT$DATA_FULL$FISH,
-      mangroves = INIT$DATA_FULL$MANGROVES
-    ),
-    # data_filtered = list(
-    #   fish = INIT$DATA_FILTERED$FISH,
-    #   mangroves = INIT$DATA_FILTERED$MANGROVES
-    # ),
-    data_filtered = list(
-      fish = INIT$DATA_FILTERED$FISH,
-      mangroves = INIT$DATA_FILTERED$MANGROVES
-    ),
-    coords = INIT$COORDS)
+    data_full = INIT$DATA_FULL)
 }

@@ -40,11 +40,15 @@ mapServer <- function(id, rv){
     
     ### need a bit of an overhaul on how to pass data through for mapping --
     ### unlike plots, we need all the metrics pass through in one pipeline together!
-    observeEvent(rv$data_filtered$fish, {
-      data_filtered <- rv$data_filtered$fish
-      coords_filtered <- rv$coords %>%
-        dplyr::filter(location_name %in% data_filtered$location_name)
-      rv$data_map <- get_map_data(data_filtered, coords_filtered)
+    observeEvent(rv$data_filtered, {
+      if ((rv$current_tab == "Map") & rv$sel_dataset == "Fish") {
+        data_filtered <- rv$data_filtered
+        cat(nrow(data_filtered))
+        coords_filtered <- INIT$COORDS %>%
+          dplyr::filter(location_name %in% data_filtered$location_name,
+                        year == rv$sel_year)
+        rv$data_map <- get_map_data(data_filtered, coords_filtered)
+      }
     })
     
   })
