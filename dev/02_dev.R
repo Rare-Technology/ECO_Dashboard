@@ -42,6 +42,7 @@ golem::add_css_file( "custom" )
 ## If you have data in your package
 usethis::use_data_raw( name = "mangroves", open = TRUE )
 usethis::use_data_raw( name = "INIT", open = TRUE)
+usethis::use_data_raw( name = "benthic", open = TRUE)
 
 ## Tests ----
 ## Add one line by test you want to create

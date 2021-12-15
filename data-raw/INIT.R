@@ -9,16 +9,20 @@
 #' @noRd
 INIT <-  list()
 INIT$DATASET <- list(
-  CHOICES = sort(c("Fish", "Mangroves")),
+  CHOICES = sort(c("Fish", "Mangroves", "Benthic")),
   SELECTED = "Fish"
 )
+INIT$METRICS <- list(
+  "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
+  "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
+  "Benthic" = c("Habitat diversity", "Habitat Cover")
+)
 INIT$CURRENT_TAB <- 'Start'
-INIT$SEL_METRIC <- 'Fish Biomass'
 INIT$SEL_GEOM <- "Bar plots"
 INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
-  "Mangrove Forests" = mangroves
+  "Mangroves" = mangroves
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"

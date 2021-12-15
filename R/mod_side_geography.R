@@ -89,17 +89,19 @@ sidebarGeoServer <- function(id, rv){
       ui
     })
     
-    observeEvent(input$dataset, {
-      rv$sel_dataset <- input$dataset
-      country_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                         target = "country")
-      rv$sel_country <- country_choices[1]
-      updateSelectInput(
-        session,
-        "sel_country",
-        choices = country_choices,
-        selected = country_choices[1]
-      )
+    observeEvent(input$sel_dataset, {
+      if(rv$sel_dataset != input$sel_dataset){
+        rv$sel_dataset <- input$sel_dataset
+        country_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                           target = "country")
+        rv$sel_country <- country_choices[1]
+        updateSelectInput(
+          session,
+          "sel_country",
+          choices = country_choices,
+          selected = country_choices[1]
+        )
+      }
     }, ignoreInit = TRUE)
     
     observeEvent(input$sel_country, {

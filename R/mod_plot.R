@@ -24,12 +24,19 @@ plotServer <- function(id, rv){
     theme_update(plot.title = element_text(hjust = 0.5))
     
     output$plot_holder <- renderUI({
-      rv$data_filtered <- INIT$DATA_FULL[[rv$sel_dataset]] %>%
-        dplyr::filter(ma_name %in% rv$sel_maa,
-                      year == rv$sel_year,
-                      family %in% rv$sel_family)
+      sel_dataset <- rv$sel_dataset
+      if (sel_dataset == "Fish") {
+        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
+          dplyr::filter(ma_name %in% rv$sel_maa,
+                        year == rv$sel_year,
+                        family %in% rv$sel_family)
+        sel_family <- rv$sel_family
+      } else if (sel_dataset == "Mangroves") {
+        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
+          dplyr::filter(ma_name %in% rv$sel_maa,
+                        year == rv$sel_year)
+      }
       data_filtered <- rv$data_filtered
-      sel_family <- rv$sel_family
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
@@ -42,7 +49,10 @@ plotServer <- function(id, rv){
               "Fish Biomass" = plot_biomass(data_filtered, sel_year, sel_family, sel_geom),
               "Fish Density" = plot_density(data_filtered, sel_year, sel_family, sel_geom),
               "Fish Diversity" = plot_diversity(data_filtered, sel_year, sel_family, sel_geom),
-              "Fish Size" = plot_size(data_filtered, sel_year, sel_family, sel_geom)
+              "Fish Size" = plot_size(data_filtered, sel_year, sel_family, sel_geom),
+              "Sapling Density" = plot_sapling_tree_density(data_filtered, sel_geom),
+              "Tree Diversity" = plot_tree_diversity(data_filtered, sel_geom),
+              "Tree Size" = plot_tree_size(data_filtered, sel_geom)
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p
