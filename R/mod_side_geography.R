@@ -22,23 +22,23 @@ sidebarGeoServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     output$geo <- renderUI({
       ui <- tagList(
-        div(class = "sidetitle", "Data"),
+        div(class = "sidetitle", tr(rv, "Data")),
         selectInput(
           ns("sel_dataset"),
-          "Data set",
+          tr(rv, "Data source"),
           choices = INIT$DATASET$CHOICES,
           selected = INIT$DATASET$SELECTED
         ),
-        div(class="sidetitle", "Geography"),
+        div(class="sidetitle", tr(rv, "Geography")),
         selectInput(
           ns('sel_country'),
-          'Country',
+          tr(rv, 'Country'),
           choices = INIT$COUNTRY$CHOICES,
           selected = INIT$COUNTRY$SELECTED
         ),
         pickerInput(
           ns('sel_subnational'),
-          'Subnational government',
+          tr(rv, 'Subnational government'),
           choices = INIT$SUBNATIONAL$CHOICES,
           selected = INIT$SUBNATIONA$SELECTED,
           multiple = TRUE,
@@ -49,7 +49,7 @@ sidebarGeoServer <- function(id, rv){
         ),
         pickerInput(
           ns('sel_local'),
-          'Local government',
+          tr(rv, 'Local government'),
           choices = INIT$LOCAL$CHOICES,
           selected = INIT$LOCAL$SELECTED,
           multiple = TRUE,
@@ -60,7 +60,7 @@ sidebarGeoServer <- function(id, rv){
         ),
         pickerInput(
           ns('sel_maa'),
-          'Managed Access Area',
+          tr(rv, 'Managed Access Area'),
           choices = INIT$MAA$CHOICES,
           selected = INIT$MAA$SELECTED,
           multiple = TRUE,
@@ -70,22 +70,7 @@ sidebarGeoServer <- function(id, rv){
           )
         )
       )
-     
-      # if (current_tab %in% c("Coral Reefs", "Map")) {
-      #   ui <- tagList(ui,
-      #     pickerInput(
-      #       ns('sel_maa'),
-      #       'Managed access area',
-      #       choices = init_maa_choices,
-      #       selected = NULL,
-      #       multiple = TRUE,
-      #       options = list(
-      #         `actions-box` = TRUE,
-      #         `selected-text-format` = "count > 2"
-      #       )
-      #     )
-      #   )
-      # }
+      
       ui
     })
     
@@ -164,13 +149,6 @@ sidebarGeoServer <- function(id, rv){
       if (!setequal(rv$sel_maa, input$sel_maa)) {
         rv$sel_maa <- input$sel_maa
       }
-      # rv$data_filtered <- INIT$DATA_FULL[[rv$sel_dataset]] %>%
-      #   dplyr::filter(country == rv$sel_country,
-      #                 level1_name %in% rv$sel_subnational,
-      #                 level2_name %in% rv$sel_local,
-      #                 ma_name %in% rv$sel_maa,
-      #                 year == rv$sel_year,
-      #                 family %in% rv$sel_family)
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
   })
 }

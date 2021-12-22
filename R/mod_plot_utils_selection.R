@@ -20,6 +20,16 @@ aggregate_data <- function(data_filtered, metric) {
     aggregate(tree_species ~ year + country + ma_name + location_status + location_name,
               data = data_filtered, FUN = count_unique)
     
+  } else if (metric == "attribute") {
+    # many rows have attributes w/ percentage = 0. these should not be be part of the
+    # diversity count
+    aggregate(attribute ~ year + country + ma_name + location_status + location_name,
+            data = data_filtered %>% dplyr::filter(percentage > 0), FUN = count_unique)
+    
+  } else if (metric == "percentage") {
+    aggregate(percentage ~ year + country + ma_name + location_status + location_name
+              + category, data = data_filtered, FUN = sum)
+    
   } else if (metric == "dbh_cm") {
     data_filtered <- data_filtered %>% # these lines may change depending on how
       dplyr::filter(age == "adult") # age is implemented in other metrics
@@ -90,6 +100,10 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
     # as it makes it very clear that the surrounding code is in regard to fish size
   }
   
+  if (metric == "percentage") {
+    groupvars1 <- c(groupvars1, "category")
+    groupvars2 <- c(groupvars2, "category")
+  }  
   # metric ~ country + ma_name + location_status + location_name
   formula1 <- paste(metric, paste(groupvars1, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
@@ -97,7 +111,7 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   formula2 <- paste(metric, paste(groupvars2, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
   
-  if (metric %in%  c("species", "tree_species")) {
+  if (metric %in% c("species", "tree_species", "attribute")) {
     # in this case, data_aggreg is already aggregated by location,
     # by count_unique instead of mean
     data_loc <- data_aggreg

@@ -26,22 +26,19 @@ sidebarDisplayServer <- function(id, rv){
       current_tab <- rv$current_tab
       
       ui <- br()
-      if (current_tab == "Visualize") {
+      if (current_tab == tr(rv, "Visualize data")) {
         ui <- tagList(ui,
           div(class="sidetitle", "Plotting"),
           selectInput(ns('sel_metric'),
-                      'Metric',
-                      # todo: habitat diversity, habitat cover
-                      # habitat diversity only worked for IDN in Abel's code
-                      # habitat cover didn't work at all
+                      tr(rv, 'Metric'),
                       choices = INIT$METRICS[["Fish"]]
           ),
           radioButtons(ns('sel_geom'),
-                       'Plot Type',
+                       tr(rv, 'Plot Type'),
                        choices = c('Bar plots', 'Distribution plots')
           ),
           radioButtons(ns('sel_yscale'),
-                       'Y-axis',
+                       tr(rv, 'Y-axis'),
                        choices = c('Free'=TRUE,
                                    'Fixed'=FALSE),
                        selected = TRUE
@@ -51,7 +48,7 @@ sidebarDisplayServer <- function(id, rv){
       if (sel_dataset == "Fish") {
         ui <- tagList(ui,
           pickerInput(ns('sel_family'),
-                      'Fish family',
+                      tr(rv, 'Family'),
                       choices = INIT$FAMILY$CHOICES,
                       selected = INIT$FAMILY$SELECTED,
                       options = list(
@@ -64,11 +61,13 @@ sidebarDisplayServer <- function(id, rv){
         ui <- tagList(ui,
           div(class="sidetitle", "Map"),
           selectInput(ns('basemap'),
-            'Select Basemap',
+            tr(rv, 'Select Basemap'),
+            # R doesn't like it when you try wrapping the choices text in tr()
+            # need to find work around when re-implementing map
             choices= c("Gray Canvas basemap" = providers$Esri.WorldGrayCanvas,
                       "National Geographic basemap" = providers$Esri.NatGeoWorldMap,
-                      "Ocean basemap"= providers$Esri.OceanBasemap,
-                      "Satellite basemap"= providers$Esri.WorldImagery,
+                      "Ocean basemap" = providers$Esri.OceanBasemap,
+                      "Satellite basemap" = providers$Esri.WorldImagery,
                       "World Topo basemap" = providers$Esri.WorldTopoMap),
             selected = rv$basemap
           )
@@ -93,43 +92,6 @@ sidebarDisplayServer <- function(id, rv){
       )
     }, ignoreInit = TRUE)
     
-    # observeEvent(rv$sel_year, {
-    #   if (rv$current_tab %in% FISH_TABS) {
-    #     family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-    #                                       sel_country = rv$sel_country,
-    #                                       sel_subnational = rv$sel_subnational,
-    #                                       sel_local = rv$sel_local,
-    #                                       sel_maa = rv$sel_maa,
-    #                                       sel_year = rv$sel_year,
-    #                                       target = "family")
-    #     updatePickerInput(
-    #       session,
-    #       'sel_family',
-    #       choices = family_choices,
-    #       selected = family_choices
-    #     )
-    #   }
-    # })
-    # 
-    # observeEvent(rv$sel_maa, { # in case a change in maa does not yield a change in year
-    #   if (rv$current_tab %in% FISH_TABS) {
-    #     family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-    #                                       sel_country = rv$sel_country,
-    #                                       sel_subnational = rv$sel_subnational,
-    #                                       sel_local = rv$sel_local,
-    #                                       sel_maa = rv$sel_maa,
-    #                                       sel_year = rv$sel_year,
-    #                                       target = "family")
-    #     updatePickerInput(
-    #       session,
-    #       'sel_family',
-    #       choices = family_choices,
-    #       selected = family_choices
-    #     )
-    #   }
-    # })
-    
-    
     observeEvent(input$sel_metric, {
       rv$sel_metric <- input$sel_metric
       updateSelectInput(
@@ -148,7 +110,7 @@ sidebarDisplayServer <- function(id, rv){
     })
     
     observeEvent(rv$sel_year, {
-      if (!is.null(rv$sel_maa)) {
+      if (!is.null(rv$sel_maa) & rv$current_tab == "Fish") {
         family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
                                           # sel_country = rv$sel_country,
                                           # sel_subnational = rv$sel_subnational,
@@ -167,23 +129,25 @@ sidebarDisplayServer <- function(id, rv){
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
     observeEvent(rv$sel_maa, {
-      toggleState(id = "sel_family",
-                  condition = !is.null(rv$sel_maa))
-      if (!is.null(rv$sel_maa)) {
-        family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                          sel_country = rv$sel_country,
-                                          sel_subnational = rv$sel_subnational,
-                                          sel_local = rv$sel_local,
-                                          sel_maa = rv$sel_maa,
-                                          sel_year = rv$sel_year,
-                                          target = "family")
-        rv$sel_family <- family_choices
-        updatePickerInput(
-          session,
-          "sel_family",
-          choices = family_choices,
-          selected = family_choices
-        )
+      if (rv$current_tab == "Fish") {
+        toggleState(id = "sel_family",
+                    condition = !is.null(rv$sel_maa))
+        if (!is.null(rv$sel_maa)) {
+          family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
+                                            sel_country = rv$sel_country,
+                                            sel_subnational = rv$sel_subnational,
+                                            sel_local = rv$sel_local,
+                                            sel_maa = rv$sel_maa,
+                                            sel_year = rv$sel_year,
+                                            target = "family")
+          rv$sel_family <- family_choices
+          updatePickerInput(
+            session,
+            "sel_family",
+            choices = family_choices,
+            selected = family_choices
+          )
+        }
       }
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     
@@ -191,13 +155,6 @@ sidebarDisplayServer <- function(id, rv){
       if (!setequal(rv$sel_family, input$sel_family)) {
         rv$sel_family <- input$sel_family
       }
-      # rv$data_filtered <- INIT$DATA_FULL[[rv$sel_dataset]] %>% 
-      #   dplyr::filter(country == rv$sel_country,
-      #                 level1_name %in% rv$sel_subnational,
-      #                 level2_name %in% rv$sel_local,
-      #                 ma_name %in% rv$sel_maa,
-      #                 year == rv$sel_year,
-      #                 family %in% input$sel_family)
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
   })
 }

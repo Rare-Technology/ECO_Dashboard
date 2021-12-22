@@ -1,6 +1,7 @@
 ## code to prepare `benthic` dataset goes here
 
 ### add 2021 PHL data
+library(dplyr)
 library(readxl)
 
 df_phl <- read_excel("../data/Benthic_survey_RARE_AllSites_2020-21_PHv2.xlsx")
@@ -8,13 +9,13 @@ detach(package:readxl)
 
 # first, let's add the missing geo columns.
 fish_coords <- fish.surveys %>% 
-  dplyr::select(ma_name, lat, lon) %>% 
+  select(ma_name, lat, lon) %>% 
   unique()
 
 get_geo_names <- function(df, site, fish_coords) {
   site_coords <- df %>% 
-    dplyr::filter(sitename == site) %>% 
-    dplyr::select(lat, lon) %>% 
+    filter(sitename == site) %>% 
+    select(lat, lon) %>% 
     unique()
   
   distances <- data.frame(ma_name = fish_coords$ma_name,
@@ -23,14 +24,14 @@ get_geo_names <- function(df, site, fish_coords) {
   distances$D <- (fish_coords$lat - site_coords$lat)**2 + (fish_coords$lon - site_coords$lon)**2
   
   closest_maa <- distances %>% 
-    dplyr::filter(D == min(D, na.rm = TRUE)) %>%  # the min distances are always 0
-    dplyr::pull(ma_name) %>% 
+    filter(D == min(D, na.rm = TRUE)) %>%  # the min distances are always 0
+    pull(ma_name) %>% 
     unique()
 
   
   geo_names <- fish.surveys %>% 
-    dplyr::filter(ma_name == closest_maa) %>% 
-    dplyr::select(level1_name, level2_name, ma_name) %>% 
+    filter(ma_name == closest_maa) %>% 
+    select(level1_name, level2_name, ma_name) %>% 
     unique()
   
   geo_names
@@ -59,8 +60,8 @@ get_geo_names_by_string <- function(df, site) {
   # instead of using disance, match the sitename with ma_name, since there are matches
   # for almost all sitenames aside from HND's "Mangrove Bight"
   geo_names <- fish.surveys %>% 
-    dplyr::filter(ma_name == site) %>% 
-    dplyr::select(level1_name, level2_name, ma_name) %>% 
+    filter(ma_name == site) %>% 
+    select(level1_name, level2_name, ma_name) %>% 
     unique()
   
   if (nrow(geo_names) > 1) {
@@ -82,7 +83,7 @@ for (site in df_sites) {
 }
 
 df <- df %>% 
-  dplyr::filter(country != "HND") # only 5 HND records and the sitename doesn't even match an maa
+  filter(country != "HND") # only 5 HND records and the sitename doesn't even match an maa
 
 df$year[df$country == "MOZ"] <- 2020
 df$year[df$country == "IDN"] <- 2019
@@ -96,11 +97,23 @@ cols <- intersect(names(df), names(df_phl))
 # the only difference is df_phl has a `reef zone` column, which only has one value: 'crest'
 
 df <- df %>% 
-  dplyr::select(cols)
+  select(cols)
 
 df_phl <- df_phl %>% 
-  dplyr::select(cols)
+  select(cols)
 
 benthic.surveys <- rbind(df, df_phl)
+
+benthic.surveys <- benthic.surveys %>%
+  mutate(country = case_when(
+    country == "IDN" ~ "Indonesia",
+    country == "MOZ" ~ "Mozambique",
+    country == "PHL" ~ "Philippines"
+    )) %>% 
+  rename(location_status = locationstatus,
+         location_name = locationname,
+         transect_no = transectno)
+
+detach(package:dplyr)
 
 usethis::use_data(benthic.surveys, overwrite = TRUE)

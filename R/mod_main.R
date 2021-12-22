@@ -25,6 +25,15 @@ mainUI <- function(id){
         ),
         div(style='flex-grow: 1;'),
         # div(id='help-button', icon('question-circle-o'), onclick='tour()'),
+        div(id="lang-select", selectInput(ns("language"), "", width = 80,
+                                          c("EN" = "English",
+                                            "ID" = "Bahasa Indonesia",
+                                            "BRA" = "Português (BRA)",
+                                            "PT" = "Português (MOZ)",
+                                            "ES" = "Español",
+                                            "PHL" = "Philippines"
+                                          ))
+        ),
         div(class = 'fs-button',
             HTML(
               "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' class='bi bi-fullscreen' viewBox='0 0 16 16'>
@@ -33,14 +42,7 @@ mainUI <- function(id){
             onclick = "shinyjs.toggleFullScreen();"
         )
     ),
-    tabsetPanel(
-      id = ns('tabs'),
-      tabPanel("Start", startUI("startUI")),
-      tabPanel("Visualize", plotUI('plotUI'))
-      # tabPanel('Mangrove Forests', mangroveUI('mangroveUI')),
-      # tabPanel('Map', mapUI('mapUI'))
-      # tabPanel('Report', reportUI('reportUI'))
-    )
+    uiOutput(ns("tabPanels"))
   )
 }
     
@@ -48,9 +50,26 @@ mainUI <- function(id){
 #'
 #' @noRd 
 mainServer <- function(id, rv){
+  ns <- NS(id)
   moduleServer( id, function(input, output, session){
+    
+    output$tabPanels <- renderUI({
+      ui <- tabsetPanel(
+        id = ns("tabs"),
+        tabPanel(tr(rv, "Start"), startUI("startUI")),
+        tabPanel(tr(rv, "Visualize data"), plotUI('plotUI'))
+        # tabPanel('Map', mapUI('mapUI')) # currently inactive, will rework soon
+        # tabPanel('Report', reportUI('reportUI')) # one day?
+      )
+      ui
+    })
+    
     observeEvent(input$tabs, {
       rv$current_tab <- input$tabs
+    })
+    
+    observeEvent(input$language, {
+      rv$language <- input$language
     })
   })
 }

@@ -21,10 +21,10 @@ sidebarYearServer <- function(id, rv){
   moduleServer( id, function(input, output, session){
     output$year <- renderUI({
       ui <- tagList(
-        div(class = "sidetitle", "Survey Year"),
+        div(class = "sidetitle", tr(rv, "Survey Year")),
         selectInput(
           ns("sel_year"),
-          "Year",
+          tr(rv, "Year"),
           choices = INIT$YEAR$CHOICES,#year_choices,
           selected = INIT$YEAR$SELECTED#max(year_choices)
         )

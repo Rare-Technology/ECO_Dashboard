@@ -1,9 +1,5 @@
-plot_size <- function(data_filtered, sel_year, sel_family, sel_geom) {
-  
-  data_aggreg <- data_filtered %>% 
-    dplyr::filter(family %in% sel_family) %>% 
-    dplyr::filter(year == sel_year) %>% 
-    aggregate_data(., 'size_class')
+plot_size <- function(data_filtered, sel_geom) {
+  data_aggreg <- aggregate_data(data_filtered, 'size_class')
 
   if (sel_geom == "Bar plots") {
     data_summary <- summarySE(data_aggreg, 'density_ind_ha', for.size=TRUE)

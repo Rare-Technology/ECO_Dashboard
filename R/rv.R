@@ -16,5 +16,6 @@ initialize_rv <- function(INIT) {
     # there is a fish family that is blank. currently, selecting that will crash
     # the app with error Warning: Error in aggregate.data.frame: no rows to aggregate
     # for now, we will just take out the ~600 samples that have this nameles family
-    data_full = INIT$DATA_FULL)
+    data_full = INIT$DATA_FULL,
+    language = "English")
 }

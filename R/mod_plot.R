@@ -25,34 +25,37 @@ plotServer <- function(id, rv){
     
     output$plot_holder <- renderUI({
       sel_dataset <- rv$sel_dataset
-      if (sel_dataset == "Fish") {
-        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
-          dplyr::filter(ma_name %in% rv$sel_maa,
-                        year == rv$sel_year,
-                        family %in% rv$sel_family)
-        sel_family <- rv$sel_family
-      } else if (sel_dataset == "Mangroves") {
-        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
-          dplyr::filter(ma_name %in% rv$sel_maa,
-                        year == rv$sel_year)
-      }
-      data_filtered <- rv$data_filtered
       sel_maa <- rv$sel_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
       sel_year <- rv$sel_year
       
+      if (sel_dataset == "Fish") {
+        sel_family <- rv$sel_family
+        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
+          dplyr::filter(ma_name %in% sel_maa,
+                        year == sel_year,
+                        family %in% sel_family)
+      } else {
+        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
+          dplyr::filter(ma_name %in% sel_maa,
+                        year == sel_year)
+      }
+      data_filtered <- rv$data_filtered
+      
       if (length(sel_maa) == 0) {
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(rv$sel_metric,
-              "Fish Biomass" = plot_biomass(data_filtered, sel_year, sel_family, sel_geom),
-              "Fish Density" = plot_density(data_filtered, sel_year, sel_family, sel_geom),
-              "Fish Diversity" = plot_diversity(data_filtered, sel_year, sel_family, sel_geom),
-              "Fish Size" = plot_size(data_filtered, sel_year, sel_family, sel_geom),
-              "Sapling Density" = plot_sapling_tree_density(data_filtered, sel_geom),
-              "Tree Diversity" = plot_tree_diversity(data_filtered, sel_geom),
-              "Tree Size" = plot_tree_size(data_filtered, sel_geom)
+              "Fish biomass" = plot_biomass(data_filtered, sel_geom),
+              "Fish density" = plot_density(data_filtered, sel_geom),
+              "Fish diversity" = plot_diversity(data_filtered, sel_geom),
+              "Fish size" = plot_size(data_filtered, sel_geom),
+              "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom),
+              "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom),
+              "Tree size" = plot_tree_size(data_filtered, sel_geom),
+              "Reef cover" = plot_reef_cover(data_filtered, sel_geom),
+              "Reef diversity" = plot_reef_diversity(data_filtered, sel_geom)
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p

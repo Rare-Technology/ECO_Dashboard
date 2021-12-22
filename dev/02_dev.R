@@ -30,7 +30,8 @@ golem::add_fct( "helpers" )
 golem::add_utils( "mangrove_plot_density" )
 golem::add_utils("mangrove_plot_diversity")
 golem::add_utils("mangrove_plot_size")
-
+golem::add_utils("benthic_plot_cover")
+golem::add_utils("benthic_plot_diversity")
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -43,6 +44,7 @@ golem::add_css_file( "custom" )
 usethis::use_data_raw( name = "mangroves", open = TRUE )
 usethis::use_data_raw( name = "INIT", open = TRUE)
 usethis::use_data_raw( name = "benthic", open = TRUE)
+usethis::use_data_raw( name = "script", open = TRUE)
 
 ## Tests ----
 ## Add one line by test you want to create

@@ -15,14 +15,15 @@ INIT$DATASET <- list(
 INIT$METRICS <- list(
   "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
-  "Benthic" = c("Habitat diversity", "Habitat Cover")
+  "Benthic" = c("Reef diversity")#, "Reef cover") add later
 )
 INIT$CURRENT_TAB <- 'Start'
 INIT$SEL_GEOM <- "Bar plots"
 INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
-  "Mangroves" = mangroves
+  "Mangroves" = mangroves,
+  "Benthic" = benthic.surveys
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"
