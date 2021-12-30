@@ -27,8 +27,23 @@ aggregate_data <- function(data_filtered, metric) {
             data = data_filtered %>% dplyr::filter(percentage > 0), FUN = count_unique)
     
   } else if (metric == "percentage") {
-    aggregate(percentage ~ year + country + ma_name + location_status + location_name
-              + category, data = data_filtered, FUN = sum)
+    data_filtered %>% 
+      dplyr::group_by(year, country, ma_name, location_status, location_name,
+                      transect_no, category) %>% 
+      dplyr::summarize(percentage = sum(percentage)) %>% 
+      dplyr::mutate(total_percentage = sum(percentage)) %>%
+      dplyr::mutate(percentage = percentage / total_percentage * 100) %>% 
+      dplyr::group_by(year, country, ma_name, location_status, location_name, category) %>%
+      dplyr::summarize(percentage = mean(percentage)) %>%
+      aggregate(percentage ~ country + ma_name + year + location_status + category,
+                data = ., FUN = mean) %>% 
+      dplyr::group_by(country, ma_name, year, location_status) %>% 
+      dplyr::mutate(total_percentage = sum(percentage)) %>% 
+      dplyr::mutate(percentage = percentage / total_percentage * 100)
+
+
+    # aggregate(percentage ~ year + country + ma_name + location_status + location_name
+    #           + category, data = data_filtered, FUN = mean)
     
   } else if (metric == "dbh_cm") {
     data_filtered <- data_filtered %>% # these lines may change depending on how
@@ -104,14 +119,14 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
     groupvars1 <- c(groupvars1, "category")
     groupvars2 <- c(groupvars2, "category")
   }  
-  # metric ~ country + ma_name + location_status + location_name
+  # metric ~ country + ma_name + year + location_status + location_name
   formula1 <- paste(metric, paste(groupvars1, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
-  # metric ~ country + ma_name + location_status
+  # metric ~ country + ma_name + year + location_status
   formula2 <- paste(metric, paste(groupvars2, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
   
-  if (metric %in% c("species", "tree_species", "attribute")) {
+  if (metric %in% c("species", "tree_species", "attribute", "percentage")) {
     # in this case, data_aggreg is already aggregated by location,
     # by count_unique instead of mean
     data_loc <- data_aggreg

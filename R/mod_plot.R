@@ -54,8 +54,8 @@ plotServer <- function(id, rv){
               "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom),
               "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom),
               "Tree size" = plot_tree_size(data_filtered, sel_geom),
-              "Reef cover" = plot_reef_cover(data_filtered, sel_geom),
-              "Reef diversity" = plot_reef_diversity(data_filtered, sel_geom)
+              "Benthic cover" = plot_reef_cover(data_filtered, sel_geom),
+              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom)
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p
