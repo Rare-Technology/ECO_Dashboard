@@ -55,7 +55,10 @@ plotServer <- function(id, rv){
               "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom),
               "Tree size" = plot_tree_size(data_filtered, sel_geom),
               "Benthic cover" = plot_reef_cover(data_filtered, sel_geom),
-              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom)
+              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom),
+              "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom),
+              "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom),
+              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom)
         )
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p

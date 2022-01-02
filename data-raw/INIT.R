@@ -15,7 +15,8 @@ INIT$DATASET <- list(
 INIT$METRICS <- list(
   "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
-  "Benthic" = c("Benthic diversity", "Benthic cover")
+  "Benthic" = c("Benthic diversity", "Benthic cover"),
+  "Seagrass" = c("Seagrass cover", "Seagrass height")
 )
 INIT$CURRENT_TAB <- 'Start'
 INIT$SEL_GEOM <- "Bar plots"

@@ -1,3 +1,6 @@
+#' Helper functions for data aggregation and summary statistics
+#' 
+#' @import dplyr
 aggregate_data <- function(data_filtered, metric) {
   # add up the biomass of all fish at each transect
   if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
@@ -26,6 +29,16 @@ aggregate_data <- function(data_filtered, metric) {
     aggregate(attribute ~ year + country + ma_name + location_status + location_name,
             data = data_filtered %>% dplyr::filter(percentage > 0), FUN = count_unique)
     
+  } else if (metric == "cover") {
+    data_filtered %>% 
+      dplyr::group_by(year, country, ma_name, survey_location, location_status,
+               seagrass_species, transect_no) %>% 
+      dplyr::summarize(cover = mean(cover, na.rm=TRUE)) %>% 
+      dplyr::group_by(year, country, ma_name, survey_location, location_status, seagrass_species) %>% 
+      dplyr::summarize(cover = mean(cover)) %>% 
+      dplyr::group_by(year, country, ma_name, location_status, seagrass_species) %>% 
+      dplyr::summarize(cover = mean(cover)) %>% View()
+      
   } else if (metric == "percentage") {
     data_filtered %>% 
       dplyr::group_by(year, country, ma_name, location_status, location_name,

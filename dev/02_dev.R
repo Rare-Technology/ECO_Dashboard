@@ -18,6 +18,8 @@
 usethis::use_package( "thinkr" )
 usethis::use_package("shinyWidgets")
 usethis::use_package("shinyjs")
+usethis::use_package("dplyr")
+usethis::use_package("ggplot2")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -32,6 +34,10 @@ golem::add_utils("mangrove_plot_diversity")
 golem::add_utils("mangrove_plot_size")
 golem::add_utils("benthic_plot_cover")
 golem::add_utils("benthic_plot_diversity")
+golem::add_utils("seagrass_plot_cover")
+golem::add_utils("seagrass_plot_diversity")
+golem::add_utils("seagrass_plot_height")
+golem::add_utils("plot")
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -45,7 +51,7 @@ usethis::use_data_raw( name = "mangroves", open = TRUE )
 usethis::use_data_raw( name = "INIT", open = TRUE)
 usethis::use_data_raw( name = "benthic", open = TRUE)
 usethis::use_data_raw( name = "script", open = TRUE)
-
+usethis::use_data_raw( name = "seagrass", open = TRUE)
 ## Tests ----
 ## Add one line by test you want to create
 # usethis::use_test( "app" )
