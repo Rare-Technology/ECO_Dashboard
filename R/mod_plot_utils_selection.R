@@ -31,14 +31,20 @@ aggregate_data <- function(data_filtered, metric) {
     
   } else if (metric == "cover") {
     data_filtered %>% 
-      dplyr::group_by(year, country, ma_name, survey_location, location_status,
+      dplyr::group_by(year, country, ma_name, location_status, location_name,
                seagrass_species, transect_no) %>% 
       dplyr::summarize(cover = mean(cover, na.rm=TRUE)) %>% 
-      dplyr::group_by(year, country, ma_name, survey_location, location_status, seagrass_species) %>% 
+      dplyr::group_by(year, country, ma_name, location_status, location_name, seagrass_species) %>% 
       dplyr::summarize(cover = mean(cover)) %>% 
       dplyr::group_by(year, country, ma_name, location_status, seagrass_species) %>% 
-      dplyr::summarize(cover = mean(cover)) %>% View()
+      dplyr::summarize(cover = mean(cover))
       
+  } else if (metric == "avg_height_cm") {
+    data_filtered %>% 
+      dplyr::filter(category == "Seagrass") %>% # maybe subject to change on future data
+      dplyr::group_by(year, country, ma_name, location_status, location_name, transect_no) %>% 
+      dplyr::summarize(avg_height_cm = mean(avg_height_cm, na.rm = TRUE))
+    
   } else if (metric == "percentage") {
     data_filtered %>% 
       dplyr::group_by(year, country, ma_name, location_status, location_name,

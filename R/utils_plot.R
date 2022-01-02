@@ -21,3 +21,14 @@ theme_rare <- function(rotate_x = FALSE, subtitle_color = "black") {
     strip.text = element_text(size = 14, face = "bold")    
   )
 }
+
+RARE_COLORS <- list(
+  "blue" = "#005BBB",
+  "green" = "#008542",
+  "grey" = "#5E6A71",
+  "red" = "#AA1948",
+  "lightblue" = "#00AFD8",
+  "orange" = "#F58233",
+  "lightgreen" = "#7AB800",
+  "yellow" = "#EEAF00"
+)

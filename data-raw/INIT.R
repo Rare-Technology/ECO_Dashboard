@@ -9,7 +9,7 @@
 #' @noRd
 INIT <-  list()
 INIT$DATASET <- list(
-  CHOICES = sort(c("Fish", "Mangroves", "Benthic")),
+  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass")),
   SELECTED = "Fish"
 )
 INIT$METRICS <- list(
@@ -24,7 +24,8 @@ INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
   "Mangroves" = mangroves,
-  "Benthic" = benthic.surveys
+  "Benthic" = benthic.surveys,
+  "Seagrass" = seagrass.surveys
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"

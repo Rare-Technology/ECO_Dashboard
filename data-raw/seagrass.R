@@ -9,6 +9,8 @@
 df <- readr::read_csv("https://query.data.world/s/5o6gw5svmfo7eezkmozxjqlrgwcrge")
 
 df$year <- 2020
+df <- df %>% 
+  dplyr::rename(location_name = survey_location)
 
 seagrass.surveys <- df
 

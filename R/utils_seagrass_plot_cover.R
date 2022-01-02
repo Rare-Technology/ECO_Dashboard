@@ -9,7 +9,7 @@ plot_seagrass_cover <- function(data_filtered, sel_geom) {
   data_aggreg <- aggregate_data(data_filtered, 'cover')
   data_summary <- data_aggreg
   
-  ggplot2::ggplot(data = data_filtered,
+  ggplot2::ggplot(data = data_summary,
                 aes(x = seagrass_species,
                     y = stringr::str_wrap(location_status, 5),
                     fill = cover)) +
