@@ -34,12 +34,12 @@ plotServer <- function(id, rv){
         sel_family <- rv$sel_family
         rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
           dplyr::filter(ma_name %in% sel_maa,
-                        year == sel_year,
+                        # year == sel_year,
                         family %in% sel_family)
       } else {
         rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
-          dplyr::filter(ma_name %in% sel_maa,
-                        year == sel_year)
+          dplyr::filter(ma_name %in% sel_maa)#,
+                        # year == sel_year)
       }
       data_filtered <- rv$data_filtered
       
@@ -47,10 +47,10 @@ plotServer <- function(id, rv){
         div(class="warning_message", "No managed access area selected.")
       } else {
         p <- switch(rv$sel_metric,
-              "Fish biomass" = plot_biomass(data_filtered, sel_geom),
-              "Fish density" = plot_density(data_filtered, sel_geom),
-              "Fish diversity" = plot_diversity(data_filtered, sel_geom),
-              "Fish size" = plot_size(data_filtered, sel_geom),
+              "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom),
+              "Fish density" = plot_fish_density(data_filtered, sel_geom),
+              "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom),
+              "Fish size" = plot_fish_size(data_filtered, sel_geom),
               "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom),
               "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom),
               "Tree size" = plot_tree_size(data_filtered, sel_geom),

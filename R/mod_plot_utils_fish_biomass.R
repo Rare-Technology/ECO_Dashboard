@@ -1,26 +1,53 @@
-plot_biomass <- function(data_filtered, sel_geom) {
+plot_fish_biomass <- function(data_filtered, sel_geom) {
   data_aggreg <- aggregate_data(data_filtered, 'biomass_kg_ha')
-
-  if (sel_geom == 'Bar plots') {
-    data_summary <- summarySE(data_aggreg, 'biomass_kg_ha')
-    ggplot2::ggplot(data=data_summary,
-                    aes(location_status, biomass_kg_ha),
-                    na.rm = TRUE) +
-      facet_wrap('ma_name') +
-      geom_bar(aes(fill = location_status), position=position_dodge(),
-               stat = 'identity') +
-      geom_errorbar(aes(ymin=biomass_kg_ha - SE, ymax=biomass_kg_ha + SE),
-                    position=position_dodge(), width=0.2, na.rm=TRUE) +
-      ggtitle("Mean Fish Biomass")
-  } else if (sel_geom == "Distribution plots") {
-    data_local <- get_local_data(data_aggreg, 'biomass_kg_ha')
-    ggplot2::ggplot(data=data_local,
-                    aes(location_status, biomass_kg_ha),
-                    na.rm = TRUE) +
-      facet_wrap('ma_name') +
-      geom_jitter(aes(fill=location_status), width=0.1, height=0, alpha=0.5, size=2) +
-      stat_summary(aes(col=location_status), na.rm=TRUE, fun.data = "mean_se",
-                   geom = "pointrange", size = .4, position=position_dodge(width=1)) +
-      ggtitle("Mean Fish Biomass")
+  data_summary <- summarySE(data_aggreg, 'biomass_kg_ha')
+  years <- sort(unique(data_summary$year))
+  
+  if (length(years) == 1) {
+    p <- plot_bar(
+      data = data_summary,
+      x = "location_status",
+      y = "biomass_kg_ha",
+      fill = "location_status",
+      title = "Biomass density,",
+      year = years,
+      y_label = "Biomass density (kg/ha)"
+    )
+    if (sel_geom == "Distribution plots") {
+      data_local <- get_local_data(data_aggreg, 'biomass_kg_ha')
+      
+      p <- p + plot_samples(
+        data =  data_local,
+        x = "location_status",
+        y = "biomass_kg_ha",
+        fill = "location_status",
+        shape = 16,
+        point_size = 4
+      )
+    }
+  } else {
+    p <- plot_trend(
+      data = data_summary,
+      x = "year",
+      y = "biomass_kg_ha",
+      fill = "location_status",
+      title = "Biomass density trends",
+      x_label = "Year",
+      y_label = "Biomass density (kg/ha)",
+      years = years
+    )
+    
+    if (sel_geom == "Distribution plots") {
+      data_local <- get_local_data(data_aggreg, "biomass_kg_ha")
+      
+      p <- p + plot_samples(
+        data = data_local,
+        x = "year",
+        y = "biomass_kg_ha",
+        fill = "location_status"
+      )
+    }
   }
+  
+  p
 }

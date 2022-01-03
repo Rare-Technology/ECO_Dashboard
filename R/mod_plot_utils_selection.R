@@ -108,7 +108,7 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
   # aggregation by transects is already given for diversity
   
   if (metric %in% c("biomass_kg_ha", "density_ind_ha", "dbh_cm", "sapling_tree_density_ind_m2")) {
-    groupvars <- c('country', 'ma_name', 'location_status', 'location_name')
+    groupvars <- c('country', 'year', 'ma_name', 'location_status', 'location_name')
     if (for.size) {
       groupvars <- append(groupvars, 'size_class')
     }
@@ -116,7 +116,7 @@ get_local_data <- function(data_aggreg, metric, for.size=FALSE) {
       as.formula()
     aggregate(formula, data=data_aggreg, FUN=mean)
   } else { # size_class
-    aggregate(density_ind_ha ~ country + ma_name + location_status +
+    aggregate(density_ind_ha ~ country + year + ma_name + location_status +
                 location_name + size_class, data=data_aggreg, FUN=mean)
   }
 }
@@ -162,7 +162,10 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
     data_summary$SD <- aggregate(formula2, data=data_loc, FUN=sd) %>% 
       dplyr::pull(metric)
     data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
-  }  
+    data_summary <- data_summary %>% 
+      dplyr::mutate(ymin = !!sym(metric) - SE,
+                    ymax = !!sym(metric) + SE)
+  } 
   
   return(data_summary)
 }
