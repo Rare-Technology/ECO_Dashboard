@@ -7,30 +7,54 @@
 #' @noRd
 plot_sapling_tree_density <- function(data_filtered, sel_geom) {
   data_aggreg <- aggregate_data(data_filtered, "sapling_tree_density_ind_m2")
+  data_summary <- summarySE(data_aggreg, "sapling_tree_density_ind_m2")
+  years <- sort(unique(data_summary$year))
   
-  if (sel_geom == "Bar plots") {
-    data_summary <- summarySE(data_aggreg, "sapling_tree_density_ind_m2")
+  if (length(years) == 1) {
+    p <- plot_bar(
+      data = data_summary,
+      x = "location_status",
+      y = "sapling_tree_density_ind_m2",
+      fill = "location_status",
+      title = "Sapling number density,",
+      year = years,
+      y_label = expression("Number density (individuals/m"^2*")")
+    )
+    if (sel_geom == "Distribution plots") {
+      data_local <- get_local_data(data_aggreg, 'sapling_tree_density_ind_m2')
+      
+      p <- p + plot_samples(
+        data =  data_local,
+        x = "location_status",
+        y = "sapling_tree_density_ind_m2",
+        fill = "location_status",
+        shape = 16,
+        point_size = 4
+      )
+    }
+  } else {
+    p <- plot_trend(
+      data = data_summary,
+      x = "year",
+      y = "sapling_tree_density_ind_m2",
+      fill = "location_status",
+      title = "Sapling number density trends",
+      x_label = "Year",
+      y_label = expression("Number density (individuals/m"^2*")"),
+      years = years
+    )
     
-    ggplot2::ggplot(data = data_summary,
-                    aes(location_status, sapling_tree_density_ind_m2),
-                    na.rm = TRUE) +
-      facet_wrap("ma_name") +
-      geom_bar(aes(fill = location_status), position = position_dodge(),
-               stat = "identity") +
-      geom_errorbar(aes(ymin = sapling_tree_density_ind_m2 - SE,
-                        ymax = sapling_tree_density_ind_m2 + SE),
-                    position = position_dodge(), width = 0.2, na.rm = TRUE) +
-      ggtitle("Mean Sapling Number Density")
-  } else if (sel_geom == "Distribution plots") {
-    data_local <- get_local_data(data_aggreg, "sapling_tree_density_ind_m2")
-    
-    ggplot2::ggplot(data = data_local,
-                    aes(location_status, sapling_tree_density_ind_m2),
-                    na.rm = TRUE) +
-      facet_wrap('ma_name') +
-      geom_jitter(aes(fill=location_status), width=0.1, height=0, alpha=0.5, size=2) +
-      stat_summary(aes(col=location_status), na.rm=TRUE, fun.data = "mean_se",
-                   geom = "pointrange", size = .4, position=position_dodge(width=1)) +
-      ggtitle("Distribution of sapling number density by survey site")
+    if (sel_geom == "Distribution plots") {
+      data_local <- get_local_data(data_aggreg, "sapling_tree_density_ind_m2")
+      
+      p <- p + plot_samples(
+        data = data_local,
+        x = "year",
+        y = "sapling_tree_density_ind_m2",
+        fill = "location_status"
+      )
+    }
   }
+  
+  p
 }

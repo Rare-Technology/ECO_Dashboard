@@ -9,7 +9,7 @@ plot_fish_biomass <- function(data_filtered, sel_geom) {
       x = "location_status",
       y = "biomass_kg_ha",
       fill = "location_status",
-      title = "Biomass density,",
+      title = "Fish biomass density,",
       year = years,
       y_label = "Biomass density (kg/ha)"
     )
@@ -31,7 +31,7 @@ plot_fish_biomass <- function(data_filtered, sel_geom) {
       x = "year",
       y = "biomass_kg_ha",
       fill = "location_status",
-      title = "Biomass density trends",
+      title = "Fish biomass density trends",
       x_label = "Year",
       y_label = "Biomass density (kg/ha)",
       years = years

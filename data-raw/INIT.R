@@ -23,7 +23,7 @@ INIT$SEL_GEOM <- "Bar plots"
 INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
-  "Mangroves" = mangroves,
+  "Mangroves" = mangrove.surveys,
   "Benthic" = benthic.surveys,
   "Seagrass" = seagrass.surveys
 )

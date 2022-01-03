@@ -6,6 +6,7 @@
 #'
 #' @noRd
 plot_seagrass_cover <- function(data_filtered, sel_geom) {
+  ## TODO implement trends
   data_aggreg <- aggregate_data(data_filtered, 'cover')
   data_summary <- data_aggreg
   

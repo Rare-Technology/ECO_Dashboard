@@ -6,6 +6,7 @@
 #'
 #' @noRd
 plot_seagrass_height <- function(data_filtered, sel_geom) {
+  ## TODO implement trends
   data_aggreg <- aggregate_data(data_filtered, "avg_height_cm")
   
   if (sel_geom == "Bar plots") {

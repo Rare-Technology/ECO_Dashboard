@@ -9,9 +9,9 @@ plot_fish_diversity <- function(data_filtered, sel_geom) {
       x = "location_status",
       y = "species",
       fill = "location_status",
-      title = "Number of unique species,",
+      title = "Fish diversity,",
       year = years,
-      y_label = "Species count"
+      y_label = "Number of unique species"
     )
     
     if (sel_geom == "Distribution plots") {
@@ -32,9 +32,9 @@ plot_fish_diversity <- function(data_filtered, sel_geom) {
       x = "year",
       y = "species",
       fill = "location_status",
-      title = "Number of unique species trends",
+      title = "Fish diversity trends",
       x_label = "Year",
-      y_label = "Species count",
+      y_label = "Number of unique fish species",
       years = years
     )
     

@@ -6,29 +6,55 @@
 #'
 #' @noRd
 plot_tree_diversity <- function(data_filtered, sel_geom) {
-  data_aggreg <- aggregate_data(data_filtered, "tree_species")
+  data_aggreg <- aggregate_data(data_filtered, 'tree_species')
+  data_summary <- summarySE(data_aggreg, 'tree_species')
+  years <- sort(unique(data_summary$year))
   
-  if (sel_geom == "Bar plots") {
-    data_summary <- summarySE(data_aggreg, "tree_species")
+  if (length(years) == 1) {
+    p <- plot_bar(
+      data = data_summary,
+      x = "location_status",
+      y = "tree_species",
+      fill = "location_status",
+      title = "Mangrove diversity,",
+      year = years,
+      y_label = "Number of unique tree species"
+    )
+    if (sel_geom == "Distribution plots") {
+      data_local <- data_aggreg
+      
+      p <- p + plot_samples(
+        data = data_local,
+        x = "location_status",
+        y = "tree_species",
+        fill = "location_status",
+        shape = 16,
+        point_size = 4
+      )
+    }
+  } else {
+    p <- plot_trend(
+      data = data_summary,
+      x = "year",
+      y = "tree_species",
+      fill = "location_status",
+      title = "Mangrove diversity trends",
+      x_label = "Year",
+      y_label = "Number of unique tree species",
+      years = years
+    )
     
-    ggplot2::ggplot(data = data_summary,
-                    aes(location_status, tree_species),
-                    na.rm = TRUE) +
-      facet_wrap('ma_name') +
-      geom_bar(aes(fill = location_status), position = position_dodge(),
-               stat = 'identity') +
-      geom_errorbar(aes(ymin = tree_species - SE, ymax = tree_species + SE),
-                    position=position_dodge(), width=0.2, na.rm=TRUE) +
-      ggtitle("Mean Number of Tree Species")
-  } else if (sel_geom == "Distribution plots") {
-    data_local <- data_aggreg
-    ggplot2::ggplot(data = data_local,
-                    aes(location_status, tree_species),
-                    na.rm = TRUE) +
-      facet_wrap('ma_name') +
-      geom_jitter(aes(fill = location_status), width=0.1, height=0, alpha=0.5, size=2) +
-      stat_summary(aes(col = location_status), na.rm=TRUE, fun.data = "mean_se",
-                   geom = "pointrange", size = .4, position=position_dodge(width=1)) +
-      ggtitle("Distribution of number of species by survey site")
+    if (sel_geom == "Distribution plots") {
+      data_local <- data_aggreg
+      
+      p <- p + plot_samples(
+        data = data_local,
+        x = "year",
+        y = "tree_species",
+        fill = "location_status"
+      )
+    }
   }
+  
+  p
 }

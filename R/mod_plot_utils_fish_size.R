@@ -1,4 +1,5 @@
 plot_fish_size <- function(data_filtered, sel_geom) {
+  ## TODO implement trends
   data_aggreg <- aggregate_data(data_filtered, 'size_class')
 
   if (sel_geom == "Bar plots") {

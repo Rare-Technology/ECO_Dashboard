@@ -9,7 +9,7 @@ plot_fish_density <- function(data_filtered, sel_geom) {
       x = "location_status",
       y = "density_ind_ha",
       fill = "location_status",
-      title = "Number density,",
+      title = "Fish number density,",
       year = years,
       y_label = "Number density (individuals/ha)"
     )
@@ -32,7 +32,7 @@ plot_fish_density <- function(data_filtered, sel_geom) {
       x = "year",
       y = "density_ind_ha",
       fill = "location_status",
-      title = "Number density trend",
+      title = "Fish number density trend",
       x_label = "Year",
       y_label = "Number density (individuals/ha)",
       years = years

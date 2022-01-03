@@ -60,4 +60,8 @@ mangroves <- rbind(mangroves_adult, mangroves_sapling)
 ## For future proofing, will hard code the year of the above survey data (2020)
 mangroves$year <- 2020
 
-usethis::use_data(mangroves, overwrite = TRUE)
+## Jan 2 2022
+## Renaming for consistency with other datasets
+mangrove.surveys <- mangroves
+
+usethis::use_data(mangrove.surveys, overwrite = TRUE)
