@@ -369,11 +369,11 @@ get_size_class <- Vectorize(get_size_class)
 fish.surveys$size_class[fish.surveys$country == "Philippines"] <- 
   as.character(get_size_class(fish.surveys$length[fish.surveys$country == "Philippines"]))
 
+### Jan 3, 2022 or so
 #### Fix location_status for some rows
 fish.surveys$location_status[fish.surveys$location_status == "MA"] <- "Managed Access"
 fish.surveys$location_status[fish.surveys$location_status == "reserve"] <- "Reserve"
-# figure out what "outside" means then uncomment and change the next line appropriately
-#fish.surveys$location_status[fish.surveys$location_status == "outside"] <- ?
+fish.surveys$location_status[fish.surveys$location_status == "outside"] <- "Managed Access"
 
 fish.surveys$year <- as.integer(fish.surveys$year)
 

@@ -19,7 +19,8 @@ theme_rare <- function(rotate_x = FALSE, subtitle_color = "black") {
     legend.text = element_text(size = 11),
     plot.title = element_text(size = 22),
     plot.subtitle = element_text(size = 15, colour = subtitle_color),
-    panel.grid.major = element_line(color = "grey75"),
+    panel.grid.major = element_line(color = "grey10"),
+    panel.grid.minor = element_line(color = "grey60"),
     panel.grid.minor.y = element_blank(),
     panel.grid.major.y = element_blank(),
     strip.text = element_text(size = 16, face = "bold")    
@@ -144,7 +145,7 @@ plot_samples <- function(data_local, x = NULL, y = NULL, fill = NULL,
         dodge.width = 0.5
       ),
       shape = shape,
-      alpha = 0.5,
+      alpha = 1,
       size = point_size,
       show.legend = FALSE
     )
@@ -159,26 +160,24 @@ plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_s
         x = x,
         fill = fill
       ),
-      position = "identity",
+      position = position_dodge(),
       binwidth = 1,
-      color = "black",
-      alpha = 0.8
+      alpha = 1
     ) +
     geom_vline(
       data = data_summary,
       aes_string(
         xintercept = x,
-        color = fill
+        color = fill,
+        linetype = fill
       ),
-      size = 1,
-      linetype = "dashed"
+      size = 0.5
     ) +
     facet_wrap("ma_name") +
     ggtitle(paste(title, year)) +
     xlab(x_label) +
     labs(
-      fill = "",
-      color = "Mean"
+      fill = ""
     ) +
     theme_rare() +
     theme(
@@ -192,8 +191,9 @@ plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_s
     # guides(
     #   color = guide_legend(title = "Mean")
     # ) +
-    scale_color_manual(values = c(RARE_COLORS$red, RARE_COLORS$yellow)) +
-    scale_fill_manual(values = c(RARE_COLORS$red, RARE_COLORS$yellow))
+    scale_color_manual(values = c(RARE_COLORS$blue, RARE_COLORS$green), name = "Mean") +
+    scale_linetype_manual(values = c("dashed", "dotted"), name = "Mean") +
+    scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
 }
 
 plot_histogram_trend <- function(data, x = NULL, y = NULL, fill = "location_status",
@@ -214,5 +214,5 @@ plot_histogram_trend <- function(data, x = NULL, y = NULL, fill = "location_stat
     ylab(y_label) +
     labs(fill = "") +
     theme_rare() +
-    scale_fill_manual(values = c(RARE_COLORS$red, RARE_COLORS$yellow))
+    scale_fill_manual(values = c(RARE_COLORS$blue, RARE_COLORS$red))
 }
