@@ -20,6 +20,11 @@ usethis::use_package("shinyWidgets")
 usethis::use_package("shinyjs")
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")
+usethis::use_package("ggridges")
+usethis::use_package("hrbrthemes")
+usethis::use_package("stringr")
+usethis::use_package("tidyr")
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/

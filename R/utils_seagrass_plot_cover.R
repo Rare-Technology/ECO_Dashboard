@@ -5,6 +5,8 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
+#' @import stringr
+#' @import ggplot2
 plot_seagrass_cover <- function(data_filtered, sel_geom) {
   ## TODO implement trends
   data_aggreg <- aggregate_data(data_filtered, 'cover')

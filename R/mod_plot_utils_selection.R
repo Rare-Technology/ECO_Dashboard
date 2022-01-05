@@ -1,6 +1,7 @@
 #' Helper functions for data aggregation and summary statistics
 #' 
 #' @import dplyr
+#' @import tidyr
 aggregate_data <- function(data_filtered, metric) {
   # add up the biomass of all fish at each transect
   if (metric %in% c('biomass_kg_ha', 'density_ind_ha')) {
@@ -95,11 +96,17 @@ aggregate_data <- function(data_filtered, metric) {
                 data = .,
                 FUN = mean)
     
-  } else if (metric == 'size_class') {
-    # idea: for each size class, you can expect to see `density_ind_ha` many 
-    # fish per hectare.
-    aggregate(density_ind_ha ~ year + country + ma_name + location_status + location_name + 
-                transect_no + size_class, data=data_filtered, FUN=sum)
+  } else if (metric == 'length') {
+    # data_filtered %>% 
+    #   dplyr::filter(!is.na(length)) %>% 
+    #   dplyr::group_by(year, country, ma_name, location_status, location_name, transect_no) %>% 
+    #   dplyr::summarize(length = sum(count * length), count = sum(count))
+    data_filtered %>% 
+      dplyr::filter(!is.na(length)) %>% 
+      dplyr::select(year, country, ma_name, location_status, location_name, transect_no, count, length) %>% 
+      tidyr::uncount(weights = count) %>% 
+      dplyr::group_by(year, country, ma_name, location_status, location_name, transect_no) %>% 
+      dplyr::summarize(length = mean(length))
   }
 }
 
@@ -125,13 +132,23 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   groupvars1 <- c('country', 'ma_name', 'year', 'location_status', 'location_name')
   groupvars2 <- groupvars1[-length(groupvars1)]
   if (for.size) {
-    groupvars1 <- append(groupvars1, 'size_class')
-    groupvars2 <- append(groupvars2, 'size_class')
-    # changing metric to 'count' to use in the following aggregates w/o changing
-    # the code much. maybe clunky to do so and it may be better to just set metric
-    # to 'count' from the beginning, but from a readability/comprehension standpoint,
-    # I think it makes sense to keep metric as 'size_class' in the beginning,
-    # as it makes it very clear that the surrounding code is in regard to fish size
+    # data_local <- data_aggreg %>% 
+    #   filter(!is.na(length)) %>% 
+    #   dplyr::group_by(year, country, ma_name, location_status, location_name) %>% 
+    #   dplyr::summarize(length = sum(count * length), count = sum(count))
+    # data_summary <- data_local %>% 
+    #   dplyr::group_by(year, country, ma_name, location_status) %>% 
+    #   dplyr::summarize(length = sum(count * length), count = sum(count)) %>% 
+    #   dplyr::rename(N = count)
+    data_loc <- data_aggreg %>% 
+      dplyr::filter(!is.na(length)) %>% 
+      dplyr::group_by(year, country, ma_name, location_status, location_name) %>% 
+      dplyr::summarize(length = mean(length))
+    data_summary <- data_loc %>% 
+      dplyr::group_by(year, country, ma_name, location_status) %>% 
+      dplyr::summarize(length = mean(length))
+
+    # return(data_summary)
   }
   
   if (metric == "percentage") {
@@ -145,18 +162,18 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
   formula2 <- paste(metric, paste(groupvars2, collapse=" + "), sep=" ~ ") %>% 
     as.formula()
   
-  if (metric %in% c("species", "tree_species", "attribute", "percentage")) {
-    # in this case, data_aggreg is already aggregated by location,
-    # by count_unique instead of mean
-    data_loc <- data_aggreg
-  } else {
-    # take mean across transects
-    data_loc <- aggregate(formula1, data=data_aggreg, FUN=mean)
+  if (!for.size) {
+    if (metric %in% c("species", "tree_species", "attribute", "percentage")) {
+      # in this case, data_aggreg is already aggregated by location,
+      # by count_unique instead of mean
+      data_loc <- data_aggreg
+    } else {
+      # take mean across transects
+      data_loc <- aggregate(formula1, data=data_aggreg, FUN=mean)
+    }
+    # take mean across locations
+    data_summary <- aggregate(formula2, data=data_loc, FUN=mean)
   }
-  # take mean across locations
-  data_summary <- aggregate(formula2, data=data_loc, FUN=mean)
-  
-  if (!for.size) { # ie not size_class
     data_summary$N <- aggregate(formula2, data=data_loc, FUN=length) %>% 
       dplyr::pull(metric)
     data_summary$SD <- aggregate(formula2, data=data_loc, FUN=sd) %>% 
@@ -165,7 +182,6 @@ summarySE <- function(data_aggreg, metric, for.size=FALSE, for.tree=FALSE) {
     data_summary <- data_summary %>% 
       dplyr::mutate(ymin = !!sym(metric) - SE,
                     ymax = !!sym(metric) + SE)
-  } 
   
   return(data_summary)
 }
