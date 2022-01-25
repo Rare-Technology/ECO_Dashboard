@@ -5,9 +5,9 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_tree_size <- function(data_filtered, sel_geom) {
+plot_tree_size <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, "dbh_cm")
-  data_summary <- summarySE(data_aggreg, "dbh_cm")
+  data_summary <- summarySE(data_aggreg, "dbh_cm", facet_maa)
   years <- sort(unique(data_summary$year))
   
   if (length(years) == 1) {
@@ -21,7 +21,7 @@ plot_tree_size <- function(data_filtered, sel_geom) {
       y_label = "Diameter (cm)"
     )
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, 'dbh_cm')
+      data_local <- get_local_data(data_aggreg, 'dbh_cm', facet_maa)
       
       p <- p + plot_samples(
         data =  data_local,
@@ -45,7 +45,7 @@ plot_tree_size <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, "dbh_cm")
+      data_local <- get_local_data(data_aggreg, "dbh_cm", facet_maa)
       
       p <- p + plot_samples(
         data = data_local,

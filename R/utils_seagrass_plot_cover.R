@@ -7,8 +7,9 @@
 #' @noRd
 #' @import stringr
 #' @import ggplot2
-plot_seagrass_cover <- function(data_filtered, sel_geom) {
+plot_seagrass_cover <- function(data_filtered, sel_geom, facet_maa) {
   ## TODO implement trends
+  ## TODO same problem as benthic cover: make the maa aggregating work properly
   data_aggreg <- aggregate_data(data_filtered, 'cover')
   data_summary <- data_aggreg
   
@@ -16,7 +17,6 @@ plot_seagrass_cover <- function(data_filtered, sel_geom) {
                 aes(x = seagrass_species,
                     y = stringr::str_wrap(location_status, 5),
                     fill = cover)) +
-    facet_wrap("ma_name") +
     geom_tile(color = "black") +
     geom_text(aes(label = round(cover,1), color = round(cover,1) >= 50),
               show.legend = c(TRUE, FALSE)) +

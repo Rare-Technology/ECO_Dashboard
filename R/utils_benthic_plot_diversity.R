@@ -5,9 +5,9 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_reef_diversity <- function(data_filtered, sel_geom) {
-  data_aggreg <- aggregate_data(data_filtered, 'attribute')
-  data_summary <- summarySE(data_aggreg, 'attribute')
+plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
+  data_aggreg <- aggregate_data(data_filtered, 'attribute') # nested up to location_name
+  data_summary <- summarySE(data_aggreg, 'attribute', facet_maa)
   years <- sort(unique(data_summary$year))
   
   if (length(years) == 1) {
@@ -21,7 +21,11 @@ plot_reef_diversity <- function(data_filtered, sel_geom) {
       y_label = "Number of benthic attributes"
     )
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, 'attribute')
+      if (facet_maa) {
+        data_local <- data_aggreg
+      } else {
+        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
+      }
       
       p <- p + plot_samples(
         data =  data_local,
@@ -45,7 +49,11 @@ plot_reef_diversity <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, "attribute")
+      if (facet_maa) {
+        data_local <- data_aggreg
+      } else {
+        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
+      }
       
       p <- p + plot_samples(
         data = data_local,

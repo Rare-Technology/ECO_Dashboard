@@ -1,6 +1,6 @@
-plot_fish_size <- function(data_filtered, sel_geom) {
+plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, "length")
-  data_summary <- summarySE(data_aggreg, "length", for.size = TRUE)
+  data_summary <- summarySE(data_aggreg, "length", facet_maa)
   years <- sort(unique(data_summary$year))
   
   if (length(years) == 1) {

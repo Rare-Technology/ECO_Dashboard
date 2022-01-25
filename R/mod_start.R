@@ -27,7 +27,7 @@ startServer <- function(id, rv){
                   icon("question-circle-o")
                 ),
                 div(class = 'timeouttxt',
-                    h3(class = 'timeouttitle', tr(rv, "Please note")),
+                    h3(class = 'timeouttitle', tr(rv, "Please note:")),
                     p(tr(rv, "This app may time-out if left idle too long, which will cause the screen to grey-out. To use the app again, refresh the page."))
                 ),
                 br(),

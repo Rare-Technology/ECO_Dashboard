@@ -11,6 +11,7 @@ initialize_rv <- function(INIT) {
     metrics = INIT$METRICS[["Fish"]],
     sel_metric = INIT$METRICS[["Fish"]][1],
     sel_geom = INIT$SEL_GEOM,
+    facet_maa = INIT$FACET_MAA,
     sel_yscale = INIT$SEL_YSCALE,
     basemap = INIT$BASEMAP,
     # there is a fish family that is blank. currently, selecting that will crash

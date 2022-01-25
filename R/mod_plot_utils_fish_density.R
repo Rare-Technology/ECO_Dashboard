@@ -1,6 +1,6 @@
-plot_fish_density <- function(data_filtered, sel_geom) {
+plot_fish_density <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, 'density_ind_ha')
-  data_summary <- summarySE(data_aggreg, "density_ind_ha")
+  data_summary <- summarySE(data_aggreg, "density_ind_ha", facet_maa)
   years <- sort(unique(data_summary$year))
   
   if (length(years) == 1) {
@@ -15,7 +15,7 @@ plot_fish_density <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, "density_ind_ha")
+      data_local <- get_local_data(data_aggreg, "density_ind_ha", facet_maa)
       
       p <- p + plot_samples(
         data_local = data_local,
@@ -39,7 +39,7 @@ plot_fish_density <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, "density_ind_ha")
+      data_local <- get_local_data(data_aggreg, "density_ind_ha", facet_maa)
       
       p <- p + plot_samples(
         data_local = data_local,

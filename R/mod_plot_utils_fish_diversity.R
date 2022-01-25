@@ -1,6 +1,6 @@
-plot_fish_diversity <- function(data_filtered, sel_geom) {
+plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, 'species')
-  data_summary <- summarySE(data_aggreg, 'species')
+  data_summary <- summarySE(data_aggreg, 'species', facet_maa)
   years <- sort(unique(data_summary$year))
   
   if (length(years) == 1) {
@@ -15,7 +15,13 @@ plot_fish_diversity <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- data_aggreg # diversity is a special case for this
+      if (facet_maa) {
+        data_local <- data_aggreg # diversity is a special case for this
+      } else {
+        # this feels a bit sneaky but it should work: pretend we're faceting maa so
+        # calculate data_summary in that case BUT call it data_local
+        data_local <- summarySE(data_aggreg, 'species', !facet_maa) # note the !
+      }
       
       p <- p + plot_samples(
         data_local = data_local,
@@ -39,7 +45,11 @@ plot_fish_diversity <- function(data_filtered, sel_geom) {
     )
     
     if (sel_geom == "Distribution plots") {
-      data_local <- data_aggreg
+      if (facet_maa) {
+        data_local <- data_aggreg
+      } else {
+        data_local <- summarySE(data_aggreg, 'species', !facet_maa)
+      }
       
       p <- p + plot_samples(
         data_local = data_local,

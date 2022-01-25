@@ -5,8 +5,10 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_reef_cover <- function(data_filtered, sel_geom) {
+plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
   ## TODO figure out how to represent trends here
+  ## TODO figure out how to aggregate across maa's. currently, just removing the
+  # facet_wrap line in this file doesn't work; the number labels overlap on top of each other
   
   data_aggreg <- aggregate_data(data_filtered, 'percentage')
   data_summary <- data_aggreg

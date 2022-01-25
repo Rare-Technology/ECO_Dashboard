@@ -26,6 +26,7 @@ plotServer <- function(id, rv){
     output$plot_holder <- renderUI({
       sel_dataset <- rv$sel_dataset
       sel_maa <- rv$sel_maa
+      facet_maa <- rv$facet_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
       sel_year <- rv$sel_year
@@ -44,22 +45,25 @@ plotServer <- function(id, rv){
       data_filtered <- rv$data_filtered
       
       if (length(sel_maa) == 0) {
-        div(class="warning_message", "No managed access area selected.")
+        div(class="warning_message", tr(rv, "No managed access area selected."))
       } else {
         p <- switch(rv$sel_metric,
-              "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom),
-              "Fish density" = plot_fish_density(data_filtered, sel_geom),
-              "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom),
-              "Fish size" = plot_fish_size(data_filtered, sel_geom),
-              "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom),
-              "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom),
-              "Tree size" = plot_tree_size(data_filtered, sel_geom),
-              "Benthic cover" = plot_reef_cover(data_filtered, sel_geom),
-              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom),
-              "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom),
-              "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom),
-              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom)
+              "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
+              "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
+              "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
+              "Fish size" = plot_fish_size(data_filtered, sel_geom, facet_maa),
+              "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom, facet_maa),
+              "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom, facet_maa),
+              "Tree size" = plot_tree_size(data_filtered, sel_geom, facet_maa),
+              "Benthic cover" = plot_reef_cover(data_filtered, sel_geom, facet_maa),
+              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
+              "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
+              "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
+              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa)
         )
+        if (facet_maa) {
+          p <- p + facet_wrap('ma_name')
+        }
         p$facet$params$free$y <- y_scale
         rv$current_plot <- p
         output$plot <- renderPlot(p, height=600)
@@ -67,7 +71,7 @@ plotServer <- function(id, rv){
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(downloadButton(ns("downloadPlot"),
                                                      class = "download-button",
-                                                     'Download Plot')))
+                                                     tr(rv, 'Download plot'))))
         ui_out <- append(ui_out, list(plotOutput(ns('plot'))))
         ui_out
       }

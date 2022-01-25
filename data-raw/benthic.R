@@ -116,4 +116,88 @@ benthic.surveys <- benthic.surveys %>%
 
 detach(package:dplyr)
 
+## Jan 12 2022
+## 2021 Indonesia data
+## From https://data.world/rare/benthic-surveys/
+## se_sulawesi_monitoring_biofisik_2021-benthicpit-obs-20210818.csv
+df <- read.csv2("../data/Benthic_IDN_SE-Sulawesi_2021.csv", header=TRUE, stringsAsFactors=FALSE);
+
+df$level1_name <- "Southeast Sulawesi"
+
+df <- df %>% 
+  #dplyr::filter(Country != "", Year != 2019) %>% # do not overwrite existing 2019 data
+  dplyr::rename(
+    country = Country,
+    level2_name = District,
+    ma_name = MAR.Name,
+    location_name = Site,
+    location_status = Management.name,
+    transect_no = Transect.number,
+    PIT_interval = PIT.interval..m.,
+    lat = Latitude,
+    lon = Longitude,
+    year = Year,
+    month = Month,
+    day = Day,
+    depth_m = Depth,
+    reefslope = Reef.slope,
+    category = Benthic.category,
+    attribute = Benthic.attribute
+  ) %>% 
+  dplyr::mutate(
+    year = as.character(year),
+    month = as.character(month),
+    day = as.character(day)
+  ) %>% 
+  tidyr::unite("surveydate", c(year, month, day), sep = "-", remove = FALSE) %>% 
+  dplyr::select(
+    country,
+    level1_name,
+    level2_name,
+    ma_name,
+    location_name,
+    location_status,
+    transect_no,
+    PIT_interval,
+    lat,
+    lon,
+    year,
+    surveydate,
+    depth_m,
+    reefslope,
+    category,
+    attribute
+  )
+
+df <- df %>% 
+  dplyr::group_by(year, location_name, transect_no, category, attribute) %>% 
+  dplyr::mutate(percentage = dplyr::n()) %>% 
+  dplyr::select(-PIT_interval) %>% 
+  dplyr::distinct() %>% 
+  dplyr::ungroup()
+
+benthic.surveys <- benthic.surveys %>% 
+  dplyr::select(
+    -sitename,
+    -controlsite,
+    -controlsitename,
+    -surveytime,
+    -divername,
+    -temp_c,
+    -avg_complexity,
+    -methodology
+  )
+
+benthic.surveys <- rbind(benthic.surveys, df)
+benthic.surveys$year <- as.integer(benthic.surveys$year)
+benthic.surveys <- benthic.surveys %>% 
+  dplyr::mutate(location_status = dplyr::case_when(
+    location_status == "ma" ~ "Managed Access",
+    location_status == "outside" ~ "Managed Access",
+    location_status == "reserve" ~ "Reserve",
+    location_status == "Managed Access" ~ "Managed Access",
+    location_status == "Reserve" ~ "Reserve"
+  ))
+
+
 usethis::use_data(benthic.surveys, overwrite = TRUE)

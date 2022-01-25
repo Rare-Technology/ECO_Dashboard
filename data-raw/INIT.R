@@ -20,6 +20,7 @@ INIT$METRICS <- list(
 )
 INIT$CURRENT_TAB <- 'Start'
 INIT$SEL_GEOM <- "Bar plots"
+INIT$FACET_MAA <- TRUE
 INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...

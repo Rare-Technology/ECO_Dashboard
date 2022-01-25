@@ -28,10 +28,10 @@ mainUI <- function(id){
         div(id="lang-select", selectInput(ns("language"), "", width = 80,
                                           c("EN" = "English",
                                             "ID" = "Bahasa Indonesia",
-                                            "BRA" = "Português (BRA)",
-                                            "PT" = "Português (MOZ)",
+                                            "BR" = "Português (BR)",
+                                            "PT" = "Português (MZ)",
                                             "ES" = "Español",
-                                            "PHL" = "Philippines"
+                                            "PH" = "Philippines"
                                           ))
         ),
         div(class = 'fs-button',

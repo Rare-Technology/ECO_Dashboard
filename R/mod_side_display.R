@@ -7,7 +7,7 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList
-#' @importFrom shinyWidgets pickerInput multiInput switchInput radioGroupButtons updatePickerInput
+#' @importFrom shinyWidgets pickerInput multiInput switchInput radioGroupButtons updatePickerInput materialSwitch
 #' @importFrom leaflet providers
 #' @importFrom shinyjs toggleState
 sidebarDisplayUI <- function(id){
@@ -28,7 +28,7 @@ sidebarDisplayServer <- function(id, rv){
       ui <- br()
       if (current_tab == tr(rv, "Visualize data")) {
         ui <- tagList(ui,
-          div(class="sidetitle", "Plotting"),
+          div(class="sidetitle", tr(rv, "Plot")),
           selectInput(ns('sel_metric'),
                       tr(rv, 'Metric'),
                       choices = INIT$METRICS[["Fish"]]
@@ -37,8 +37,13 @@ sidebarDisplayServer <- function(id, rv){
                        tr(rv, 'Plot Type'),
                        choices = c('Bar plots', 'Distribution plots')
           ),
+          materialSwitch(ns('facet_maa'),
+            label = tr(rv,"Group by MA"), 
+            value = TRUE,
+            status = "primary"
+          ),
           radioButtons(ns('sel_yscale'),
-                       tr(rv, 'Y-axis'),
+                       tr(rv, 'Axis scale'),
                        choices = c('Free'=TRUE,
                                    'Fixed'=FALSE),
                        selected = TRUE
@@ -53,7 +58,9 @@ sidebarDisplayServer <- function(id, rv){
                       selected = INIT$FAMILY$SELECTED,
                       options = list(
                         `actions-box` = TRUE,
-                        `selected-text-format` = "count > 3"
+                        `selected-text-format` = "count > 3",
+                        `count-selected-text` = paste("{0}", tr(rv, "items selected")),
+                        `none-selected-text` = tr(rv, "Nothing selected")
                       ), multiple = TRUE)
         )
       }
@@ -103,6 +110,10 @@ sidebarDisplayServer <- function(id, rv){
     
     observeEvent(input$sel_geom, {
       rv$sel_geom <- input$sel_geom
+    })
+    
+    observeEvent(input$facet_maa, {
+      rv$facet_maa <- input$facet_maa
     })
     
     observeEvent(input$sel_yscale, {

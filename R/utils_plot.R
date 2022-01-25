@@ -42,7 +42,7 @@ plot_trend <- function(data, x = "year", y = NULL, ymin = "ymin", ymax = "ymax",
   fill = "location_status", title = NULL, x_label = "Year", y_label = NULL,
   years = NULL) {
   
-  ggplot2::ggplot() +
+  p <- ggplot2::ggplot() +
     geom_errorbar(
       data = data,
       aes_string(
@@ -74,7 +74,6 @@ plot_trend <- function(data, x = "year", y = NULL, ymin = "ymin", ymax = "ymax",
       size = 6,
       position = position_dodge(width = 0.5)
     ) +
-    facet_wrap("ma_name") +
     scale_x_continuous(breaks = years) +
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen)) +
     labs(
@@ -120,7 +119,6 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
       na.rm = TRUE
     ) +
     ggtitle(paste(title, year)) +
-    facet_wrap('ma_name') +
     xlab(x_label) + 
     ylab(y_label) +
     theme_rare() +
@@ -173,7 +171,6 @@ plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_s
       ),
       size = 0.5
     ) +
-    facet_wrap("ma_name") +
     ggtitle(paste(title, year)) +
     xlab(x_label) +
     labs(
@@ -208,7 +205,6 @@ plot_histogram_trend <- function(data, x = NULL, y = NULL, fill = "location_stat
       ),
       alpha = 0.7
     ) +
-    facet_wrap("ma_name") +
     ggtitle(title) +
     xlab(x_label) +
     ylab(y_label) +
