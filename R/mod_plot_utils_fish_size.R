@@ -2,6 +2,7 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, "length")
   data_summary <- summarySE(data_aggreg, "length", facet_maa)
   years <- sort(unique(data_summary$year))
+  out <- list(data = data_summary)
   
   if (length(years) == 1) {
     if (sel_geom == "Bar plots") {
@@ -15,6 +16,8 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
         y_label = "Length (cm)"
       )
     } else if (sel_geom == "Distribution plots") {
+      out$data <- data_filtered
+      
       p <- plot_histogram(
         data_full =  data_filtered,
         data_summary = data_summary,
@@ -38,6 +41,8 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
         data_filtered$year <- as.character(data_filtered$year)
         years <- as.character(years)
         data_filtered$year <- factor(data_filtered$year, levels = years)
+        
+        out$data <- data_filtered
               
         p <- plot_histogram_trend(
           data = data_filtered,
@@ -50,5 +55,6 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
     }
   }
   
-  p
+  out$plot <- p
+  out
 }

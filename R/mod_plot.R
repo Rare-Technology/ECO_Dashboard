@@ -62,11 +62,12 @@ plotServer <- function(id, rv){
               "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa)
         )
         if (facet_maa) {
-          p <- p + facet_wrap('ma_name')
+          p$plot <- p$plot + facet_wrap('ma_name')
         }
-        p$facet$params$free$y <- y_scale
-        rv$current_plot <- p
-        output$plot <- renderPlot(p, height=600)
+        p$plot$facet$params$free$y <- y_scale
+        rv$current_plot <- p$plot
+        rv$current_plot_data <- p$data
+        output$plot <- renderPlot(p$plot, height=600)
         
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(downloadButton(ns("downloadPlot"),
@@ -78,10 +79,27 @@ plotServer <- function(id, rv){
     })
     
     output$downloadPlot <- downloadHandler(
-      filename = function(){paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".png")},
-      content = function(file){
-        ggsave(file,plot=rv$current_plot, width = 27, height = 20, units = "cm")
-      })
+      filename = function() {paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".zip")},
+      content = function(file) {
+        wd <- getwd()
+        setwd(tempdir())
+        
+        meta_name <- 'filters.txt'
+        data_name <- 'data.csv'
+        plot_name <- paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".png")
+        
+        filters_text <- display_filters(rv)
+        write(filters_text, meta_name)
+        write.csv(rv$current_plot_data, data_name, row.names = FALSE)
+        ggsave(plot_name, plot = rv$current_plot, width = 27, height = 20, units = "cm")
+        
+        fs = c(meta_name, data_name, plot_name)
+        zip(zipfile = file, files = fs)
+        
+        setwd(wd)
+      },
+      contentType = 'application/zip'
+    )
   })
 }
     

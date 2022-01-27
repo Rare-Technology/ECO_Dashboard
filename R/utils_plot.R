@@ -212,3 +212,21 @@ plot_histogram_trend <- function(data, x = NULL, y = NULL, fill = "location_stat
     theme_rare() +
     scale_fill_manual(values = c(RARE_COLORS$blue, RARE_COLORS$red))
 }
+
+
+display_filters <- function(rv) {
+  out <- c(
+    tr(rv, "Country"), paste(rv$sel_country), '\n',
+    tr(rv, "Subnational unit"), paste(rv$sel_subnational, collapse=', '), '\n',
+    tr(rv, "Local government unit"), paste(rv$sel_local, collapse=', '), '\n',
+    tr(rv, "Managed access area"), paste(rv$sel_maa, collapse=', '), '\n'
+  )
+  
+  if (rv$sel_dataset == 'Fish') { # add other cases as more dataset-specific filters are added
+    out <- c(out, tr(rv, "Family"), paste(rv$sel_family), '\n')
+  }
+  
+  out <- paste(out, collapse='\n')
+  
+  out
+}

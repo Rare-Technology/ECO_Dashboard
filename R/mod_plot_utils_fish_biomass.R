@@ -3,6 +3,8 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
   data_summary <- summarySE(data_aggreg, 'biomass_kg_ha', facet_maa)
   years <- sort(unique(data_summary$year))
   
+  out <- list(data = data_summary)
+  
   if (length(years) == 1) {
     p <- plot_bar(
       data = data_summary,
@@ -15,6 +17,7 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
     )
     if (sel_geom == "Distribution plots") {
       data_local <- get_local_data(data_aggreg, 'biomass_kg_ha', facet_maa)
+      out$data <- data_local
       
       p <- p + plot_samples(
         data =  data_local,
@@ -25,6 +28,7 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
         point_size = 4
       )
     }
+    
   } else {
     p <- plot_trend(
       data = data_summary,
@@ -39,6 +43,7 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
     
     if (sel_geom == "Distribution plots") {
       data_local <- get_local_data(data_aggreg, "biomass_kg_ha", facet_maa)
+      out$data <- data_local
       
       p <- p + plot_samples(
         data = data_local,
@@ -49,5 +54,6 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
     }
   }
   
-  p
+  out$plot <- p
+  out
 }

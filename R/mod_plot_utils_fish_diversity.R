@@ -2,6 +2,7 @@ plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, 'species')
   data_summary <- summarySE(data_aggreg, 'species', facet_maa)
   years <- sort(unique(data_summary$year))
+  out <- list(data = data_summary)
   
   if (length(years) == 1) {
     p <- plot_bar(
@@ -22,6 +23,8 @@ plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
         # calculate data_summary in that case BUT call it data_local
         data_local <- summarySE(data_aggreg, 'species', !facet_maa) # note the !
       }
+      
+      out$data <- data_local
       
       p <- p + plot_samples(
         data_local = data_local,
@@ -51,6 +54,8 @@ plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
         data_local <- summarySE(data_aggreg, 'species', !facet_maa)
       }
       
+      out$data <- data_local
+      
       p <- p + plot_samples(
         data_local = data_local,
         x = "year",
@@ -60,5 +65,6 @@ plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
     }
   }
   
-  p
+  out$plot <- p
+  out
 }

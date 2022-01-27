@@ -9,11 +9,13 @@ plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
   ## TODO figure out how to represent trends here
   ## TODO figure out how to aggregate across maa's. currently, just removing the
   # facet_wrap line in this file doesn't work; the number labels overlap on top of each other
+  ## TODO update `out` when you do the above
   
   data_aggreg <- aggregate_data(data_filtered, 'percentage')
   data_summary <- data_aggreg
+  out <- list(data = data_summary)
   
-  ggplot2::ggplot(data = data_summary,
+  p <- ggplot2::ggplot(data = data_summary,
                   aes(x = category, y = location_status, fill = percentage)) +
     facet_wrap("ma_name") +
     geom_tile() +
@@ -27,4 +29,7 @@ plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
       panel.grid.major.x = element_blank(),
       axis.title.y = element_blank()
     )
+  
+  out$plot <- p
+  out
 }

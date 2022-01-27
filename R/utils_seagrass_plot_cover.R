@@ -12,8 +12,9 @@ plot_seagrass_cover <- function(data_filtered, sel_geom, facet_maa) {
   ## TODO same problem as benthic cover: make the maa aggregating work properly
   data_aggreg <- aggregate_data(data_filtered, 'cover')
   data_summary <- data_aggreg
+  out <- list(data = data_summary)
   
-  ggplot2::ggplot(data = data_summary,
+  p <- ggplot2::ggplot(data = data_summary,
                 aes(x = seagrass_species,
                     y = stringr::str_wrap(location_status, 5),
                     fill = cover)) +
@@ -32,4 +33,7 @@ plot_seagrass_cover <- function(data_filtered, sel_geom, facet_maa) {
       axis.text.x = element_text(angle = 30, hjust = 1),
       axis.title.y = element_blank()
     )
+  
+  out$plot <- p
+  out
 }

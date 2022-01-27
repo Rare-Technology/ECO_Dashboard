@@ -9,6 +9,7 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, 'attribute') # nested up to location_name
   data_summary <- summarySE(data_aggreg, 'attribute', facet_maa)
   years <- sort(unique(data_summary$year))
+  out <- list(data = data_summary)
   
   if (length(years) == 1) {
     p <- plot_bar(
@@ -26,6 +27,8 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
       } else {
         data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
       }
+      
+      out$data <- data_local
       
       p <- p + plot_samples(
         data =  data_local,
@@ -55,6 +58,8 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
         data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
       }
       
+      out$data <- data_local
+      
       p <- p + plot_samples(
         data = data_local,
         x = "year",
@@ -64,5 +69,6 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
     }
   }
   
-  p
+  out$plot <- p
+  out
 }
