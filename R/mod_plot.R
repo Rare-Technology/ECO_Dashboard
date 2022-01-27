@@ -65,6 +65,7 @@ plotServer <- function(id, rv){
           p$plot <- p$plot + facet_wrap('ma_name')
         }
         p$plot$facet$params$free$y <- y_scale
+        p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
         rv$current_plot <- p$plot
         rv$current_plot_data <- p$data
         output$plot <- renderPlot(p$plot, height=600)
