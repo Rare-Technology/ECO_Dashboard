@@ -28,8 +28,8 @@ mainUI <- function(id){
         div(id="lang-select", selectInput(ns("language"), "", width = 80,
                                           c("EN" = "English",
                                             "ID" = "Bahasa Indonesia",
-                                            "BR" = "Português (BR)",
-                                            "PT" = "Português (MZ)",
+                                            "BR" = "Português (BRA)",
+                                            "PT" = "Português (MOZ)",
                                             "ES" = "Español",
                                             "PH" = "Philippines"
                                           ))
