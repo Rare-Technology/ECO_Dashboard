@@ -20,6 +20,7 @@ Imports:
     hrbrthemes,
     htmltools,
     leaflet,
+    lubridate,
     magrittr,
     pkgload,
     shiny (>= 1.6.0),

@@ -24,7 +24,7 @@ usethis::use_package("ggridges")
 usethis::use_package("hrbrthemes")
 usethis::use_package("stringr")
 usethis::use_package("tidyr")
-
+usethis::use_package("lubridate")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

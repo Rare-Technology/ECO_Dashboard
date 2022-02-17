@@ -1,107 +1,46 @@
 ## code to prepare `fish.surveys` dataset goes here
 ##
-## fish.surveys came with the old version of the ECO dashboard, it had data for surveys before 2021.
+## fish_surveys_all from Dive Surveys project https://data.world/rare/dive-surveys/
+fish.surveys <- readr::read_csv("https://query.data.world/s/khyask2eviivyjp4mbhyaufodpjmrl");
 
-## Cleaning original dataset
+# Removing columns that have a lot of missing information/have no use in the dashboard.
 fish.surveys <- fish.surveys %>% 
-  mutate(country = as.character(country)) %>% 
-  mutate(level1_name = as.character(level1_name)) %>% 
-  mutate(level2_name = as.character(level2_name)) %>% 
-  mutate(ma_name = as.character(ma_name)) %>% 
-  mutate(location_status = as.character(location_status)) %>% 
-  mutate(species = as.character(species)) %>% 
-  mutate(family = as.character(family)) %>% 
-  mutate(size_class = as.character(size_class)) %>% 
-  mutate(survey_date = lubridate::ymd(survey_date))
-  
+  dplyr::select(-c(submittedon, submittedby, control_site, control_site_name, diver_name, temp))
 
-## 2021 Indonesia Fish Surveys
-## From the fish surveys dataset https://data.world/rare/fish-surveys/workspace/file?filename=se_sulawesi_monitoring_biofisik_2021-beltfish-obs-20210809.csv
-df <- read.csv("https://query.data.world/s/ujuauezgztamzbxqyl5olmbugpw7s2", header=TRUE, stringsAsFactors=FALSE);
-df <- df %>% select(
-  country = Country,
-  year = Year,
-  month = Month,
-  day = Day,
-  lat = Latitude,
-  lon = Longitude,
-  location_name = Site,
-  location_status = Management.name,
-  transect_no = Transect.number,
-  transect_length = Transect.length.surveyed,
-  count = Count,
-  family = Fish.family,
-  species = Fish.taxon,
-  biomass_kg_ha = Biomass_kgha,
-  length = Size,
-  a,
-  b
-)
-
-get_size_class <- function (x) { # need to fix this for existing fish data, its a mess
-  if (x <= 5) {"0-5"}
-  else if (x > 5 & x <= 10) {"5-10"}
-  else if (x > 10 & x <= 20) {"10-20"}
-  else if (x > 20 & x <= 30) {"20-30"}
-  else if (x > 30 & x <= 40) {"30-40"}
-  else if (x > 40 & x <= 50) {"40-50"}
-}
-get_size_class <- Vectorize(get_size_class)
-
-get_ma_name <- function (x) {
-  switch(substr(x, 1, nchar(x)-1),
-    "KAPUN" = "Kapuntori",
-    "KULIS" = "Kulisusu",
-    "MAGIN" = "Maginti",
-    "MATA0" = "Mataoleo",
-    "MAWAS" = "Mawasangka",
-    "MORAM" = "Teluk Moramo",
-    # "NTZ" = "",
-    "PASIK" = "Pasi Kolaga",
-    "SAGOR" = "Sagori",
-    "SIOMP" = "Siompu",
-    "SIONT" = "Siotapina - Lasel",
-    "TALRAY" = "Talaga Raya",
-    "TIWOR" = "Tiworo Utara",
-    # "UZ" = "",
-    "WABUL"  = "Wabula",
-    "WAWON" = "Wawonii")
-}
-get_ma_name <- Vectorize(get_ma_name)
-
+# Add subnational and local info
 get_level_name <- function (x, level) {
-  if (x %in% unique(fish.surveys$ma_name)) {
-    fish.surveys %>% 
-      filter(ma_name == x) %>% 
-      pull(level) %>% 
+  if (x %in% unique(geo_levels$ma_name)) {
+    geo_levels %>% 
+      dplyr::filter(ma_name == x) %>% 
+      dplyr::pull(level) %>% 
       unique()
+  } else if (x == "Teluk Kolono") {
+    switch(level,
+           "level1_name" = "Southeast Sulawesi",
+           "level2_name" = "Konawe Selatan"
+    )
   } else {
     NA
   }
 }
 get_level_name <- Vectorize(get_level_name)
 
-df <- df %>% 
-  mutate(country = "IDN") %>% 
-  mutate(survey_date = lubridate::ymd(paste(year, month, day, sep = "-"))) %>% 
-  mutate(transect_width = ifelse(length < 35, 5, 20)) %>% # based on surveying methodology
-  mutate(transect_area = transect_width * transect_length) %>% 
-  mutate(weight = a * length ^ b / 1000) %>% 
-  mutate(density_ind_ha = biomass_kg_ha / weight) %>% 
-  mutate(size_class = as.character(get_size_class(length))) %>% 
-  mutate(ma_name = as.character(get_ma_name(location_name))) %>% 
-  mutate(level1_name = get_level_name(ma_name, "level1_name")) %>%
-  mutate(level2_name = get_level_name(ma_name, "level2_name"))
+# Fix some ma_name spellings to ensure they'll pass through get_level_names correctly
+fish.surveys$ma_name[fish.surveys$ma_name == "Santa Fe"] <- "Santa Fé"
+fish.surveys$ma_name[fish.surveys$ma_name == "Puerto Cortes"] <- "Puerto Cortés"
+fish.surveys$ma_name[fish.surveys$ma_name == "Roatan"] <- "Roatán"
+fish.surveys$ma_name[fish.surveys$ma_name == "Pilar"] <- "Pilar, Cebu" # based on matching lat/lon with PHL data below
 
-## Combine 2021 IDN data with 2019 records
-
-fish.surveys <- fish.surveys %>% select(intersect(names(df), names(fish.surveys)))
-df <- df %>% select(names(fish.surveys))
-fish.surveys <- rbind(fish.surveys, df)
 fish.surveys <- fish.surveys %>% 
-  mutate(year = lubridate::year(survey_date))
+  dplyr::mutate(
+    level1_name = get_level_name(ma_name, 'level1_name'),
+    level2_name = get_level_name(ma_name, 'level2_name')
+  )
 
-# MOZ 2020 survey was at the end of the year and about 50 records (out of 504) have a survey date that
+# to get the year, for almost all records, the following does work:
+fish.surveys$year <- lubridate::year(fish.surveys$survey_date)
+
+# But MOZ 2020 survey was at the end of the year and about 50 records (out of 504) have a survey date that
 # went into January. We will label the year on these as being 2020 as they belong to the
 # 2020 survey
 fish.surveys$year[fish.surveys$country == "MOZ" & fish.surveys$year == 2021] <- 2020
@@ -122,21 +61,6 @@ fish.surveys$year[fish.surveys$country == "MOZ" & fish.surveys$year == 2021] <- 
 # 5. Merge the new 2021/2017 records with fish.surveys
 # 6. Update the .rda and document
 
-get_level_name <- function (x, level) {
-  if (x %in% unique(fish.surveys$ma_name)) {
-    fish.surveys %>% 
-      dplyr::filter(ma_name == x) %>% 
-      dplyr::pull(level) %>% 
-      unique()
-  } else if (x == "Teluk Kolono") {
-    switch(level,
-      "level1_name" = "Southeast Sulawesi",
-      "level2_name" = "Konawe Selatan"
-    )
-  }
-}
-get_level_name <- Vectorize(get_level_name)
-
 get_size_class <- function (x) { # need to fix this for existing fish data, its a mess
   if (x <= 5) {"0-5"}
   else if (x > 5 & x <= 10) {"5-10"}
@@ -147,7 +71,7 @@ get_size_class <- function (x) { # need to fix this for existing fish data, its 
 }
 get_size_class <- Vectorize(get_size_class)
 
-df <- read.csv("../data/IDN_fish_data.csv", header = TRUE, stringsAsFactors = FALSE)
+df <- readr::read_csv("../data/IDN_fish_data.csv")
 df <- df %>%
   # 1
   dplyr::filter(Year %in% c(2017, 2021)) %>% 
@@ -159,16 +83,20 @@ df <- df %>%
     day = Day,
     lat = Latitude,
     lon = Longitude,
-    ma_name = MAR.Name,
+    ma_name = `MAR Name`,
     location_name = Site,
-    location_status = Management.name,
-    transect_no = Transect.number,
+    location_status = `Management name`,
+    transect_no = `Transect number`,
     count = Count,
-    family = Fish.family,
-    species = Fish.taxon,
+    family = `Fish family`,
+    species = `Fish taxon`,
     density_ind_ha = density_countha,
     biomass_kg_ha = Biomass_kgha,
-    length = Size
+    length = Size,
+    a,
+    b,
+    reef_slope = `Reef slope`,
+    reef_zone = `Reef zone`,
   ) %>% 
   # 3
   dplyr::mutate(
@@ -180,10 +108,10 @@ df <- df %>%
   )
 
 fish.surveys <- fish.surveys %>% 
-  # 4
-  dplyr::filter(country != "IDN" | year != 2021) %>% 
-  dplyr::select(intersect(names(df), names(fish.surveys)))
+  # 4 drop lmax from fish.surveys
+  dplyr::select(intersect(names(df), names(fish.surveys))) 
 
+# drop month, day from df
 df <- df %>% dplyr::select(names(fish.surveys))
 
 # 5
@@ -226,10 +154,13 @@ clean_df <- function(df) {
       transect_no,
       transect_area, # need to compute values of density_ind_ha
       count = Count,
+      family,
       species = Species,
       length,
-      survey_date,
-      size_class
+      size_class,
+      reef_slope,
+      reef_zone,
+      survey_date
     ) %>% 
     dplyr::mutate(
       survey_date = as.character(survey_date), # save effort on fixing df3 problem
@@ -244,10 +175,11 @@ df3 <- clean_df(df3)
 df <- rbind(df1, rbind(df2, df3))
 
 
-# now that we have the three sheets combined into one data frame, we need to calculate the biomass
-# to do this, we need the weight for each fish (weight_kg)
-# to get the weight, we need to use the length-weight formula and thus need the a and b parameters
-# to get those parameters, we pull from some tables we have.
+# Now that we have the three sheets combined into one data frame, we need to calculate the biomass
+# To do this, we need the weight for each fish (weight_kg)
+# To get the weight, we need to use the length-weight formula and thus need the a and b parameters
+# The spreadsheet that df1/2/3 came from do have an a and b column, but they are entirely blank.
+# To get those parameters, we pull from some tables we have.
 # Not every species in df has an a or b value in the tables, so we impute missing values using
 # the genus means of a/b.
 
@@ -329,17 +261,36 @@ df <- df %>%
   dplyr::mutate(
     weight_kg = a * length^b / 1000,
     biomass_kg_ha = density_ind_ha * weight_kg,
-    transect_area = NULL,
-    a = NULL,
-    b = NULL,
-    genus = NULL,
   ) %>% 
-  dplyr::mutate(
-    weight_kg = NULL
+  dplyr::rename(
+    family = family.y
+  ) %>% 
+  dplyr::select(
+    -c(transect_area, genus, weight_kg, family.x)
   )
+
+# Some inconvenience... the records for this PHL excel spreadsheet and from the original data.world
+# file (the initial read in this file) have some overlap on dates. It's only four dates, but within
+# each day, the way they overlap is different:
+
+# 2020-11-08 is OK; nothing to change
+
+# 2020-11-12: fish.surveys supersets df. drop the df data on this day
+df <- df %>%
+  dplyr::filter(survey_date != "2020-11-12")
+
+# 2020-11-13: This one is complicated. Neither dataframe supersets the other. For now, as a simple
+# but not clean solution, just drop the df records since fish.surveys has more
+df <- df %>%
+  dplyr::filter(survey_date != "2020-11-13")
+
+# 2020-11-14: df supersets fish.surveys; drop fish.surveys records
+fish.surveys <- fish.surveys %>% 
+  dplyr::filter(!(country == "PHL" & survey_date == "2020-11-14"))
 
 fish.surveys <- rbind(fish.surveys, df)
 
+fish.surveys$year[fish.surveys$country == "PHL"] <- 2021
 #### transform country names
 
 iso3_to_full <- function(x) {
