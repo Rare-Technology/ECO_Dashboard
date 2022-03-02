@@ -125,7 +125,12 @@ df <- read.csv2("../data/Benthic_IDN_SE-Sulawesi_2021.csv", header=TRUE, strings
 df$level1_name <- "Southeast Sulawesi"
 
 df <- df %>% 
-  #dplyr::filter(Country != "", Year != 2019) %>% # do not overwrite existing 2019 data
+  # there's 2019 data here but after grouping to get percentages (the next pipeline),
+  # the 2019 data from BenthicMaster provides more samples for the same areas.
+  # So, we ignore the 2019 data here
+  # Also, the records with blank `Country` have missing benthic info as well, so
+  # they are useless
+  dplyr::filter(Country != "", Year != 2019) %>%
   dplyr::rename(
     country = Country,
     level2_name = District,

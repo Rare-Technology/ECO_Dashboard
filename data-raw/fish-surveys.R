@@ -29,7 +29,7 @@ get_level_name <- Vectorize(get_level_name)
 fish.surveys$ma_name[fish.surveys$ma_name == "Santa Fe"] <- "Santa Fé"
 fish.surveys$ma_name[fish.surveys$ma_name == "Puerto Cortes"] <- "Puerto Cortés"
 fish.surveys$ma_name[fish.surveys$ma_name == "Roatan"] <- "Roatán"
-fish.surveys$ma_name[fish.surveys$ma_name == "Pilar"] <- "Pilar, Cebu" # based on matching lat/lon with PHL data below
+fish.surveys$ma_name[fish.surveys$ma_name == "Pilar"] <- "Cebu_Pilar" # based on matching lat/lon with PHL data below
 
 fish.surveys <- fish.surveys %>% 
   dplyr::mutate(
@@ -320,12 +320,16 @@ get_size_class <- Vectorize(get_size_class)
 fish.surveys$size_class[fish.surveys$country == "Philippines"] <- 
   as.character(get_size_class(fish.surveys$length[fish.surveys$country == "Philippines"]))
 
-### Jan 3, 2022 or so
-#### Fix location_status for some rows
+##### Jan 3, 2022 or so
+### Fix location_status for some rows
 fish.surveys$location_status[fish.surveys$location_status == "MA"] <- "Managed Access"
 fish.surveys$location_status[fish.surveys$location_status == "reserve"] <- "Reserve"
 fish.surveys$location_status[fish.surveys$location_status == "outside"] <- "Managed Access"
 
 fish.surveys$year <- as.integer(fish.surveys$year)
+
+##### Mar 2, 2022
+### Fix level1_name in HND records so they match
+fish.surveys$level1_name[fish.surveys$level1_name == "Islas de Bahía"] <- "Islas de la Bahía"
 
 usethis::use_data(fish.surveys, overwrite = TRUE)

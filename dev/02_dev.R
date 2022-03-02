@@ -57,6 +57,7 @@ usethis::use_data_raw( name = "INIT", open = TRUE)
 usethis::use_data_raw( name = "benthic", open = TRUE)
 usethis::use_data_raw( name = "script", open = TRUE)
 usethis::use_data_raw( name = "seagrass", open = TRUE)
+usethis::use_data_raw( name = "geo_levels", open = TRUE)
 ## Tests ----
 ## Add one line by test you want to create
 # usethis::use_test( "app" )
