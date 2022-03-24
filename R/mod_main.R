@@ -11,6 +11,7 @@
 #' @importFrom shinyjs useShinyjs extendShinyjs
 mainUI <- function(id){
   ns <- NS(id)
+  div(id = 'fma-body',
   fillPage(
     useShinyjs(),
     extendShinyjs(script="www/toggleFullScreen.js", functions=c("toggleFullScreen")),
@@ -43,7 +44,7 @@ mainUI <- function(id){
         )
     ),
     uiOutput(ns("tabPanels"))
-  )
+  ))
 }
     
 #' main Server Functions

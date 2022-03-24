@@ -322,9 +322,11 @@ fish.surveys$size_class[fish.surveys$country == "Philippines"] <-
 
 ##### Jan 3, 2022 or so
 ### Fix location_status for some rows
+fish.surveys$location_status[fish.surveys$location_status == "ma"] <- "Managed Access"
 fish.surveys$location_status[fish.surveys$location_status == "MA"] <- "Managed Access"
 fish.surveys$location_status[fish.surveys$location_status == "reserve"] <- "Reserve"
 fish.surveys$location_status[fish.surveys$location_status == "outside"] <- "Managed Access"
+fish.surveys$location_status[fish.surveys$location_status == "Outside"] <- "Managed Access"
 
 fish.surveys$year <- as.integer(fish.surveys$year)
 

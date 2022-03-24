@@ -82,7 +82,6 @@ a {
 
 .tab-content{
   margin-top: 20px;
-  overflow-y: scroll;
 }
 
 .img-holder{
@@ -191,9 +190,16 @@ a {
 }
 
 .startpage {
-  margin-left: 20px;
+
 }
 
+#start_banner {
+  display: block;
+  margin-top: 50px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
 /*
 .display-filters {
     display: block;
@@ -244,4 +250,11 @@ a {
 #lang-select {
   margin-top: -20px;
   margin-right: 15px;
+}
+
+#fma-body {
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }

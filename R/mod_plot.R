@@ -10,7 +10,8 @@
 #' @import ggplot2
 plotUI <- function(id){
   ns <- NS(id)
-  tagList(
+  div(
+    style = "height: calc(100vh - 120px); overflow-y: scroll",
     uiOutput(ns('plot_holder'))
   )
 }
