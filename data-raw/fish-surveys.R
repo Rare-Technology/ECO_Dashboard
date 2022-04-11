@@ -29,7 +29,6 @@ get_level_name <- Vectorize(get_level_name)
 fish.surveys$ma_name[fish.surveys$ma_name == "Santa Fe"] <- "Santa Fé"
 fish.surveys$ma_name[fish.surveys$ma_name == "Puerto Cortes"] <- "Puerto Cortés"
 fish.surveys$ma_name[fish.surveys$ma_name == "Roatan"] <- "Roatán"
-fish.surveys$ma_name[fish.surveys$ma_name == "Pilar"] <- "Cebu_Pilar" # based on matching lat/lon with PHL data below
 
 fish.surveys <- fish.surveys %>% 
   dplyr::mutate(
@@ -117,197 +116,61 @@ df <- df %>% dplyr::select(names(fish.surveys))
 # 5
 fish.surveys <- rbind(fish.surveys, df)
 
+##### PHL fish surveys, 2011-2021 #####
+### From Rare Fish Surveys: PHL_Master_Fish_2012_2021_Final.csv (think the 2012 part is a typo)
+### https://data.world/rare/fish-surveys/
+df <- read.csv("https://query.data.world/s/wcmohtrplklrfcymlgb5qnwyyt7odd", header=TRUE, stringsAsFactors=FALSE);
 
-#### 2021 PHL data
-library(readxl)
-library(rfishbase)
-
-data_path <- "../data/PHL_fish_data_2021.xlsx"
-df1 <- read_xlsx(data_path, sheet = 1)
-df2 <- read_xlsx(data_path, sheet = 2)
-df3 <- read_xlsx(data_path, sheet = 3)
-
-# survey_date for df3 is not parsed correctly; almost all of the dates appear as
-# character of an integer representing the number of days since a certain date in 1900
-# eg "44332", "44317"
-
-df2 <- df2 %>% 
-  dplyr::rename(transect_no = "Transect number",
-                transect_area = "Transect area")
-
-df3 <- df3 %>% 
-  dplyr::rename(transect_no = Transect,
-                length = "length (cm)",
-                transect_area = "Transect area (m2)")
-
-clean_df <- function(df) {
-  df %>% 
-    dplyr::select(
-      country,
-      level1_name,
-      level2_name,
-      ma_name,
-      location_name,
-      location_status,
-      lat = Latitude,
-      lon = Longitude,
-      transect_no,
-      transect_area, # need to compute values of density_ind_ha
-      count = Count,
-      family,
-      species = Species,
-      length,
-      size_class,
-      reef_slope,
-      reef_zone,
-      survey_date
-    ) %>% 
-    dplyr::mutate(
-      survey_date = as.character(survey_date), # save effort on fixing df3 problem
-      density_ind_ha = count / transect_area * 10000 # m2 to ha
-    )
-}
-
-df1 <- clean_df(df1)
-df2 <- clean_df(df2)
-df3 <- clean_df(df3)
-
-df <- rbind(df1, rbind(df2, df3))
-
-
-# Now that we have the three sheets combined into one data frame, we need to calculate the biomass
-# To do this, we need the weight for each fish (weight_kg)
-# To get the weight, we need to use the length-weight formula and thus need the a and b parameters
-# The spreadsheet that df1/2/3 came from do have an a and b column, but they are entirely blank.
-# To get those parameters, we pull from some tables we have.
-# Not every species in df has an a or b value in the tables, so we impute missing values using
-# the genus means of a/b.
-
-# first, create a column for the genus. while we're at it, set the survey years
-genus_regex <-  "^[A-Za-z]*"
-df <- df %>% 
-  dplyr::mutate(
-    year = 2021,
-    genus = stringr::str_extract(species, pattern = genus_regex)
-  )
-
-# a few records have genus Archamia but they were reclassified as Taeniamia in 2013
-df[df$genus == "Archamia",]$genus <- "Taeniamia"
-# fix some typos
-df[df$species == "Stethjulis trilineata",]$genus <- "Stethojulis"
-df[df$species == "chaetodon octofasciatus",]$genus <- "Chaetodon"
-
-
-# read in the tables for a/b parameters
-ab_old <- read.csv("https://query.data.world/s/adbk2l66cdg7vhd6h4ejq6n32ekq7a", header=TRUE, stringsAsFactors=FALSE);
-ab <- read.csv("../data/fish_ab.csv")
-ab <- ab %>% 
-  dplyr::mutate(species = paste(Genus, Species)) %>% 
-  dplyr::select(
-    species,
-    a = Biomass.Constant.A,
-    b = Biomass.Constant.B
+# 127,285 records
+df <- df %>% dplyr::select(
+  country = Country,
+  year = Year,
+  lat = Latitude, # along with lon, 13,881 are NA
+  lon = Longitude,
+  ma_name = Management.secondary.name,
+  location_name = Site,
+  location_status = Management.name,
+  transect_no = Transect.number,
+  count = Count,
+  family = Fish.family,
+  species = Fish.taxon,
+  biomass_kg_ha = Biomass_kgha,
+  length = Size,
+  a = a,
+  b = b,
+  reef_slope = Reef.slope,
+  reef_zone = Reef.zone
+) %>% dplyr::filter(
+  year != 20 # one row with this. no indication of actual year
 )
 
-ab_old <- ab_old %>% 
-  dplyr::select(
-    species,
-    a,
-    b
-  ) %>% 
-  dplyr::filter(
-    !(species %in% unique(ab$species))
-)
+### Columns missing:
+# - density_ind_ha (to be calculated)
+# - survey_date (insufficient data to process; that are Year, Month, Day columns but
+#   only about 15k records out of 127k have Month and Day recorded
+# - size_class (to be calculated but not important)
+# - level1_name (could try to process using existing geographic level info, but not sure if
+#   the info we have is historically accurate)
 
-ab <- rbind(ab, ab_old)
 
-ab_species <- ab %>% 
-  dplyr::filter(!is.na(a) & !is.na(b)) %>% 
-  dplyr::group_by(species) %>%
-  dplyr::mutate(a_species = mean(a), b_species = mean(b)) %>% # there is one species with two records, this line is for that
-  dplyr::ungroup() %>%
-  dplyr::select(species, a_species, b_species) %>% 
-  dplyr::distinct()
-
-ab_genus <- ab_species %>% 
-  dplyr::mutate(genus = stringr::str_extract(species, pattern = genus_regex)) %>% 
-  dplyr::group_by(genus) %>% 
-  dplyr::mutate(a_genus = mean(a_species), b_genus = mean(b_species)) %>% 
-  dplyr::ungroup() %>% 
-  dplyr::select(genus, a_genus, b_genus) %>% 
-  dplyr::distinct()
-
-genfam <- fishbase %>%
-  dplyr::select(genus = Genus, family = Family) %>% 
-  dplyr::distinct()
-
-df <- dplyr::left_join(df, ab_genus, by = "genus") %>% 
-  dplyr::left_join(., ab_species, by = "species") %>% 
-  dplyr::mutate(
-    a = ifelse(is.na(a_species),
-      a_genus,
-      a_species),
-    b = ifelse(is.na(b_species),
-      b_genus,
-      b_species),
-    a_species = NULL,
-    a_genus = NULL,
-    b_species = NULL,
-    b_genus = NULL
-  ) %>% 
-  dplyr::left_join(., genfam, by = "genus")
-
-df <- df %>% 
+### Number density
+df <- df %>%
   dplyr::mutate(
     weight_kg = a * length^b / 1000,
-    biomass_kg_ha = density_ind_ha * weight_kg,
-  ) %>% 
-  dplyr::rename(
-    family = family.y
+    density_ind_ha = biomass_kg_ha / weight_kg
   ) %>% 
   dplyr::select(
-    -c(transect_area, genus, weight_kg, family.x)
+    -weight_kg
   )
 
-# Some inconvenience... the records for this PHL excel spreadsheet and from the original data.world
-# file (the initial read in this file) have some overlap on dates. It's only four dates, but within
-# each day, the way they overlap is different:
 
-# 2020-11-08 is OK; nothing to change
+### survey date
+df$survey_date <- NA
 
-# 2020-11-12: fish.surveys supersets df. drop the df data on this day
-df <- df %>%
-  dplyr::filter(survey_date != "2020-11-12")
-
-# 2020-11-13: This one is complicated. Neither dataframe supersets the other. For now, as a simple
-# but not clean solution, just drop the df records since fish.surveys has more
-df <- df %>%
-  dplyr::filter(survey_date != "2020-11-13")
-
-# 2020-11-14: df supersets fish.surveys; drop fish.surveys records
-fish.surveys <- fish.surveys %>% 
-  dplyr::filter(!(country == "PHL" & survey_date == "2020-11-14"))
-
-fish.surveys <- rbind(fish.surveys, df)
-
-fish.surveys$year[fish.surveys$country == "PHL"] <- 2021
-#### transform country names
-
-iso3_to_full <- function(x) {
-  switch(x,
-         "HND" = "Honduras",
-         "IDN" = "Indonesia",
-         "MOZ" = "Mozambique",
-         "PHL" = "Philippines")
-}
-
-fish.surveys$country <- as.character(sapply(fish.surveys$country, iso3_to_full))
-
-#### 2021 PHL data compute size_class
-# forgot to do this when first adding the data
-
+### Size class
 get_size_class <- function (x) { # need to fix this for existing fish data, its a mess
-  if (x <= 5) {"0-5"}
+  if (is.na(x)) {NA}
+  else if (x <= 5) {"0-5"}
   else if (x > 5 & x <= 10) {"5-10"}
   else if (x > 10 & x <= 20) {"10-20"}
   else if (x > 20 & x <= 30) {"20-30"}
@@ -317,8 +180,33 @@ get_size_class <- function (x) { # need to fix this for existing fish data, its 
 }
 get_size_class <- Vectorize(get_size_class)
 
-fish.surveys$size_class[fish.surveys$country == "Philippines"] <- 
-  as.character(get_size_class(fish.surveys$length[fish.surveys$country == "Philippines"]))
+df$size_class <- as.character(get_size_class(df$length))
+
+### level1/level2_name
+# TODO have PHL team fill out geo level info and use table to fill in geo info
+geo <- readr::read_csv('../data/ECO_PHL_Historical_geo.csv')
+names(geo) <- c('ma_name', 'level1_name', 'level2_name')
+df <- dplyr::left_join(df, geo, by = 'ma_name') %>% 
+  dplyr::mutate(
+    level1_name = ifelse(is.na(level1_name), 'Unspecified', level1_name),
+    level2_name = ifelse(is.na(level2_name), 'Unspecified', level2_name)
+  )
+
+fish.surveys <- fish.surveys %>% dplyr::filter(country != "PHL") %>% 
+  rbind(., df)
+
+#### transform country names
+
+iso3_to_full <- function(x) {
+  switch(x,
+         "HND" = "Honduras",
+         "IDN" = "Indonesia",
+         "MOZ" = "Mozambique",
+         "Philippines" = "Philippines")
+}
+
+fish.surveys$country <- as.character(sapply(fish.surveys$country, iso3_to_full))
+
 
 ##### Jan 3, 2022 or so
 ### Fix location_status for some rows

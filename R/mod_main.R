@@ -11,7 +11,7 @@
 #' @importFrom shinyjs useShinyjs extendShinyjs
 mainUI <- function(id){
   ns <- NS(id)
-  div(id = 'fma-body',
+  div(id = 'eco-body',
   fillPage(
     useShinyjs(),
     extendShinyjs(script="www/toggleFullScreen.js", functions=c("toggleFullScreen")),

@@ -13,8 +13,35 @@ plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
   
   data_aggreg <- aggregate_data(data_filtered, 'percentage')
   data_summary <- data_aggreg
+  
+  data_summary$percentage_ma[data_summary$location_status == 'Managed Access'] <- data_summary %>% 
+    dplyr::filter(location_status == 'Managed Access') %>% 
+    dplyr::pull(percentage)
+  
   out <- list(data = data_summary)
   
+  
+  ### WIP cleveland plots, restrict to one MA at a time
+  # p <- ggplot2::ggplot(data = data_summary) +
+  #   geom_segment(aes(
+  #     x = category, xend = category, y = percentage_ma, yend = percentage_r
+  #   )) +
+  #   geom_point(aes(
+  #     x = category, y = percentage_ma
+  #   ), color = 'red') +
+  #   geom_point(aes(
+  #     x = category, y = percentage_r
+  #   ), color = 'blue') +
+  #   coord_flip() +
+  #   facet_wrap("year") +
+  #   labs(title = "Benthic area cover composition (%)") +
+  #   theme_rare() +
+  #   theme(
+  #     # axis.text.x = element_text(angle = 30, hjust = 1),
+  #     panel.grid.major.x = element_blank(),
+  #     axis.title.y = element_blank()
+  #   )
+    
   p <- ggplot2::ggplot(data = data_summary,
                   aes(x = category, y = location_status, fill = percentage)) +
     facet_wrap("ma_name") +
@@ -24,6 +51,7 @@ plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
     scale_fill_viridis_c(option = "magma") +
     scale_color_manual(values = c("white", "black")) +
     labs(title = "Benthic area cover composition (%)") +
+    theme_rare() +
     theme(
       axis.text.x = element_text(angle = 30, hjust = 1),
       panel.grid.major.x = element_blank(),

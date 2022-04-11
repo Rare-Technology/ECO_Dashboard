@@ -94,7 +94,7 @@ sidebarGeoServer <- function(id, rv){
           selected = country_choices[1]
         )
       }
-    }, ignoreInit = TRUE)
+    }, ignoreInit = TRUE, ignoreNULL = TRUE)
     
     observeEvent(input$sel_country, {
       # update rv$sel_country only as a result of changing input$sel_country,
@@ -156,7 +156,7 @@ sidebarGeoServer <- function(id, rv){
       if (!setequal(rv$sel_maa, input$sel_maa)) {
         rv$sel_maa <- input$sel_maa
       }
-    }, ignoreInit = TRUE, ignoreNULL = FALSE)
+    }, ignoreInit = TRUE, ignoreNULL = TRUE)
   })
 }
     

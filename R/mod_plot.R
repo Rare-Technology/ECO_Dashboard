@@ -10,10 +10,7 @@
 #' @import ggplot2
 plotUI <- function(id){
   ns <- NS(id)
-  div(
-    style = "height: calc(100vh - 120px); overflow-y: scroll",
-    uiOutput(ns('plot_holder'))
-  )
+  uiOutput(ns('plot_holder'))
 }
     
 #' plot Server Functions
@@ -69,13 +66,28 @@ plotServer <- function(id, rv){
         p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
         rv$current_plot <- p$plot
         rv$current_plot_data <- p$data
-        output$plot <- renderPlot(p$plot, height=600)
+        output$plot <- renderPlot(p$plot) 
+          
         
         ui_out <- list(list(br()))
-        ui_out <- append(ui_out, list(downloadButton(ns("downloadPlot"),
-                                                     class = "download-button",
-                                                     tr(rv, 'Download plot'))))
-        ui_out <- append(ui_out, list(plotOutput(ns('plot'))))
+        ui_out <- append(ui_out, list(
+          downloadButton(ns("downloadPlot"),
+            class = "download-button",
+            tr(rv, 'Download plot')
+          )
+        ))
+        
+        num_maa <- rv$sel_maa
+        plot_height <- ifelse(
+          length(num_maa) <= 3,
+          400,
+          300 * ceiling(length(num_maa) / 3)
+        )
+        
+        ui_out <- append(ui_out, list(
+          plotOutput(ns('plot'), width = 900, height = plot_height) %>% 
+            tagAppendAttributes(style = "margin: 0 auto;")
+        ))
         ui_out
       }
     })
