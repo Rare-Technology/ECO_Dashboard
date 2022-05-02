@@ -66,8 +66,9 @@ aggregate_data <- function(data_filtered, metric) {
     data_filtered <- data_filtered %>% # these lines may change depending on how
       dplyr::filter(age == "adult") # age is implemented in other metrics
     
-    groupvars <- c(groupvars, 'transect_no', 'plot_no')
+    groupvars <- c(groupvars, 'plot_no')
     groupvars2 <- groupvars[-length(groupvars)] # drop plot_no
+    cat(groupvars2)
     form <- str_to_formula(metric, groupvars)
     form2 <- str_to_formula(metric, groupvars2)
     
@@ -80,15 +81,15 @@ aggregate_data <- function(data_filtered, metric) {
     data_filtered <- data_filtered %>%
       dplyr::filter(age == "sapling")
     
-    groupvars <- c(groupvars, 'transect_no', 'plot_no', 'quadrat_no')
+    groupvars <- c(groupvars, 'plot_no', 'quadrat_no')
     groupvars2 <- groupvars[-length(groupvars)] # drop quadrat_no
     groupvars3 <- groupvars2[-length(groupvars2)] # drop plot_no
     form <- str_to_formula('count', groupvars) # dependent var gets renamed for the 2nd/3rd aggregates
     form2 <- str_to_formula(metric, groupvars2)
     form3 <- str_to_formula(metric, groupvars3)
     
-    aggregate(form, data = data_filtered, FUN = sum) %>% 
-      dplyr::rename(sapling_tree_density_ind_m2 = count) %>%
+    out1 <- aggregate(form, data = data_filtered, FUN = sum) %>% 
+      dplyr::rename(sapling_tree_density_ind_m2 = count) %>% 
       aggregate(form2, data = ., FUN = mean) %>% 
       aggregate(form3, data = ., FUN = mean)
     
