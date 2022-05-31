@@ -99,9 +99,11 @@ df_adult <- df_adult %>%
     dbh_cm >= 4
   )
 
+# In the mutate below, we set count = 1. This is because there is no count data recorded, but
+# after asking Mayra about it, she said each row represents a count of 1.
 df_sapling <- readxl::read_excel('../data/Mangrove-Surveys-Brazil.xlsx', sheet = 'master_quadrat')
 df_sapling <- df_sapling %>% 
-  dplyr::mutate(age = 'sapling', dbh_cm = NA, year = 2020) %>% 
+  dplyr::mutate(age = 'sapling', dbh_cm = NA, year = 2020, count = 1) %>%
   dplyr::select(country,
     level1_name = `level1_name (state or region)`,
     level2_name = `level2_name (district)`,

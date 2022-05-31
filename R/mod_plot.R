@@ -79,7 +79,7 @@ plotServer <- function(id, rv){
         
         num_maa <- rv$sel_maa
         plot_height <- ifelse(
-          length(num_maa) <= 3,
+          length(num_maa) <= 3 | !(facet_maa),
           400,
           300 * ceiling(length(num_maa) / 3)
         )

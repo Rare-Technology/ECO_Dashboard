@@ -1,7 +1,7 @@
 ## code to prepare `fish.surveys` dataset goes here
 ##
 ## fish_surveys_all from Dive Surveys project https://data.world/rare/dive-surveys/
-fish.surveys <- readr::read_csv("https://query.data.world/s/khyask2eviivyjp4mbhyaufodpjmrl");
+fish.surveys <- readr::read_csv("https://query.data.world/s/vigzulfjfm7fh7mah2q3tctcx76exu");
 
 # Removing columns that have a lot of missing information/have no use in the dashboard.
 fish.surveys <- fish.surveys %>% 
@@ -119,7 +119,7 @@ fish.surveys <- rbind(fish.surveys, df)
 ##### PHL fish surveys, 2011-2021 #####
 ### From Rare Fish Surveys: PHL_Master_Fish_2012_2021_Final.csv (think the 2012 part is a typo)
 ### https://data.world/rare/fish-surveys/
-df <- read.csv("https://query.data.world/s/wcmohtrplklrfcymlgb5qnwyyt7odd", header=TRUE, stringsAsFactors=FALSE);
+df <- readr::read_csv("https://query.data.world/s/4fsbqm5yxnrtz2n26ukkagl6kthpgm");
 
 # 127,285 records
 df <- df %>% dplyr::select(
@@ -215,6 +215,8 @@ fish.surveys$location_status[fish.surveys$location_status == "MA"] <- "Managed A
 fish.surveys$location_status[fish.surveys$location_status == "reserve"] <- "Reserve"
 fish.surveys$location_status[fish.surveys$location_status == "outside"] <- "Managed Access"
 fish.surveys$location_status[fish.surveys$location_status == "Outside"] <- "Managed Access"
+fish.surveys$location_status[fish.surveys$location_status == "Inside"] <- "Reserve"
+fish.surveys$location_status[fish.surveys$location_status == "TURF"] <- "Managed Access"
 
 fish.surveys$year <- as.integer(fish.surveys$year)
 
