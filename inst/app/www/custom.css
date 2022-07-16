@@ -77,11 +77,18 @@ a {
     height: 200px;
 }
 
-
+.row {
+  height: 90%;
+}
 
 
 .tab-content{
   margin-top: 20px;
+  height: calc(100% - 60px);
+}
+
+.tab-pane {
+  height: 100%;
 }
 
 .img-holder{
@@ -153,9 +160,8 @@ a {
   margin-right: 5px;
 }
 
-.sw-dropdown-content {
-  height: 500px;
-  overflow-y: scroll;
+.dropdown-menu.inner {
+  max-height: 300px !important;
 }
 
 .sidetitle {
@@ -167,7 +173,14 @@ a {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 5px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  height: 5%;
+
+}
+
+#reset-filters {
+  margin-left: 15px;
 }
 
 #help-button {
@@ -177,8 +190,14 @@ a {
   cursor: pointer;
 }
 
-.download-button {
-  margin-left: 45%;
+#mainUI-language-label {
+  display: none;
+}
+
+#download-button-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
 }
 
 .fs-button {
@@ -187,10 +206,6 @@ a {
   width: 32px;
   height: 32px;
   cursor: pointer;
-}
-
-.startpage {
-
 }
 
 #start_banner {
@@ -240,7 +255,13 @@ a {
 }
 
 #plotUI-plot_holder {
-  height: 700px;
+  height: 100%;
+}
+
+#visualizeUI-plot {
+  margin: 0;
+  overflow-y: auto;
+  height: calc(100% - 34px - 3rem) !important; /* 34px is the downlaod button and 3rem is the margin below it */
 }
 
 #mapUI-map {
@@ -248,13 +269,25 @@ a {
 }
 
 #lang-select {
-  margin-top: -20px;
   margin-right: 15px;
 }
 
-#eco-body {
-  margin-left: 15px;
-  margin-right: 15px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+#filters-sidebar {
+  height: 100%;
+}
+
+.well{
+  background-color: white;
+  overflow-y: auto;
+  height: 100%;
+}
+
+#sidebar-layout {
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-bottom: 1.5rem;
+}
+
+#main-panel {
+  height: 100%;
 }

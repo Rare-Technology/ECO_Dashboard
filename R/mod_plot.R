@@ -60,33 +60,29 @@ plotServer <- function(id, rv){
               "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa)
         )
         if (facet_maa) {
-          p$plot <- p$plot + facet_wrap('ma_name')
+          p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)
+          plot_height <- get_plot_height(length(rv$sel_maa))
+        } else {
+          plot_height <- 'auto'
         }
         p$plot$facet$params$free$y <- y_scale
         p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
         rv$current_plot <- p$plot
         rv$current_plot_data <- p$data
-        output$plot <- renderPlot(p$plot) 
+        output$plot <- renderPlot(p$plot, height = plot_height) 
           
         
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(
-          downloadButton(ns("downloadPlot"),
-            class = "download-button",
-            tr(rv, 'Download plot')
+          div(id = "download-button-container",
+            downloadButton(ns("downloadPlot"), tr(rv, 'Download plot'))
           )
         ))
-        
-        num_maa <- rv$sel_maa
-        plot_height <- ifelse(
-          length(num_maa) <= 3 | !(facet_maa),
-          400,
-          300 * ceiling(length(num_maa) / 3)
-        )
+
         
         ui_out <- append(ui_out, list(
-          plotOutput(ns('plot'), width = 900, height = plot_height) %>% 
-            tagAppendAttributes(style = "margin: 0 auto;")
+          plotOutput(ns('plot')) #%>% 
+            # tagAppendAttributes(style = "margin: 0 auto;")
         ))
         ui_out
       }

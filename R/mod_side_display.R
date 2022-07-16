@@ -58,6 +58,7 @@ sidebarDisplayServer <- function(id, rv){
                       selected = INIT$FAMILY$SELECTED,
                       options = list(
                         `actions-box` = TRUE,
+                        `live-search` = TRUE,
                         `selected-text-format` = "count > 3",
                         `count-selected-text` = paste("{0}", tr(rv, "items selected")),
                         `none-selected-text` = tr(rv, "Nothing selected")
