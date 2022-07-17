@@ -167,6 +167,11 @@ a {
 .sidetitle {
   text-align: center;
   font-size: 16px;
+  font-weight: bold;
+}
+
+.control-label {
+  font-weight: normal;
 }
 
 .flow-div {
@@ -258,7 +263,7 @@ a {
   height: 100%;
 }
 
-#visualizeUI-plot {
+#plotUI-plot {
   margin: 0;
   overflow-y: auto;
   height: calc(100% - 34px - 3rem) !important; /* 34px is the downlaod button and 3rem is the margin below it */
@@ -289,5 +294,13 @@ a {
 }
 
 #main-panel {
+  height: 100%;
+}
+
+#mainUI-tabPanels {
+  height: 100%;
+}
+
+.tabbable {
   height: 100%;
 }

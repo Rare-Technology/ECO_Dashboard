@@ -65,7 +65,7 @@ plotServer <- function(id, rv){
         } else {
           plot_height <- 'auto'
         }
-        p$plot$facet$params$free$y <- y_scale
+        p$plot$facet$params$free$y <- !y_scale
         p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
         rv$current_plot <- p$plot
         rv$current_plot_data <- p$data

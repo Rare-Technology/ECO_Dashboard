@@ -42,11 +42,12 @@ sidebarDisplayServer <- function(id, rv){
             value = TRUE,
             status = "primary"
           ),
-          radioButtons(ns('sel_yscale'),
-                       tr(rv, 'Axis scale'),
-                       choices = c('Free'=TRUE,
-                                   'Fixed'=FALSE),
-                       selected = TRUE
+          materialSwitch(
+            ns("sel_yscale"),
+            tr(rv, "Fixed Y-axis"),
+            value = TRUE,
+            width = "100%",
+            status = "primary"
           )
         )
       }
