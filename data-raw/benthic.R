@@ -2,9 +2,13 @@
 
 ### add 2021 PHL data
 library(dplyr)
+library(httr)
 library(readxl)
 
-df_phl <- read_excel("../data/Benthic_survey_RARE_AllSites_2020-21_PHv2.xlsx")
+GET("https://query.data.world/s/kq57wjyui2lglnojgt2el5htm5inam", write_disk(tf <- tempfile(fileext = ".xlsx")))
+df_phl <- read_excel(tf)
+
+detach(package:httr)
 detach(package:readxl)
 
 # first, let's add the missing geo columns.
@@ -38,12 +42,19 @@ get_geo_names <- function(df, site, fish_coords) {
 }
 
 sitenames <- unique(df_phl$sitename)
+df_phl <- df_phl %>% 
+  tibble::add_column(
+    level1_name = '',
+    level2_name = '',
+    ma_name = ''
+  )
 
 for (site in sitenames) {
   geo_names <- get_geo_names(df_phl, site, fish_coords)
-  df_phl$level1_name[df_phl$sitename == site] <- geo_names$level1_name
-  df_phl$level2_name[df_phl$sitename == site] <- geo_names$level2_name
-  df_phl$ma_name[df_phl$sitename == site] <- geo_names$ma_name
+  View(geo_names)
+  df_phl[df_phl$sitename == site,]$level1_name <- geo_names$level1_name
+  df_phl[df_phl$sitename == site,]$level2_name <- geo_names$level2_name
+  df_phl[df_phl$sitename == site,]$ma_name <- geo_names$ma_name
 }
 
 df_phl$year <- 2021
@@ -51,10 +62,9 @@ df_phl$year <- 2021
 ## now pre-process IDN+HND data
 ## from BenthicMaster.csv in Benthic Surveys dataset
 ## https://data.world/rare/benthic-surveys/workspace/file?filename=BenthicMaster.csv
-df <- read.csv("https://query.data.world/s/3bfxh2fxbexydjawr4q756hkt6av4v", header=TRUE, stringsAsFactors=FALSE);
+df <- readr::read_csv("https://query.data.world/s/3bfxh2fxbexydjawr4q756hkt6av4v");
 
 df_sites <- df$sitename %>% unique()
-df_sites[df_sites %in% fish.surveys$ma_name]
 
 get_geo_names_by_string <- function(df, site) {
   # instead of using disance, match the sitename with ma_name, since there are matches
@@ -116,11 +126,9 @@ benthic.surveys <- benthic.surveys %>%
 
 detach(package:dplyr)
 
-## Jan 12 2022
-## 2021 Indonesia data
-## From https://data.world/rare/benthic-surveys/
-## se_sulawesi_monitoring_biofisik_2021-benthicpit-obs-20210818.csv
-df <- read.csv2("../data/Benthic_IDN_SE-Sulawesi_2021.csv", header=TRUE, stringsAsFactors=FALSE);
+## July 18 2022
+## 2017, 2021 Indonesia data
+df <- read.csv2("../data/ECO/Benthic Raw Data - Southeast Sulawesi - RJWSED Correction_2021.09.30-edit", header=TRUE, stringsAsFactors=FALSE);
 
 df$level1_name <- "Southeast Sulawesi"
 
@@ -128,26 +136,24 @@ df <- df %>%
   # there's 2019 data here but after grouping to get percentages (the next pipeline),
   # the 2019 data from BenthicMaster provides more samples for the same areas.
   # So, we ignore the 2019 data here
-  # Also, the records with blank `Country` have missing benthic info as well, so
-  # they are useless
-  dplyr::filter(Country != "", Year != 2019) %>%
+  dplyr::filter(Year != 2019) %>%
   dplyr::rename(
     country = Country,
     level2_name = District,
-    ma_name = MAR.Name,
+    ma_name = `MAR Name`,
     location_name = Site,
-    location_status = Management.name,
-    transect_no = Transect.number,
-    PIT_interval = PIT.interval..m.,
+    location_status = `Management name`,
+    transect_no = `Transect number`,
+    PIT_interval = `PIT interval (m)`,
     lat = Latitude,
     lon = Longitude,
     year = Year,
     month = Month,
     day = Day,
     depth_m = Depth,
-    reefslope = Reef.slope,
-    category = Benthic.category,
-    attribute = Benthic.attribute
+    reefslope = `Reef slope`,
+    category = `Benthic category`,
+    attribute = `Benthic attribute`
   ) %>% 
   dplyr::mutate(
     year = as.character(year),

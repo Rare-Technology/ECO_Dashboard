@@ -10,9 +10,9 @@ plot_fish_density <- function(data_filtered, sel_geom, facet_maa) {
       x = "location_status",
       y = "density_ind_ha",
       fill = "location_status",
-      title = "Fish number density,",
+      title = "Fish density,",
       year = years,
-      y_label = "Number density (individuals/ha)"
+      y_label = "Density (individuals/ha)"
     )
     
     if (sel_geom == "Distribution plots") {
@@ -34,9 +34,9 @@ plot_fish_density <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "density_ind_ha",
       fill = "location_status",
-      title = "Fish number density trend",
+      title = "Fish density",
       x_label = "Year",
-      y_label = "Number density (individuals/ha)",
+      y_label = "Density (individuals/ha)",
       years = years
     )
     

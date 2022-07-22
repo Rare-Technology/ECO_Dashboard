@@ -11,9 +11,9 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
       x = "location_status",
       y = "biomass_kg_ha",
       fill = "location_status",
-      title = "Fish biomass density,",
+      title = "Fish biomass,",
       year = years,
-      y_label = "Biomass density (kg/ha)"
+      y_label = "Biomass (kg/ha)"
     )
     if (sel_geom == "Distribution plots") {
       data_local <- get_local_data(data_aggreg, 'biomass_kg_ha', facet_maa)
@@ -35,9 +35,9 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "biomass_kg_ha",
       fill = "location_status",
-      title = "Fish biomass density trends",
+      title = "Fish biomass",
       x_label = "Year",
-      y_label = "Biomass density (kg/ha)",
+      y_label = "Biomass (kg/ha)",
       years = years
     )
     

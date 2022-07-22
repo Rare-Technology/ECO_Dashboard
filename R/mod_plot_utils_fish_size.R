@@ -33,7 +33,7 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
         data = data_summary,
         x = "year",
         y = "length",
-        title = "Average fish length trends",
+        title = "Average fish length",
         y_label = "Length (cm)",
         years = years
       )
@@ -48,7 +48,7 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
           data = data_filtered,
           x = "length",
           y = "year",
-          title = "Distribution of fish length trends",
+          title = "Distribution of fish length",
           x_label = "Length (cm)",
           y_label = "Year"
         )

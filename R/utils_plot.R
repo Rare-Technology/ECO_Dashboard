@@ -85,7 +85,8 @@ plot_trend <- function(data, x = "year", y = NULL, ymin = "ymin", ymax = "ymax",
     theme_rare() +
     theme(
       panel.grid.major.y = element_line(),
-      panel.grid.minor.x = element_blank()
+      panel.grid.minor.x = element_blank(),
+      panel.grid.major.x = element_blank()
     )
 }
 
@@ -124,6 +125,7 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
     theme_rare() +
     theme(
       panel.grid.major.y = element_line(),
+      panel.grid.major.x = element_blank(),
       panel.grid.major.x = element_blank()
     ) +
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
@@ -179,7 +181,8 @@ plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_s
     theme_rare() +
     theme(
       panel.grid.major.y = element_line(),
-      panel.grid.minor.x = element_line()
+      panel.grid.minor.x = element_line(),
+      panel.grid.major.x = element_blank()
     ) +
     scale_x_continuous(
       breaks = seq(0, max(data_full[[x]], na.rm = TRUE), by = 10),
