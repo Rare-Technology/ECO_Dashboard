@@ -17,9 +17,9 @@ plot_sapling_tree_density <- function(data_filtered, sel_geom, facet_maa) {
       x = "location_status",
       y = "sapling_tree_density_ind_m2",
       fill = "location_status",
-      title = "Sapling number density,",
+      title = "Sapling density,",
       year = years,
-      y_label = expression("Number density (individuals/m"^2*")")
+      y_label = expression("Density (individuals/m"^2*")")
     )
     if (sel_geom == "Distribution plots") {
       data_local <- get_local_data(data_aggreg, 'sapling_tree_density_ind_m2', facet_maa)
@@ -41,9 +41,9 @@ plot_sapling_tree_density <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "sapling_tree_density_ind_m2",
       fill = "location_status",
-      title = "Sapling number density trends",
+      title = "Sapling density",
       x_label = "Year",
-      y_label = expression("Number density (individuals/m"^2*")"),
+      y_label = expression("Density (individuals/m"^2*")"),
       years = years
     )
     

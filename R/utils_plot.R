@@ -126,7 +126,6 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
     theme(
       panel.grid.major.y = element_line(),
       panel.grid.major.x = element_blank(),
-      panel.grid.major.x = element_blank()
     ) +
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
 }
