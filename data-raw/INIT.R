@@ -9,14 +9,15 @@
 #' @noRd
 INIT <-  list()
 INIT$DATASET <- list(
-  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass")),
+  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass", "Invertebrates")),
   SELECTED = "Fish"
 )
 INIT$METRICS <- list(
   "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
   "Benthic" = c("Benthic diversity", "Benthic cover"),
-  "Seagrass" = c("Seagrass cover", "Seagrass height")
+  "Seagrass" = c("Seagrass cover", "Seagrass height"),
+  "Invertebrates" = c("Oyster density") #, "Oyster size", "Crab density", "Crab size")
 )
 INIT$CURRENT_TAB <- 'Start'
 INIT$SEL_GEOM <- "Bar plots"
@@ -26,7 +27,11 @@ INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
   "Mangroves" = mangrove.surveys,
   "Benthic" = benthic.surveys,
-  "Seagrass" = seagrass.surveys
+  "Seagrass" = seagrass.surveys,
+  "Invertebrates" = list(
+    "crabs" = crab.surveys,
+    "oysters" = oyster.surveys
+  )
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"

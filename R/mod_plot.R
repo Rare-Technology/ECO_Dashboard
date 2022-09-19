@@ -23,6 +23,7 @@ plotServer <- function(id, rv){
     
     output$plot_holder <- renderUI({
       sel_dataset <- rv$sel_dataset
+      sel_metric <- rv$sel_metric
       sel_maa <- rv$sel_maa
       facet_maa <- rv$facet_maa
       y_scale <- rv$sel_yscale
@@ -31,10 +32,18 @@ plotServer <- function(id, rv){
       
       if (sel_dataset == "Fish") {
         sel_family <- rv$sel_family
-        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
+        rv$data_filtered <- INIT$DATA_FULL[['Fish']] %>%
           dplyr::filter(ma_name %in% sel_maa,
                         # year == sel_year,
                         family %in% sel_family)
+      } else if (sel_dataset == "Invertebrates") {
+        if (sel_metric %in% c("Crab density", "Crab size")) {
+          rv$data_filtered <- INIT$DATA_FULL[['Invertebrates']]$crabs %>% 
+            dplyr::filter(ma_name %in% sel_maa)
+        } else if (sel_metric %in% c("Oyster density", "Oyster size")) {
+          rv$data_filterd <- INIT$DATA_FULL[['Invertebrates']]$oysters %>% 
+            dplyr::filter(ma_name %in% sel_maa)
+        }
       } else {
         rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
           dplyr::filter(ma_name %in% sel_maa)#,
@@ -45,7 +54,7 @@ plotServer <- function(id, rv){
       if (length(sel_maa) == 0) {
         div(class="warning_message", tr(rv, "No managed access area selected."))
       } else {
-        p <- switch(rv$sel_metric,
+        p <- switch(sel_metric,
               "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
               "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
               "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),

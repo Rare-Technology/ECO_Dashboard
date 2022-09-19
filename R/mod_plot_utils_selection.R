@@ -100,6 +100,34 @@ aggregate_data <- function(data_filtered, metric) {
       tidyr::uncount(weights = count) %>% 
       dplyr::group_by(year, ma_name, location_status, location_name, transect_no) %>% 
       dplyr::summarize(length = mean(length))
+    
+  } else if (metric == "oyster_density_ind_ha") {
+    # This data type has no transects so will return numbers at the location_name level
+    data_filtered %>% dplyr::group_by(
+      year,
+      ma_name,
+      location_status,
+      location_name,
+      plot_no,
+      quadrat_no
+    ) %>% 
+    # Add up densities within each quadrat; they are already normalized by the quadrat area
+    dplyr::summarize(oyster_density_ind_ha = sum(oyster_density_ind_ha, na.rm = TRUE)) %>%
+    dplyr::group_by(
+      year,
+      ma_name,
+      location_status,
+      location_name,
+      plot_no
+    ) %>%
+    dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha, na.rm = TRUE)) %>% 
+    dplyr::group_by(
+      year,
+      ma_name,
+      location_status,
+      location_name
+    )
+    
   }
 }
 
@@ -143,7 +171,7 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
   # metric ~ ma_name + year + location_status (aggregate across survey sites)
   form2 <- str_to_formula(metric, groupvars2)
 
-  if (metric %in% c("species", "tree_species", "attribute", "percentage")) {
+  if (metric %in% c("species", "tree_species", "attribute", "percentage", "oyster_density_ind_ha")) {
     # data_loc is nested up to location_name. the metrics from this conditional
     # already have data_aggreg nested up to location_name, so let data_loc equal that
     data_loc <- data_aggreg

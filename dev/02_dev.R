@@ -43,6 +43,10 @@ golem::add_utils("seagrass_plot_cover")
 golem::add_utils("seagrass_plot_diversity")
 golem::add_utils("seagrass_plot_height")
 golem::add_utils("plot")
+golem::add_utils("crab_plot_density")
+golem::add_utils("crab_plot_size")
+golem::add_utils("oyster_plot_density")
+golem::add_utils("oyster_plot_size")
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
@@ -58,6 +62,8 @@ usethis::use_data_raw( name = "benthic", open = TRUE)
 usethis::use_data_raw( name = "script", open = TRUE)
 usethis::use_data_raw( name = "seagrass", open = TRUE)
 usethis::use_data_raw( name = "geo_levels", open = TRUE)
+usethis::use_data_raw( name = "crabs", open = TRUE)
+usethis::use_data_raw( name = "oysters", open = TRUE)
 ## Tests ----
 ## Add one line by test you want to create
 # usethis::use_test( "app" )
