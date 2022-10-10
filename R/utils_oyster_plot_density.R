@@ -7,7 +7,7 @@
 #' @noRd
 plot_oyster_density <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, "oyster_density_ind_ha")
-  data_summary <- summarySE(data_aggreg, facet_maa)
+  data_summary <- summarySE(data_aggreg, "oyster_density_ind_ha", facet_maa)
   years <- sort(unique(data_summary$year))
   out <- list(data = data_summary)
   
@@ -36,4 +36,7 @@ plot_oyster_density <- function(data_filtered, sel_geom, facet_maa) {
       )
     }
   }
+  
+  out$plot <- p
+  out
 }

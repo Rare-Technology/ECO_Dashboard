@@ -9,7 +9,7 @@
 #' @noRd
 INIT <-  list()
 INIT$DATASET <- list(
-  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass", "Invertebrates")),
+  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass", "Oysters")),#, "Crabs")),
   SELECTED = "Fish"
 )
 INIT$METRICS <- list(
@@ -17,7 +17,8 @@ INIT$METRICS <- list(
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
   "Benthic" = c("Benthic diversity", "Benthic cover"),
   "Seagrass" = c("Seagrass cover", "Seagrass height"),
-  "Invertebrates" = c("Oyster density") #, "Oyster size", "Crab density", "Crab size")
+  "Oysters" = c("Oyster density") #, "Oyster size"),
+  #"Crabs" = c(Crab density", "Crab size")
 )
 INIT$CURRENT_TAB <- 'Start'
 INIT$SEL_GEOM <- "Bar plots"
@@ -28,10 +29,8 @@ INIT$DATA_FULL <- list(
   "Mangroves" = mangrove.surveys,
   "Benthic" = benthic.surveys,
   "Seagrass" = seagrass.surveys,
-  "Invertebrates" = list(
-    "crabs" = crab.surveys,
-    "oysters" = oyster.surveys
-  )
+  "Crabs" = crab.surveys,
+  "Oysters" = oyster.surveys
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"

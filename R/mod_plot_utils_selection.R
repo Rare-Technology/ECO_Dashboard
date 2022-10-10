@@ -103,31 +103,51 @@ aggregate_data <- function(data_filtered, metric) {
     
   } else if (metric == "oyster_density_ind_ha") {
     # This data type has no transects so will return numbers at the location_name level
-    data_filtered %>% dplyr::group_by(
-      year,
-      ma_name,
-      location_status,
-      location_name,
-      plot_no,
-      quadrat_no
-    ) %>% 
-    # Add up densities within each quadrat; they are already normalized by the quadrat area
-    dplyr::summarize(oyster_density_ind_ha = sum(oyster_density_ind_ha, na.rm = TRUE)) %>%
-    dplyr::group_by(
-      year,
-      ma_name,
-      location_status,
-      location_name,
-      plot_no
-    ) %>%
-    dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha, na.rm = TRUE)) %>% 
-    dplyr::group_by(
-      year,
-      ma_name,
-      location_status,
-      location_name
-    )
-    
+    # NEST STRUCTURE:
+    # year
+    #   |__ ma_name
+    #          |__ location_status
+    #                        |__ location_name
+    #                                   |__ plot_no
+    #                                           |__ quadrat_no
+    #                                                     |__ sampling_day/sampling_time
+    data_filtered %>%
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name,
+        plot_no,
+        quadrat_no,
+        sampling_day,
+        sampling_time
+      ) %>% 
+      # Add counts from samples done at the same sampling date/time
+      dplyr::summarize(oyster_density_ind_ha = sum(oyster_density_ind_ha, na.rm = TRUE)) %>%
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name,
+        plot_no,
+        quadrat_no
+      ) %>% 
+      dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha, na.rm = TRUE)) %>% 
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name,
+        plot_no
+      ) %>%
+      dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha)) %>% 
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name
+      ) %>% 
+      dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha))
   }
 }
 
