@@ -22,7 +22,7 @@ plot_oyster_density <- function(data_filtered, sel_geom, facet_maa) {
       y_label = expression("Density (individuals/ha)")
     )
     if (sel_geom == "Distribution plots") {
-      data_local <- get_local_data(data_aggreg, 'oyster_density_ind_m2', facet_maa)
+      data_local <- get_local_data(data_aggreg, 'oyster_density_ind_ha', facet_maa)
       
       out$data <- data_local
       

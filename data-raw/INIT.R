@@ -17,7 +17,7 @@ INIT$METRICS <- list(
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
   "Benthic" = c("Benthic diversity", "Benthic cover"),
   "Seagrass" = c("Seagrass cover", "Seagrass height"),
-  "Oysters" = c("Oyster density") #, "Oyster size"),
+  "Oysters" = c("Oyster density", "Oyster size")
   #"Crabs" = c(Crab density", "Crab size")
 )
 INIT$CURRENT_TAB <- 'Start'
