@@ -45,7 +45,7 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "attribute",
       fill = "location_status",
-      title = "Benthic diversity trends",
+      title = "Benthic diversity",
       x_label = "Year",
       y_label = "Number of benthic attributes",
       years = years

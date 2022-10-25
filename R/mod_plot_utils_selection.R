@@ -122,17 +122,9 @@ aggregate_data <- function(data_filtered, metric) {
         sampling_day,
         sampling_time
       ) %>% 
-      # Add counts from samples done at the same sampling date/time
+      # Each quadrat (including quadrats surveyed more than once) has multiple count values
+      # Add them up before taking aggregate mean across quadrats
       dplyr::summarize(oyster_density_ind_ha = sum(oyster_density_ind_ha, na.rm = TRUE)) %>%
-      dplyr::group_by(
-        year,
-        ma_name,
-        location_status,
-        location_name,
-        plot_no,
-        quadrat_no
-      ) %>% 
-      dplyr::summarize(oyster_density_ind_ha = mean(oyster_density_ind_ha, na.rm = TRUE)) %>% 
       dplyr::group_by(
         year,
         ma_name,
@@ -156,15 +148,6 @@ aggregate_data <- function(data_filtered, metric) {
         ma_name,
         location_status,
         location_name,
-        plot_no,
-        quadrat_no,
-      ) %>% 
-      dplyr::summarize(length_mm = mean(length_mm, na.rm = TRUE)) %>% 
-      dplyr::group_by(
-        year,
-        ma_name,
-        location_status,
-        location_name,
         plot_no
       ) %>% 
       dplyr::summarize(length_mm = mean(length_mm)) %>% 
@@ -175,6 +158,26 @@ aggregate_data <- function(data_filtered, metric) {
         location_name
       ) %>% 
       dplyr::summarize(length_mm = mean(length_mm))
+  } else if (metric == "crab_density_ind_ha") {
+    data_filtered %>% 
+      # no plots specified, so we jump straight to aggregating up to the location level
+      dplyr::filter(!is.na(crab_density_ind_ha)) %>% 
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name
+      ) %>% 
+      dplyr::summarize(crab_density_ind_ha = mean(crab_density_ind_ha))
+  } else if (metric == "carapace_length_cm") {
+    data_filtered %>% 
+      dplyr::group_by(
+        year,
+        ma_name,
+        location_status,
+        location_name
+      ) %>% 
+      dplyr::summarize(carapace_length_cm = mean(carapace_length_cm, na.rm = TRUE))
   }
 }
 
@@ -218,7 +221,8 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
   # metric ~ ma_name + year + location_status (aggregate across survey sites)
   form2 <- str_to_formula(metric, groupvars2)
 
-  if (metric %in% c("species", "tree_species", "attribute", "percentage", "oyster_density_ind_ha", "length_mm")) {
+  if (metric %in% c("species", "tree_species", "attribute", "percentage", 
+    "oyster_density_ind_ha", "length_mm", "crab_density_ind_ha", "carapace_length_cm")) {
     # data_loc is nested up to location_name. the metrics from this conditional
     # already have data_aggreg nested up to location_name, so let data_loc equal that
     data_loc <- data_aggreg
@@ -267,6 +271,7 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
   data_summary <- data_summary %>% 
     dplyr::mutate(ymin = !!sym(metric) - SE,
                   ymax = !!sym(metric) + SE)
+  
   return(data_summary)
 }
 

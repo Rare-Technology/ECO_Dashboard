@@ -45,7 +45,7 @@ plot_tree_diversity <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "tree_species",
       fill = "location_status",
-      title = "Mangrove diversity trends",
+      title = "Mangrove diversity",
       x_label = "Year",
       y_label = "Number of unique tree species",
       years = years

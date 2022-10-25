@@ -42,7 +42,7 @@ plot_seagrass_height <- function(data_filtered, sel_geom, facet_maa) {
         data = data_summary,
         x = "year",
         y = "avg_height_cm",
-        title = "Average seagrass height trends",
+        title = "Average seagrass height",
         y_label = "Height (cm)",
         years = years
       )
@@ -57,7 +57,7 @@ plot_seagrass_height <- function(data_filtered, sel_geom, facet_maa) {
         data = data_filtered,
         x = "avg_height_cm",
         y = "year",
-        title = "Distribution of seagrass height trends",
+        title = "Distribution of seagrass height",
         x_label = "Height (cm)",
         y_label = "Year"
       )

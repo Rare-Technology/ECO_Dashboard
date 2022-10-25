@@ -35,6 +35,30 @@ plot_oyster_size <- function(data_filtered, sel_geom, facet_maa) {
         point_size = 4
       )
     }
+  } else {
+    p <- plot_trend(
+      data = data_summary,
+      x = "year",
+      y = "length_mm",
+      fill = "location_status",
+      title = "Oyster size",
+      x_label = "Year",
+      y_label = "Length (mm)",
+      years = years
+    )
+    
+    if (sel_geom == "Distribution plots") {
+      data_local <- get_local_data(data_aggreg, "length_mm", facet_maa)
+      
+      out$data <- data_local
+      
+      p <- p + plot_samples(
+        data = data_local,
+        x = "year",
+        y = "length_mm",
+        fill = "location_status"
+      )
+    }
   }
   
   out$plot <- p
