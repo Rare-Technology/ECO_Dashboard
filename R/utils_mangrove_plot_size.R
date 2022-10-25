@@ -41,7 +41,7 @@ plot_tree_size <- function(data_filtered, sel_geom, facet_maa) {
       x = "year",
       y = "dbh_cm",
       fill = "location_status",
-      title = "Tree diameter trends",
+      title = "Tree diameter",
       x_label = "Year",
       y_label = "Diameter (cm)",
       years = years

@@ -1,13 +1,13 @@
-#' benthic_plot_diversity 
+#' oyster_plot_size 
 #'
 #' @description A utils function
 #'
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
-  data_aggreg <- aggregate_data(data_filtered, 'attribute') # nested up to location_name
-  data_summary <- summarySE(data_aggreg, 'attribute', facet_maa)
+plot_oyster_size <- function(data_filtered, sel_geom, facet_maa) {
+  data_aggreg <- aggregate_data(data_filtered, "length_mm")
+  data_summary <- summarySE(data_aggreg, "length_mm", facet_maa)
   years <- sort(unique(data_summary$year))
   out <- list(data = data_summary)
   
@@ -15,25 +15,21 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
     p <- plot_bar(
       data = data_summary,
       x = "location_status",
-      y = "attribute",
+      y = "length_mm",
       fill = "location_status",
-      title = "Benthic diversity,",
+      title = "Oyster size,",
       year = years,
-      y_label = "Number of benthic attributes"
+      y_label = expression("Length (mm)")
     )
     if (sel_geom == "Distribution plots") {
-      if (facet_maa) {
-        data_local <- data_aggreg
-      } else {
-        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
-      }
+      data_local <- get_local_data(data_aggreg, 'length_mm', facet_maa)
       
       out$data <- data_local
       
       p <- p + plot_samples(
         data =  data_local,
         x = "location_status",
-        y = "attribute",
+        y = "length_mm",
         fill = "location_status",
         shape = 16,
         point_size = 4
@@ -43,27 +39,23 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
     p <- plot_trend(
       data = data_summary,
       x = "year",
-      y = "attribute",
+      y = "length_mm",
       fill = "location_status",
-      title = "Benthic diversity",
+      title = "Oyster size",
       x_label = "Year",
-      y_label = "Number of benthic attributes",
+      y_label = "Length (mm)",
       years = years
     )
     
     if (sel_geom == "Distribution plots") {
-      if (facet_maa) {
-        data_local <- data_aggreg
-      } else {
-        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
-      }
+      data_local <- get_local_data(data_aggreg, "length_mm", facet_maa)
       
       out$data <- data_local
       
       p <- p + plot_samples(
         data = data_local,
         x = "year",
-        y = "attribute",
+        y = "length_mm",
         fill = "location_status"
       )
     }

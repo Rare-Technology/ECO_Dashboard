@@ -23,6 +23,7 @@ plotServer <- function(id, rv){
     
     output$plot_holder <- renderUI({
       sel_dataset <- rv$sel_dataset
+      sel_metric <- rv$sel_metric
       sel_maa <- rv$sel_maa
       facet_maa <- rv$facet_maa
       y_scale <- rv$sel_yscale
@@ -31,21 +32,19 @@ plotServer <- function(id, rv){
       
       if (sel_dataset == "Fish") {
         sel_family <- rv$sel_family
-        rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>%
+        rv$data_filtered <- INIT$DATA_FULL[['Fish']] %>%
           dplyr::filter(ma_name %in% sel_maa,
-                        # year == sel_year,
                         family %in% sel_family)
       } else {
         rv$data_filtered <- INIT$DATA_FULL[[sel_dataset]] %>% 
-          dplyr::filter(ma_name %in% sel_maa)#,
-                        # year == sel_year)
+          dplyr::filter(ma_name %in% sel_maa)
       }
       data_filtered <- rv$data_filtered
       
       if (length(sel_maa) == 0) {
         div(class="warning_message", tr(rv, "No managed access area selected."))
       } else {
-        p <- switch(rv$sel_metric,
+        p <- switch(sel_metric,
               "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
               "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
               "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
@@ -57,7 +56,11 @@ plotServer <- function(id, rv){
               "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
               "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
               "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
-              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa)
+              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa),
+              "Oyster density" = plot_oyster_density(data_filtered, sel_geom, facet_maa),
+              "Oyster size" = plot_oyster_size(data_filtered, sel_geom, facet_maa),
+              "Crab density" = plot_crab_density(data_filtered, sel_geom, facet_maa),
+              "Crab size" = plot_crab_size(data_filtered, sel_geom, facet_maa)
         )
         if (facet_maa) {
           p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)

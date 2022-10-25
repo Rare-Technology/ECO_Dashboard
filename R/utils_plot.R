@@ -8,6 +8,7 @@
 #' @import ggplot2
 #' @import ggridges
 #' @import hrbrthemes
+#' @import scales
 theme_rare <- function(rotate_x = FALSE, subtitle_color = "black") {
   hrbrthemes::theme_ipsum_rc(
     axis_title_size = 16,
@@ -127,6 +128,7 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
       panel.grid.major.y = element_line(),
       panel.grid.major.x = element_blank(),
     ) +
+    scale_y_continuous(labels = scales::comma) +
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
 }
 
