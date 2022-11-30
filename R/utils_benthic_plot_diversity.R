@@ -6,8 +6,8 @@
 #'
 #' @noRd
 plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
-  data_aggreg <- aggregate_data(data_filtered, 'attribute') # nested up to location_name
-  data_summary <- summarySE(data_aggreg, 'attribute', facet_maa)
+  data_aggreg <- aggregate_data(data_filtered, 'family') # nested up to location_name
+  data_summary <- summarySE(data_aggreg, 'family', facet_maa)
   years <- sort(unique(data_summary$year))
   out <- list(data = data_summary)
   
@@ -15,17 +15,17 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
     p <- plot_bar(
       data = data_summary,
       x = "location_status",
-      y = "attribute",
+      y = "family",
       fill = "location_status",
-      title = "Benthic diversity,",
+      title = "Coral reef diversity,",
       year = years,
-      y_label = "Number of benthic attributes"
+      y_label = "Number of unique benthic families"
     )
     if (sel_geom == "Distribution plots") {
       if (facet_maa) {
         data_local <- data_aggreg
       } else {
-        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
+        data_local <- summarySE(data_aggreg, 'family', !facet_maa)
       }
       
       out$data <- data_local
@@ -33,7 +33,7 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
       p <- p + plot_samples(
         data =  data_local,
         x = "location_status",
-        y = "attribute",
+        y = "family",
         fill = "location_status",
         shape = 16,
         point_size = 4
@@ -43,11 +43,11 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
     p <- plot_trend(
       data = data_summary,
       x = "year",
-      y = "attribute",
+      y = "family",
       fill = "location_status",
-      title = "Benthic diversity",
+      title = "Coral reef diversity",
       x_label = "Year",
-      y_label = "Number of benthic attributes",
+      y_label = "Number of unique benthic families",
       years = years
     )
     
@@ -55,7 +55,7 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
       if (facet_maa) {
         data_local <- data_aggreg
       } else {
-        data_local <- summarySE(data_aggreg, 'attribute', !facet_maa)
+        data_local <- summarySE(data_aggreg, 'family', !facet_maa)
       }
       
       out$data <- data_local
@@ -63,7 +63,7 @@ plot_reef_diversity <- function(data_filtered, sel_geom, facet_maa) {
       p <- p + plot_samples(
         data = data_local,
         x = "year",
-        y = "attribute",
+        y = "family",
         fill = "location_status"
       )
     }

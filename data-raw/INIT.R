@@ -9,13 +9,13 @@
 #' @noRd
 INIT <-  list()
 INIT$DATASET <- list(
-  CHOICES = sort(c("Fish", "Mangroves", "Benthic", "Seagrass", "Oysters", "Crabs")),
+  CHOICES = sort(c("Fish", "Mangroves", "Coral reefs", "Seagrass", "Oysters", "Crabs")),
   SELECTED = "Fish"
 )
 INIT$METRICS <- list(
   "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
   "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
-  "Benthic" = c("Benthic diversity", "Benthic cover"),
+  "Coral reefs" = c("Coral reef diversity", "Coral reef cover"),
   "Seagrass" = c("Seagrass cover", "Seagrass height"),
   "Oysters" = c("Oyster density", "Oyster size"),
   "Crabs" = c("Crab density", "Crab size")
@@ -27,7 +27,7 @@ INIT$SEL_YSCALE <- TRUE
 INIT$DATA_FULL <- list(
   "Fish" = fish.surveys %>% dplyr::filter(family != ""), # this can be fixed easily...
   "Mangroves" = mangrove.surveys,
-  "Benthic" = benthic.surveys,
+  "Coral reefs" = benthic.surveys,
   "Seagrass" = seagrass.surveys,
   "Crabs" = crab.surveys,
   "Oysters" = oyster.surveys

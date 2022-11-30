@@ -10,18 +10,17 @@ aggregate_data <- function(data_filtered, metric) {
     form <- str_to_formula(metric, groupvars)
     aggregate(form, data = data_filtered, FUN = sum)
     
-  } else if (metric %in% c('species', 'tree_species', 'attribute')) {
+  } else if (metric %in% c('species', 'tree_species', 'family')) {
     # for these metrics, we count unique values among all transects, so transect_no
     # is not a grouping variable here
     groupvars <- groupvars[-length(groupvars)] # drop transect_no
     form <- str_to_formula(metric, groupvars)
   
     # have to filter out some data for plotting attribute. other metrics OK
-    if (metric == 'attribute') {
+    if (metric == 'family') {
       data_filtered <- data_filtered %>% 
         dplyr::filter(percentage > 0)
     }
-    
     aggregate(form, data = data_filtered, FUN = count_unique)
     
   } else if (metric == "cover") {

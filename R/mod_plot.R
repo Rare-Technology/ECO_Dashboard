@@ -42,26 +42,32 @@ plotServer <- function(id, rv){
       data_filtered <- rv$data_filtered
       
       if (length(sel_maa) == 0) {
-        div(class="warning_message", tr(rv, "No managed access area selected."))
+        return(div(class="warning_message", tr(rv, "No managed access area selected.")))
       } else {
-        p <- switch(sel_metric,
-              "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
-              "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
-              "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
-              "Fish size" = plot_fish_size(data_filtered, sel_geom, facet_maa),
-              "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom, facet_maa),
-              "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom, facet_maa),
-              "Tree size" = plot_tree_size(data_filtered, sel_geom, facet_maa),
-              "Benthic cover" = plot_reef_cover(data_filtered, sel_geom, facet_maa),
-              "Benthic diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
-              "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
-              "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
-              "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa),
-              "Oyster density" = plot_oyster_density(data_filtered, sel_geom, facet_maa),
-              "Oyster size" = plot_oyster_size(data_filtered, sel_geom, facet_maa),
-              "Crab density" = plot_crab_density(data_filtered, sel_geom, facet_maa),
-              "Crab size" = plot_crab_size(data_filtered, sel_geom, facet_maa)
+        p <- try(
+          switch(sel_metric,
+            "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
+            "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
+            "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
+            "Fish size" = plot_fish_size(data_filtered, sel_geom, facet_maa),
+            "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom, facet_maa),
+            "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom, facet_maa),
+            "Tree size" = plot_tree_size(data_filtered, sel_geom, facet_maa),
+            "Coral reef cover" = plot_reef_cover(data_filtered, sel_geom, facet_maa),
+            "Coral reef diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
+            "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
+            "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
+            "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa),
+            "Oyster density" = plot_oyster_density(data_filtered, sel_geom, facet_maa),
+            "Oyster size" = plot_oyster_size(data_filtered, sel_geom, facet_maa),
+            "Crab density" = plot_crab_density(data_filtered, sel_geom, facet_maa),
+            "Crab size" = plot_crab_size(data_filtered, sel_geom, facet_maa)
+          )
         )
+      }
+      if (class(p) == "try-error") {
+        return(div(class="warning_message", tr(rv, PLOT_ERROR)))
+      } else {
         if (facet_maa) {
           p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)
           plot_height <- get_plot_height(length(rv$sel_maa))
@@ -87,7 +93,7 @@ plotServer <- function(id, rv){
           plotOutput(ns('plot')) #%>% 
             # tagAppendAttributes(style = "margin: 0 auto;")
         ))
-        ui_out
+        return(ui_out)
       }
     })
     

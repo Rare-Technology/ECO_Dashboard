@@ -3,8 +3,8 @@ library(readxl)
 crab.surveys <- readxl::read_excel("../data/ECO/brazil-crabs.xlsx") %>% 
   dplyr::mutate(
     sampling_year = ifelse(sampling_year == 2019, 2019, 2020),
-    level1_name = ma_name,
-    level2_name = ma_name,
+    level1_name = "Para",
+    level2_name = "Viseu",
     crab_density_ind_ha = burrow_no_Total / quadrat_area_m2 * 10000,
     sampling_location_status = "Managed access" #TBD !!!
     ) %>% 

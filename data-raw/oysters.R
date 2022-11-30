@@ -5,8 +5,8 @@ oyster.surveys <- readxl::read_excel("../data/ECO/brazil-oysters.xlsx") %>%
   dplyr::filter(species == "Crassostrea gasar") %>% 
   dplyr::mutate(
     oyster_density_ind_ha = count_alive / quadrat_area_m2 * 10000,
-    level2_name = ma_name,
-    level1_name = ma_name,
+    level1_name = "Pará",
+    level2_name = "Curuçá",
     # Some sampling_day values are saved as a numeric epoch; the number of days since January 1 1900
     # So we will use ifelse to find these dates and convert them to a dd/mm/yyyy string
     sampling_day = ifelse(is.numeric(sampling_day),
