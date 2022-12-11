@@ -77,10 +77,10 @@ plotServer <- function(id, rv){
         p$plot$facet$params$free$y <- !y_scale
         p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
         rv$current_plot <- p$plot
+        rv$current_plot_height <- plot_height
         rv$current_plot_data <- p$data
         output$plot <- renderPlot(p$plot, height = plot_height) 
-          
-        
+    
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(
           div(id = "download-button-container",
@@ -110,7 +110,13 @@ plotServer <- function(id, rv){
         filters_text <- display_filters(rv)
         write(filters_text, meta_name)
         write.csv(rv$current_plot_data, data_name, row.names = FALSE)
-        ggsave(plot_name, plot = rv$current_plot, width = 27, height = 20, units = "cm")
+        plot_height <- rv$current_plot_height
+        plot_height <- ifelse(plot_height == "auto", 500, plot_height)
+        # Maybe adjust this at some point so plots aren't so large, esp. when
+        # plotting only one or two facet rows or one aggregate plot.
+        png(plot_name, width=500*300/72, height=plot_height*300/72, res=300)
+        print(rv$current_plot)
+        dev.off()
         
         fs = c(meta_name, data_name, plot_name)
         zip(zipfile = file, files = fs)
