@@ -50,16 +50,29 @@ aggregate_data <- function(data_filtered, metric) {
     data_filtered %>% 
       dplyr::group_by(year, ma_name, location_status, location_name,
                       transect_no, category) %>% 
+      # Each category is ~supposed to~ be split up into more specific taxonomy
+      # (ideally to a point of Genus-Species) but ofc not all taxonomic info is available
+      # and sometimes the category indicates something non-living, like sand.
+      # But anyway, you can imagine e.g. category == Macroalgea has multiple rows with
+      # each with different species of macroalgae, so to assign a single number to
+      # this category, we start by summing up the percentages
       dplyr::summarize(percentage = sum(percentage)) %>% 
-      dplyr::mutate(total_percentage = sum(percentage)) %>% # every row up to the same category will have the same sum
-      dplyr::mutate(percentage = percentage / total_percentage * 100) %>% 
-      dplyr::group_by(year, ma_name, location_status, location_name, category) %>%
-      dplyr::summarize(percentage = mean(percentage)) %>%
-      aggregate(percentage ~ ma_name + year + location_status + category,
-                data = ., FUN = mean) %>% 
-      dplyr::group_by(ma_name, year, location_status) %>% 
-      dplyr::mutate(total_percentage = sum(percentage)) %>% 
-      dplyr::mutate(percentage = percentage / total_percentage * 100)
+      #### Jan 3 2023
+      # This next mutate shouldn't be necessary !! BUT currently there are
+      # some maa-year-status-loc-transect combinations where the sum of
+      # percentages != 100%. It's not just a matter of duplicate rows, will have
+      # to investigate
+      dplyr::mutate(
+        total_percentage = sum(percentage),
+        percentage = percentage / total_percentage * 100
+      ) %>%
+      dplyr::group_by(ma_name, year, location_status, location_name, category) %>%
+      dplyr::summarize(percentage = mean(percentage)) %>% 
+      # Once again normalize
+      dplyr::mutate(
+        total_percentage = sum(percentage),
+        percentage = percentage / total_percentage * 100
+      )
     
   } else if (metric == "dbh_cm") {
     data_filtered <- data_filtered %>% # these lines may change depending on how
@@ -210,11 +223,6 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
   groupvars1 <- c('ma_name', 'year', 'location_status', 'location_name')
   groupvars2 <- groupvars1[-length(groupvars1)] # drop location_name
   
-  if (metric == "percentage") {
-    groupvars1 <- c(groupvars1, "category")
-    groupvars2 <- c(groupvars2, "category")
-  }
-  
   # metric ~ ma_name + year + location_status + location_name (aggregate across transects)
   form1 <- str_to_formula(metric, groupvars1)
   # metric ~ ma_name + year + location_status (aggregate across survey sites)
@@ -234,7 +242,59 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
   }
     
   # take mean across locations
-  data_summary <- aggregate(form2, data = data_loc, FUN = mean)
+  if (metric != "percentage") {
+    data_summary <- aggregate(form2, data = data_loc, FUN = mean)
+  } else {
+    # Getting the SD/SE/etc is a little different here since we have to
+    # normalize the mean percentages (the means across the locations).
+    # This normalization means we need to transform the standard deviation,
+    # luckily just be scaling it by a factor of 100 / total_percentage.
+    # So then SD (transform) = SD * 100 / total_percentage
+    # While we're at it, we'll handle the faceting portion here too.
+    if (facet_maa) {
+      data_summary <- data_aggreg %>% 
+        dplyr::group_by(ma_name, year, location_status, category) %>% 
+        dplyr::summarize(
+          SD = sd(percentage),
+          percentage = mean(percentage),
+          N = dplyr::n(),
+        ) %>% 
+        dplyr::mutate(
+          total_percentage = sum(percentage),
+          percentage = percentage / total_percentage * 100,
+          SD = SD / total_percentage * 100, # sd is linear
+          SE = SD / sqrt(N),
+          ymin = percentage - SE,
+          ymax = percentage + SE
+        )
+    } else {
+      data_summary <- data_aggreg %>% 
+        dplyr::group_by(ma_name, year, location_status, category) %>% 
+        dplyr::summarize(
+          percentage = mean(percentage),
+        ) %>% 
+        dplyr::mutate(
+          total_percentage = sum(percentage),
+          percentage = percentage / total_percentage * 100
+        ) %>% 
+        dplyr::group_by(location_status, year, category) %>% 
+        dplyr::summarize(
+          SD = sd(percentage),
+          percentage = mean(percentage),
+          N = dplyr::n()
+        ) %>% 
+        dplyr::mutate(
+          total_percentage = sum(percentage),
+          percentage = percentage / total_percentage * 100,
+          SD = SD / total_percentage * 100, # sd is linear
+          SE = SD / sqrt(N),
+          ymin = percentage - SE,
+          ymax = percentage + SE
+        )
+    }
+    
+    return(data_summary)
+  }
   
   # recap:
   # data_loc looks like this: year | ma_name | location_status | location_name | metric
@@ -259,18 +319,20 @@ summarySE <- function(data_aggreg, metric, facet_maa) {
     # metric ~ year + location_status (aggregate across maa's)
     form3 <- str_to_formula(metric, groupvars3)
     
-    data_loc <- data_summary
-    data_summary <- aggregate(form3, data = data_summary, FUN = mean)
     
-    data_summary$N <- aggregate(form3, data = data_loc, FUN = length) %>% dplyr::pull(metric)
-    data_summary$SD <- aggregate(form3, data = data_loc, FUN  = sd) %>% dplyr::pull(metric)
-    data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
+    if (metric != "percentage") {
+      data_loc <- data_summary
+      data_summary <- aggregate(form3, data = data_summary, FUN = mean)
+      data_summary$N <- aggregate(form3, data = data_loc, FUN = length) %>% dplyr::pull(metric)
+      data_summary$SD <- aggregate(form3, data = data_loc, FUN  = sd) %>% dplyr::pull(metric)
+      data_summary$SE <- data_summary$SD / sqrt(data_summary$N)
+    }
   }
   
   data_summary <- data_summary %>% 
     dplyr::mutate(ymin = !!sym(metric) - SE,
                   ymax = !!sym(metric) + SE)
-  
+
   return(data_summary)
 }
 
