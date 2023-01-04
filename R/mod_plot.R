@@ -69,9 +69,17 @@ plotServer <- function(id, rv){
         return(div(class="warning_message", tr(rv, PLOT_ERROR)))
       } else {
         if (facet_maa) {
-          p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)
-          plot_height <- get_plot_height(length(rv$sel_maa))
+          if (sel_metric == "Coral reef cover") {
+            p$plot <- p$plot + facet_grid(rows = vars(ma_name), cols = vars(location_status))
+            plot_height <- get_plot_height(2*length(rv$sel_maa))
+          } else {
+            p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)
+            plot_height <- get_plot_height(length(rv$sel_maa))
+          }
         } else {
+          if (sel_metric == "Coral reef cover") {
+            p$plot <- p$plot + facet_wrap("location_status")
+          }
           plot_height <- 'auto'
         }
         p$plot$facet$params$free$y <- !y_scale

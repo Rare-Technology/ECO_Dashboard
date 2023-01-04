@@ -26,102 +26,67 @@ plot_reef_cover <- function(data_filtered, sel_geom, facet_maa) {
     tidyr::pivot_wider(names_from = category, values_from = percentage)
   df[is.na(df)] <- 0
   df <- df %>% 
-    tidyr::pivot_longer(cols = all_categories, names_to = "category", values_to = "percentage")
+    tidyr::pivot_longer(cols = all_categories, names_to = "category", values_to = "percentage") %>% 
+    summarySE(., "percentage", facet_maa)
   
   out <- list(data = df)
   
   # Convert MA numbers to negative, a hack to make the pyramid work
-  df <- summarySE(df, "percentage", TRUE) %>% 
+  # Also convert year to character so it is treated as a discrete variable
+  df <- df %>% 
     dplyr::mutate(
-      year = as.character(year),
-      percentage = dplyr::case_when(
-        location_status == "Managed Access" ~ -percentage,
-        TRUE ~ percentage
-      ),
-      ymin = dplyr::case_when(
-        location_status == "Managed Access" ~ -ymin,
-        TRUE ~ ymin
-      ),
-      ymax = dplyr::case_when(
-        location_status == "Managed Access" ~ -ymax,
-        TRUE ~ ymax
-      )
+      year = as.character(year)
+      # percentage = dplyr::case_when(
+      #   location_status == "Managed Access" ~ -percentage,
+      #   TRUE ~ percentage
+      # ),
+      # ymin = dplyr::case_when(
+      #   location_status == "Managed Access" ~ -ymin,
+      #   TRUE ~ ymin
+      # ),
+      # ymax = dplyr::case_when(
+      #   location_status == "Managed Access" ~ -ymax,
+      #   TRUE ~ ymax
+      # )
     )
   
-  xmax <- max(abs(df$ymax))
-  
-  p <- ggplot(df) +
-    geom_col(
-      aes(x=percentage, y=category, fill=year),
-      color="black",
-      position="dodge"
-    ) +
-    geom_errorbar(
-      aes(
-        y = category,
-        fill = year,
-        xmin = ymin,
-        xmax = ymax
-      ),
-      position = position_dodge(0.9),
-      width = 0.2,
-      na.rm = TRUE
-    ) +
-    geom_vline(xintercept=0) +
-    scale_y_discrete(limits = rev) +
-    scale_x_continuous(
-      labels = abs,
-      limits = xmax*c(-1.1, 1.1)
-    )
-  
-  xbreaks <- ggplot_build(p)$layout$panel_params[[1]]$x$breaks
-  loc_break <- xbreaks[length(xbreaks)] / 2
-  rm(p)
   grad <- colorRampPalette(c(RARE_COLORS$lightblue, RARE_COLORS$red), bias=0.5, space="rgb")
   grad <- grad(length(unique(df$year)))
   
-  # Remake p to add the ticks for the location status; this doesn't work:
-  # p <- p + ggplot2::scale_x_continuous(...)
   p <- ggplot(df) +
     geom_col(
-      aes(x=percentage, y=category, fill=year),
+      aes(y=percentage, x=category, fill=year),
       color="black",
       position="dodge"
     ) +
     geom_errorbar(
       aes(
-        y = category,
+        x = category,
         fill = year,
-        xmin = ymin,
-        xmax = ymax
+        ymin = ymin,
+        ymax = ymax
       ),
       position = position_dodge(0.9),
       width = 0.2,
       na.rm = TRUE
     ) +
-    geom_vline(xintercept=0) +
-    scale_y_discrete(limits= rev) +
-    scale_x_continuous(
-      labels = abs,
-      limits = xmax*c(-1.1, 1.1),
-      sec.axis = ggplot2::sec_axis(
-        ~ .,
-        labels = c("Managed Access", "Reserve"),
-        breaks = c(-loc_break, loc_break)
-      )
-    ) +
+    # geom_vline(xintercept=0) +
+    scale_x_discrete(limits = rev) +
     ggtitle("Coral reef composition") +
-    xlab("Cover (%)") +
+    ylab("Cover (%)") +
     labs(
       fill = ""
     ) +
     theme_rare() +
     theme(
+      panel.grid.major.x = element_line(),
+      panel.grid.minor.y = element_line(),
       panel.grid.major.y = element_line(),
-      panel.grid.minor.x = element_line(),
-      panel.grid.major.x = element_line()
+      axis.text.x = element_text(hjust=1, angle=30)
+      # strip.text = element_text(size = 12, face = "bold"),
     ) +
     scale_fill_manual(values = grad)
+
   
   out$plot <- p
   out
