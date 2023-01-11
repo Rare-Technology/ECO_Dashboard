@@ -48,17 +48,12 @@ fish.surveys$year[fish.surveys$country == "MOZ" & fish.surveys$year == 2021] <- 
 # Raymond provided an updated dataset that has the 2021 survey as well has historical records for 2019 and 2017
 # This dataset includes the community site name for the survey sites; NTZ and UTZ correspond to Teluk Kolono
 # Teluk Kolono in turn belongs to the LGU Konawe Selatan, which then belongs to SNU South East Sulawesi
-# The 2017 data is made up entirely of Teluk Kolono records.
-# The 2019 records differ from the existing ones by one row; we won't worry about them
-# The 2021 records are almost the same but the count density is more accurate than the ones in fish.surveys
 # since the weight-length formula had to be used in fish.surveys
 # For this stage of data cleaning, we will:
-# 1. Filter the 2021/2017 records from the updated dataset
-# 2. Select appropriate columns from the updated dataset
-# 3. Add level1_name/level2_name columns
-# 4. Drop the 2021 IDN records in fish.surveys
-# 5. Merge the new 2021/2017 records with fish.surveys
-# 6. Update the .rda and document
+# 1. Select appropriate columns from the updated dataset
+# 2. Add level1_name/level2_name columns
+# 3. Drop the 2019 IDN records in fish.surveys
+# 4. Merge the new 2017/19/21 records with fish.surveys
 
 get_size_class <- function (x) { # need to fix this for existing fish data, its a mess
   if (x <= 5) {"0-5"}
@@ -73,8 +68,6 @@ get_size_class <- Vectorize(get_size_class)
 df <- readr::read_csv("../data/IDN_fish_data.csv")
 df <- df %>%
   # 1
-  dplyr::filter(Year %in% c(2017, 2021)) %>% 
-  # 2
   dplyr::select(
     country = Country,
     year = Year,
@@ -97,7 +90,7 @@ df <- df %>%
     reef_slope = `Reef slope`,
     reef_zone = `Reef zone`,
   ) %>% 
-  # 3
+  # 2
   dplyr::mutate(
     country = "IDN",
     survey_date = lubridate::ymd(paste(year, month, day, sep = "-")),
@@ -106,14 +99,15 @@ df <- df %>%
     level2_name = get_level_name(ma_name, "level2_name")
   )
 
-fish.surveys <- fish.surveys %>% 
-  # 4 drop lmax from fish.surveys
-  dplyr::select(intersect(names(df), names(fish.surveys))) 
+# drop lmax from fish.surveys, drop 2019 Indonesia records
+fish.surveys <- fish.surveys %>%
+  dplyr::select(intersect(names(df), names(fish.surveys))) %>% 
+  dplyr::filter(country != "IDN" | year == 2018)
 
 # drop month, day from df
 df <- df %>% dplyr::select(names(fish.surveys))
 
-# 5
+# 4
 fish.surveys <- rbind(fish.surveys, df)
 
 ##### PHL fish surveys, 2011-2021 #####
@@ -121,7 +115,7 @@ fish.surveys <- rbind(fish.surveys, df)
 ### https://data.world/rare/fish-surveys/
 df <- readr::read_csv("https://query.data.world/s/4fsbqm5yxnrtz2n26ukkagl6kthpgm");
 
-# 127,285 records
+# 186,764 records
 df <- df %>% dplyr::select(
   country = Country,
   year = Year,
@@ -140,8 +134,6 @@ df <- df %>% dplyr::select(
   b = b,
   reef_slope = Reef.slope,
   reef_zone = Reef.zone
-) %>% dplyr::filter(
-  year != 20 # one row with this. no indication of actual year
 )
 
 ### Columns missing:
@@ -183,29 +175,73 @@ get_size_class <- Vectorize(get_size_class)
 df$size_class <- as.character(get_size_class(df$length))
 
 ### level1/level2_name
-# TODO have PHL team fill out geo level info and use table to fill in geo info
-geo <- readr::read_csv('../data/ECO_PHL_Historical_geo.csv')
-names(geo) <- c('ma_name', 'level1_name', 'level2_name')
-df <- dplyr::left_join(df, geo, by = 'ma_name') %>% 
+# The dataset is missing snu/lgu names. The ma_name is in the form
+# snu_ma. For example, Negros_Oriental_Ayungon is the ma Ayungon from snu
+# Negros Oriental.
+# So, we can rewrite some of these ma_name's like
+# Negros Oriental_Ayungon
+# Then use tidyr::separate on "_" to create the level1_name col and a new ma_name col
+# We will have to manually edit a few (like Sta. Monica -> Santa Monica)
+# The lgu seems to always match the ma name (according to footprint data), so
+# we will copy the new ma_name column and call it level2_name
+
+# footprint_global from https://data.world/rare/footprint/
+phl_footprint <- readr::read_csv("https://query.data.world/s/6k6dp5zatacjashdxo2v644qsxwnnf") %>% 
+  dplyr::filter(country == "Philippines") %>% 
+  dplyr::distinct(country, ma_name, level1_name, level2_name)
+
+df <- df %>% 
+  dplyr::rename(snu_maa = ma_name) %>% 
   dplyr::mutate(
-    level1_name = ifelse(is.na(level1_name), 'Unspecified', level1_name),
-    level2_name = ifelse(is.na(level2_name), 'Unspecified', level2_name)
+    snu_maa = dplyr::recode(snu_maa,
+      "Camarines_Norte_Mercedes" = "Camarines Norte_Mercedes",
+      "Camarines_Sur_Sagnay" = "Camarines Sur_Sagnay",
+      "Camarines_Sur_Tinambac" = "Camarines Sur_Tinambac",
+      "Cebu_San_Francisco" = "Cebu_San Francisco",
+      "Negros Occidental_San_Carlos" = "Negros Occidental_San Carlos",
+      "Negros Occidental_Tayasan" = "Negros Oriental_Tayasan", # original data had typo
+      "Negros_Oriental_Ayungon" = "Negros Oriental_Ayungon",
+      "Negros_Oriental_Bindoy" = "Negros Oriental_Bindoy",
+      "Negros_Oriental_Manjuyod" = "Negros Oriental_Manjuyod",
+      "Occidental_Mindoro_Looc" = "Occidental Mindoro_Looc",
+      "Occidental_Mindoro_Lubang" = "Occidental Mindoro_Lubang",
+      "Surigao_del_Norte_Burgos" = "Surigao Del Norte_Burgos",
+      "Surigao_del_Norte_Del_Carmen" = "Surigao Del Norte_Del Carmen",
+      "Surigao_del_Norte_Dapa" = "Surigao Del Norte_Dapa",
+      "Surigao_del_Norte_General_Luna" = "Surigao Del Norte_General Luna",
+      "Surigao_del_Norte_Pilar" = "Surigao Del Norte_Pilar",
+      "Surigao_del_Norte_San_Benito" = "Surigao Del Norte_San Benito",
+      "Surigao_del_Norte_San_Isidro" = "Surigao Del Norte_San Isidro",
+      "Surigao_del_Norte_Socorro" = "Surigao Del Norte_Socorro",
+      "Surigao_del_Norte_Sta. Monica" = "Surigao Del Norte_Santa Monica",
+      "Surigao_Del_Sur_Cantilan" = "Surigao Del Sur_Cantilan",
+      "Surigao_Del_Sur_Cortes" = "Surigao Del Sur_Cortes",
+      "Zamboanga _Ibugay_Ipil" = "Zamboanga Sibugay_Ipil"
+    )
+  ) %>% 
+  tidyr::separate(snu_maa, c("level1_name", "ma_name"), "_") %>% 
+  dplyr::left_join(phl_footprint, by=c("country", "level1_name", "ma_name")) %>% 
+  # A couple lgu names did not match with anything on the footprint table
+  # Since nearly all the other lgu names match the ma name, we'll just fill in
+  # the missing lgu names to match their ma name.
+  dplyr::mutate(
+    level2_name = dplyr::recode(level2_name,
+      .missing = ma_name
+    )
   )
 
 fish.surveys <- fish.surveys %>% dplyr::filter(country != "PHL") %>% 
   rbind(., df)
 
-#### transform country names
-
-iso3_to_full <- function(x) {
-  switch(x,
-         "HND" = "Honduras",
-         "IDN" = "Indonesia",
-         "MOZ" = "Mozambique",
-         "Philippines" = "Philippines")
-}
-
-fish.surveys$country <- as.character(sapply(fish.surveys$country, iso3_to_full))
+#### changes iso3 codes to country names
+fish.surveys <- fish.surveys %>% 
+  dplyr::mutate(
+    country = dplyr::recode(country,
+      "HND" = "Honduras",
+      "IDN" = "Indonesia",
+      "MOZ" = "Mozambique",
+      )
+  )
 
 
 ##### Jan 3, 2022 or so
