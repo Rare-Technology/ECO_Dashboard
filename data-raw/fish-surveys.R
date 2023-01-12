@@ -136,6 +136,21 @@ df <- df %>% dplyr::select(
   reef_zone = Reef.zone
 )
 
+# The family taxonomy is missing for all records in 2019-21.
+# We'll use the species column and fishbase to get this info
+df1921 <- df %>% 
+  dplyr::filter(year %in% c(2019, 2020, 2021)) %>% 
+  dplyr::select(-family)
+library(rfishbase)
+taxa <- rfishbase::load_taxa() %>% 
+  dplyr::select(species = Species, family = Family)
+df1921 <- dplyr::left_join(df1921, taxa, by = "species")
+
+df <- df %>% 
+  dplyr::filter(year < 2019) %>% 
+  dplyr::bind_rows(df1921)
+rm(df1921, taxa)
+
 ### Columns missing:
 # - density_ind_ha (to be calculated)
 # - survey_date (insufficient data to process; that are Year, Month, Day columns but
@@ -194,29 +209,29 @@ df <- df %>%
   dplyr::rename(snu_maa = ma_name) %>% 
   dplyr::mutate(
     snu_maa = dplyr::recode(snu_maa,
-      "Camarines_Norte_Mercedes" = "Camarines Norte_Mercedes",
-      "Camarines_Sur_Sagnay" = "Camarines Sur_Sagnay",
-      "Camarines_Sur_Tinambac" = "Camarines Sur_Tinambac",
-      "Cebu_San_Francisco" = "Cebu_San Francisco",
-      "Negros Occidental_San_Carlos" = "Negros Occidental_San Carlos",
-      "Negros Occidental_Tayasan" = "Negros Oriental_Tayasan", # original data had typo
-      "Negros_Oriental_Ayungon" = "Negros Oriental_Ayungon",
-      "Negros_Oriental_Bindoy" = "Negros Oriental_Bindoy",
-      "Negros_Oriental_Manjuyod" = "Negros Oriental_Manjuyod",
-      "Occidental_Mindoro_Looc" = "Occidental Mindoro_Looc",
-      "Occidental_Mindoro_Lubang" = "Occidental Mindoro_Lubang",
-      "Surigao_del_Norte_Burgos" = "Surigao Del Norte_Burgos",
-      "Surigao_del_Norte_Del_Carmen" = "Surigao Del Norte_Del Carmen",
-      "Surigao_del_Norte_Dapa" = "Surigao Del Norte_Dapa",
-      "Surigao_del_Norte_General_Luna" = "Surigao Del Norte_General Luna",
-      "Surigao_del_Norte_Pilar" = "Surigao Del Norte_Pilar",
-      "Surigao_del_Norte_San_Benito" = "Surigao Del Norte_San Benito",
-      "Surigao_del_Norte_San_Isidro" = "Surigao Del Norte_San Isidro",
-      "Surigao_del_Norte_Socorro" = "Surigao Del Norte_Socorro",
-      "Surigao_del_Norte_Sta. Monica" = "Surigao Del Norte_Santa Monica",
-      "Surigao_Del_Sur_Cantilan" = "Surigao Del Sur_Cantilan",
-      "Surigao_Del_Sur_Cortes" = "Surigao Del Sur_Cortes",
-      "Zamboanga _Ibugay_Ipil" = "Zamboanga Sibugay_Ipil"
+                            "Camarines_Norte_Mercedes" = "Camarines Norte_Mercedes",
+                            "Camarines_Sur_Sagnay" = "Camarines Sur_Sagnay",
+                            "Camarines_Sur_Tinambac" = "Camarines Sur_Tinambac",
+                            "Cebu_San_Francisco" = "Cebu_San Francisco",
+                            "Negros Occidental_San_Carlos" = "Negros Occidental_San Carlos",
+                            "Negros Occidental_Tayasan" = "Negros Oriental_Tayasan", # original data had typo
+                            "Negros_Oriental_Ayungon" = "Negros Oriental_Ayungon",
+                            "Negros_Oriental_Bindoy" = "Negros Oriental_Bindoy",
+                            "Negros_Oriental_Manjuyod" = "Negros Oriental_Manjuyod",
+                            "Occidental_Mindoro_Looc" = "Occidental Mindoro_Looc",
+                            "Occidental_Mindoro_Lubang" = "Occidental Mindoro_Lubang",
+                            "Surigao_del_Norte_Burgos" = "Surigao Del Norte_Burgos",
+                            "Surigao_del_Norte_Del_Carmen" = "Surigao Del Norte_Del Carmen",
+                            "Surigao_del_Norte_Dapa" = "Surigao Del Norte_Dapa",
+                            "Surigao_del_Norte_General_Luna" = "Surigao Del Norte_General Luna",
+                            "Surigao_del_Norte_Pilar" = "Surigao Del Norte_Pilar",
+                            "Surigao_del_Norte_San_Benito" = "Surigao Del Norte_San Benito",
+                            "Surigao_del_Norte_San_Isidro" = "Surigao Del Norte_San Isidro",
+                            "Surigao_del_Norte_Socorro" = "Surigao Del Norte_Socorro",
+                            "Surigao_del_Norte_Sta. Monica" = "Surigao Del Norte_Santa Monica",
+                            "Surigao_Del_Sur_Cantilan" = "Surigao Del Sur_Cantilan",
+                            "Surigao_Del_Sur_Cortes" = "Surigao Del Sur_Cortes",
+                            "Zamboanga _Ibugay_Ipil" = "Zamboanga Sibugay_Ipil"
     )
   ) %>% 
   tidyr::separate(snu_maa, c("level1_name", "ma_name"), "_") %>% 
@@ -226,7 +241,7 @@ df <- df %>%
   # the missing lgu names to match their ma name.
   dplyr::mutate(
     level2_name = dplyr::recode(level2_name,
-      .missing = ma_name
+                                .missing = ma_name
     )
   )
 
@@ -237,10 +252,10 @@ fish.surveys <- fish.surveys %>% dplyr::filter(country != "PHL") %>%
 fish.surveys <- fish.surveys %>% 
   dplyr::mutate(
     country = dplyr::recode(country,
-      "HND" = "Honduras",
-      "IDN" = "Indonesia",
-      "MOZ" = "Mozambique",
-      )
+                            "HND" = "Honduras",
+                            "IDN" = "Indonesia",
+                            "MOZ" = "Mozambique",
+    )
   )
 
 
