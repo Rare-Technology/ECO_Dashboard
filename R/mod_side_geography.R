@@ -157,7 +157,7 @@ sidebarGeoServer <- function(id, rv){
       if (!setequal(rv$sel_maa, input$sel_maa)) {
         rv$sel_maa <- input$sel_maa
       }
-    }, ignoreInit = TRUE, ignoreNULL = TRUE)
+    }, ignoreInit = TRUE)
   })
 }
     

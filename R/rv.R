@@ -6,7 +6,6 @@ initialize_rv <- function(INIT) {
     sel_subnational = INIT$SUBNATIONAL$SELECTED,
     sel_local = INIT$LOCAL$SELECTED,
     sel_maa = INIT$MAA$SELECTED,
-    sel_year = INIT$YEAR$SELECTED,
     sel_family = INIT$FAMILY$SELECTED,
     metrics = INIT$METRICS[["Fish"]],
     sel_metric = INIT$METRICS[["Fish"]][1],

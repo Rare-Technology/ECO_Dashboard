@@ -122,15 +122,14 @@ sidebarDisplayServer <- function(id, rv){
       rv$sel_yscale <- as.logical(input$sel_yscale)
     })
     
-    observeEvent(rv$sel_year, {
-      if (!is.null(rv$sel_maa) & rv$current_tab == "Fish") {
-        family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                          # sel_country = rv$sel_country,
-                                          # sel_subnational = rv$sel_subnational,
-                                          # sel_local = rv$sel_local,
-                                          sel_maa = rv$sel_maa,
-                                          sel_year = rv$sel_year,
-                                          target = "family")
+    observeEvent(rv$sel_maa, {
+      if (rv$sel_dataset == "Fish") {
+        family_choices <- get_geo_choices(INIT$DATA_FULL[["Fish"]],
+          sel_country = rv$sel_country,
+          sel_subnational = rv$sel_subnational,
+          sel_local = rv$sel_local,
+          sel_maa = rv$sel_maa,
+          target = "family")
         rv$sel_family <- family_choices
         updatePickerInput(
           session,
@@ -138,29 +137,6 @@ sidebarDisplayServer <- function(id, rv){
           choices = family_choices,
           selected = family_choices
         )
-      }
-    }, ignoreInit = TRUE, ignoreNULL = FALSE)
-    
-    observeEvent(rv$sel_maa, {
-      if (rv$current_tab == "Fish") {
-        toggleState(id = "sel_family",
-                    condition = !is.null(rv$sel_maa))
-        if (!is.null(rv$sel_maa)) {
-          family_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                            sel_country = rv$sel_country,
-                                            sel_subnational = rv$sel_subnational,
-                                            sel_local = rv$sel_local,
-                                            sel_maa = rv$sel_maa,
-                                            sel_year = rv$sel_year,
-                                            target = "family")
-          rv$sel_family <- family_choices
-          updatePickerInput(
-            session,
-            "sel_family",
-            choices = family_choices,
-            selected = family_choices
-          )
-        }
       }
     }, ignoreInit = TRUE, ignoreNULL = FALSE)
     

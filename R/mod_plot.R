@@ -28,10 +28,16 @@ plotServer <- function(id, rv){
       facet_maa <- rv$facet_maa
       y_scale <- rv$sel_yscale
       sel_geom <- rv$sel_geom
-      sel_year <- rv$sel_year
+
+      if (length(sel_maa) == 0) {
+        return(div(class="warning_message", tr(rv, "No managed access area selected.")))
+      }
       
       if (sel_dataset == "Fish") {
         sel_family <- rv$sel_family
+        if(length(sel_family) == 0) {
+          return(div(class="warning_message", tr(rv, "No fish families selected.")))
+        }
         rv$data_filtered <- INIT$DATA_FULL[['Fish']] %>%
           dplyr::filter(ma_name %in% sel_maa,
                         family %in% sel_family)
@@ -41,30 +47,27 @@ plotServer <- function(id, rv){
       }
       data_filtered <- rv$data_filtered
       
-      if (length(sel_maa) == 0) {
-        return(div(class="warning_message", tr(rv, "No managed access area selected.")))
-      } else {
-        p <- try(
-          switch(sel_metric,
-            "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
-            "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
-            "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
-            "Fish size" = plot_fish_size(data_filtered, sel_geom, facet_maa),
-            "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom, facet_maa),
-            "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom, facet_maa),
-            "Tree size" = plot_tree_size(data_filtered, sel_geom, facet_maa),
-            "Coral reef cover" = plot_reef_cover(data_filtered, sel_geom, facet_maa),
-            "Coral reef diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
-            "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
-            "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
-            "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa),
-            "Oyster density" = plot_oyster_density(data_filtered, sel_geom, facet_maa),
-            "Oyster size" = plot_oyster_size(data_filtered, sel_geom, facet_maa),
-            "Crab density" = plot_crab_density(data_filtered, sel_geom, facet_maa),
-            "Crab size" = plot_crab_size(data_filtered, sel_geom, facet_maa)
-          )
+      p <- try(
+        switch(sel_metric,
+          "Fish biomass" = plot_fish_biomass(data_filtered, sel_geom, facet_maa),
+          "Fish density" = plot_fish_density(data_filtered, sel_geom, facet_maa),
+          "Fish diversity" = plot_fish_diversity(data_filtered, sel_geom, facet_maa),
+          "Fish size" = plot_fish_size(data_filtered, sel_geom, facet_maa),
+          "Sapling density" = plot_sapling_tree_density(data_filtered, sel_geom, facet_maa),
+          "Tree diversity" = plot_tree_diversity(data_filtered, sel_geom, facet_maa),
+          "Tree size" = plot_tree_size(data_filtered, sel_geom, facet_maa),
+          "Coral reef cover" = plot_reef_cover(data_filtered, sel_geom, facet_maa),
+          "Coral reef diversity" = plot_reef_diversity(data_filtered, sel_geom, facet_maa),
+          "Seagrass cover" = plot_seagrass_cover(data_filtered, sel_geom, facet_maa),
+          "Seagrass diversity" = plot_seagrass_diversity(data_filtered, sel_geom, facet_maa),
+          "Seagrass height" = plot_seagrass_height(data_filtered, sel_geom, facet_maa),
+          "Oyster density" = plot_oyster_density(data_filtered, sel_geom, facet_maa),
+          "Oyster size" = plot_oyster_size(data_filtered, sel_geom, facet_maa),
+          "Crab density" = plot_crab_density(data_filtered, sel_geom, facet_maa),
+          "Crab size" = plot_crab_size(data_filtered, sel_geom, facet_maa)
         )
-      }
+      )
+      
       if (class(p) == "try-error") {
         return(div(class="warning_message", tr(rv, PLOT_ERROR)))
       } else {
@@ -87,7 +90,7 @@ plotServer <- function(id, rv){
         rv$current_plot <- p$plot
         rv$current_plot_height <- plot_height
         rv$current_plot_data <- p$data
-        output$plot <- renderPlot(p$plot, height = plot_height) 
+        output$plot <- renderPlot(p$plot, height = plot_height, width=1000) 
     
         ui_out <- list(list(br()))
         ui_out <- append(ui_out, list(
@@ -135,9 +138,3 @@ plotServer <- function(id, rv){
     )
   })
 }
-    
-## To be copied in the UI
-# mod_plot_ui("plot_ui_1")
-    
-## To be copied in the server
-# mod_plot_server("plot_ui_1")

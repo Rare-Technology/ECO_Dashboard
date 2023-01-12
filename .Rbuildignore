@@ -6,3 +6,6 @@ $run_dev.*
 ^data-raw$
 ^app\.R$
 ^rsconnect$
+^rareeco\.Rcheck$
+^rareeco.*\.tar\.gz$
+^rareeco.*\.tgz$

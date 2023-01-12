@@ -10,7 +10,6 @@ app_server <- function( input, output, session ) {
   mainServer('mainUI', rv)
   
   sidebarServer('sidebarUI')
-  sidebarYearServer("sidebarYearUI", rv)
   sidebarGeoServer('sidebarGeoUI', rv)
   sidebarDisplayServer('sidebarDisplayUI', rv)
   

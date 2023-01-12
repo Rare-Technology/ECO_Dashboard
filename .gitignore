@@ -3,3 +3,6 @@
 .Rproj.user
 .Rhistory
 rsconnect/
+rareeco.Rcheck/
+rareeco*.tar.gz
+rareeco*.tgz
