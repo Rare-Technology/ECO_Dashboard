@@ -91,10 +91,14 @@ plot_trend <- function(data, x = "year", y = NULL, ymin = "ymin", ymax = "ymax",
     )
 }
 
-plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax = "ymax",
-  fill = "location_status", title = NULL, year = NULL, x_label = "", y_label = NULL) {
+plot_bar <- function(data, x = "year", y = NULL, ymin = "ymin", ymax = "ymax",
+  fill = "location_status", title = NULL, years = NULL, x_label = "", y_label = NULL) {
   
-  ggplot2::ggplot() +
+  one_year <- ifelse(length(unique(data[[x]])) == 1, TRUE, FALSE)
+  if (one_year) {
+    data[[x]] <- as.factor(data[[x]])
+  }
+  ggplot2::ggplot() + list(
     geom_bar(
       data = data,
       aes_string(
@@ -102,12 +106,11 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
         y = y,
         fill = fill
       ),
-      position = position_dodge(),
+      position = position_dodge(0.6),
       color = "black",
       stat = 'identity',
-      width = 0.6,
-      show.legend = FALSE
-    ) +
+      width = 0.6
+    ),
     geom_errorbar(
       data = data,
       aes_string(
@@ -116,24 +119,34 @@ plot_bar <- function(data, x = "location_status", y = NULL, ymin = "ymin", ymax 
         ymin = ymin,
         ymax = ymax
       ),
-      position = position_dodge(),
-      width = 0.2,
+      position = position_dodge(0.6),
+      width = 0.3,
       na.rm = TRUE
-    ) +
-    ggtitle(paste(title, year)) +
-    xlab(x_label) + 
-    ylab(y_label) +
-    theme_rare() +
+    ),
+    if (!one_year) {scale_x_continuous(breaks = years)},
+    labs(
+      title = title,
+      x = x_label,
+      y = y_label,
+      fill = "Location status" # look out for any fill != location_status
+    ), 
+    theme_rare(),
     theme(
       panel.grid.major.y = element_line(),
       panel.grid.major.x = element_blank(),
-    ) +
-    scale_y_continuous(labels = scales::comma) +
+    ),
+    scale_y_continuous(labels = scales::comma),
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
+  )
 }
 
 plot_samples <- function(data_local, x = NULL, y = NULL, fill = NULL,
   shape = 21, point_size = 2) {
+  one_year <- ifelse(length(unique(data_local[[x]])) == 1, TRUE, FALSE)
+  if (one_year) {
+    data_local[[x]] <- as.factor(data_local[[x]])
+  }
+  
   geom_point(
       data = data_local,
       aes_string(
@@ -143,13 +156,13 @@ plot_samples <- function(data_local, x = NULL, y = NULL, fill = NULL,
       ),
       position = position_jitterdodge(
         jitter.width = 0.1,
-        dodge.width = 0.5
+        dodge.width = 0.6
       ),
       shape = shape,
       alpha = 1,
       size = point_size,
       show.legend = FALSE
-    )
+  )
 }
 
 plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_status",

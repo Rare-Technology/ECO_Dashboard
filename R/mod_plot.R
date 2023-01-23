@@ -126,7 +126,6 @@ plotServer <- function(id, rv){
         # Maybe adjust this at some point so plots aren't so large, esp. when
         # plotting only one or two facet rows or one aggregate plot.
         png(plot_name, width=500*300/72, height=plot_height*300/72, res=300)
-        print(rv$current_plot)
         dev.off()
         
         fs = c(meta_name, data_name, plot_name)
