@@ -107,7 +107,7 @@ aggregate_data <- function(data_filtered, metric) {
     
   } else if (metric == 'length') {
     data_filtered %>% 
-      dplyr::filter(!is.na(length)) %>% 
+      dplyr::filter(!is.na(length), !is.na(count)) %>% 
       dplyr::select(year, ma_name, location_status, location_name, transect_no, count, length) %>% 
       tidyr::uncount(weights = count) %>% 
       dplyr::group_by(year, ma_name, location_status, location_name, transect_no) %>% 

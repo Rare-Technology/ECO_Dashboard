@@ -165,7 +165,7 @@ plot_samples <- function(data_local, x = NULL, y = NULL, fill = NULL,
   )
 }
 
-plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_status",
+plot_histogram_deprecated <- function(data_full, data_summary, x = NULL, fill = "location_status",
   year = year, title = NULL, x_label = NULL) {
   ggplot2::ggplot() +
     geom_histogram(
@@ -210,7 +210,7 @@ plot_histogram <- function(data_full, data_summary, x = NULL, fill = "location_s
     scale_fill_manual(values = c(RARE_COLORS$lightblue, RARE_COLORS$lightgreen))
 }
 
-plot_histogram_trend <- function(data, x = NULL, y = NULL, fill = "location_status",
+plot_density <- function(data, x = NULL, y = NULL, fill = "location_status",
   title = NULL, x_label = NULL, y_label = NULL) {
   ggplot2::ggplot() +
     ggridges::geom_density_ridges(
