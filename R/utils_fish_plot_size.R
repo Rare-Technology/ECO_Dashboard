@@ -30,7 +30,7 @@ plot_fish_size <- function(data_filtered, sel_geom, facet_maa) {
       y_label = "Year"
     )
   }
-
+  
   out$plot <- p
   out
 }

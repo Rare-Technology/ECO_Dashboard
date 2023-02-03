@@ -10,7 +10,6 @@ plot_fish_biomass <- function(data_filtered, sel_geom, facet_maa) {
     y = "biomass_kg_ha",
     fill = "location_status",
     title = "Fish biomass",
-    x_label = "Year",
     y_label = "Biomass (kg/ha)",
     years = years
   )

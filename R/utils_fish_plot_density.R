@@ -10,7 +10,6 @@ plot_fish_density <- function(data_filtered, sel_geom, facet_maa) {
     y = "density_ind_ha",
     fill = "location_status",
     title = "Fish density",
-    x_label = "Year",
     y_label = "Density (individuals/ha)",
     years = years
   )

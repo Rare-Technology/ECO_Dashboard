@@ -10,7 +10,6 @@ plot_fish_diversity <- function(data_filtered, sel_geom, facet_maa) {
     y = "species",
     fill = "location_status",
     title = "Fish diversity",
-    x_label = "Year",
     y_label = "Number of unique species",
     years = years
   )
