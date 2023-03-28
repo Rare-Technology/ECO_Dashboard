@@ -24,20 +24,25 @@ aggregate_data <- function(data_filtered, metric) {
     aggregate(form, data = data_filtered, FUN = count_unique)
     
   } else if (metric == "cover") {
-    # seagrass cover is among a few metrics that having been implemented later in dev,
-    # I sought to `dplyr`-ize the code instead of using `aggregate`. in doing so though,
-    # it is hard to follow the process of the past few metrics of creating a list
-    # of grouping variables and passing into and pasting it into a formula.
-    # At some point, figure out a way to write this better
-    # Angel, Jan-24-22
+    # Seagrass data includes quadrats which are nested under transects.
+    # At least with the existing Mozambique data, the "cover" is unique up to the category, NOT the
+    # seagrass species. So a row with cover=80 and seagrass species="Enhalus acoroides" doesn't mean
+    # that Enhalus acoroides covered up 80% of the quadrat, it means that between all the recorded
+    # seagrass species at that quadrat, they cover 80% of the quadrat.
+    # On top of that, the cover is strictly the seagrass cover; whenever the category=No seagrass,
+    # cover=0.
+    # Finally, each quadrat has only one category; a quadrat will either have 1 row with category=
+    # No seagrass or multiple rows with category=Seagrass, one row for each seagrass species
+    # So to aggregate, we will take the mean of the cover at each quadrat.
     
     data_filtered %>% 
-      dplyr::group_by(year, ma_name, location_status, location_name,
-                      seagrass_species, transect_no) %>% 
+      dplyr::group_by(year, ma_name, location_status, location_name, transect_no, quadrat_no) %>% 
       dplyr::summarize(cover = mean(cover, na.rm=TRUE)) %>% 
-      dplyr::group_by(year, ma_name, location_status, location_name, seagrass_species) %>% 
+      dplyr::group_by(year, ma_name, location_status, location_name, transect_no) %>% 
       dplyr::summarize(cover = mean(cover)) %>% 
-      dplyr::group_by(year, ma_name, location_status, seagrass_species) %>% 
+      dplyr::group_by(year, ma_name, location_status, location_name) %>% 
+      dplyr::summarize(cover = mean(cover)) %>% 
+      dplyr::group_by(year, ma_name, location_status) %>% 
       dplyr::summarize(cover = mean(cover))
       
   } else if (metric == "avg_height_cm") {
@@ -100,7 +105,7 @@ aggregate_data <- function(data_filtered, metric) {
     form2 <- str_to_formula(metric, groupvars2)
     form3 <- str_to_formula(metric, groupvars3)
     
-    out1 <- aggregate(form, data = data_filtered, FUN = sum) %>% 
+    aggregate(form, data = data_filtered, FUN = sum) %>% 
       dplyr::rename(sapling_tree_density_ind_m2 = count) %>% 
       aggregate(form2, data = ., FUN = mean) %>% 
       aggregate(form3, data = ., FUN = mean)
