@@ -7,25 +7,45 @@
 #' @noRd 
 #'
 #' @importFrom shiny NS tagList 
+#' @importFrom rmarkdown render
 reportUI <- function(id){
   ns <- NS(id)
-  tagList(
- 
-  )
+  uiOutput(ns("report_page"))
 }
     
 #' report Server Functions
 #'
 #' @noRd 
-reportServer <- function(id){
+reportServer <- function(id, rv){
+  ns <- NS(id)
   moduleServer( id, function(input, output, session){
-    ns <- session$ns
- 
+    output$report_page <- renderUI({
+      ui_out <- list()
+      
+      ui_out <- append(ui_out, list(checkboxGroupInput(
+        ns("report_metrics"),
+        strong("Ecological metrics"),
+        choices = c("Fish Biomass", "Fish Density"),
+        selected = NULL,
+        inline = FALSE
+      )))
+      
+      ui_out <- append(ui_out, list(downloadButton(
+        ns("downloadReport"), tr(rv, 'Download report')
+      )))
+      
+      return(ui_out)
+    })
+    
+    output$downloadReport <- downloadHandler(
+      filename = 'Ecological_monitoring_summary_report.doc',
+      content = function(file) {
+        tempReport <- file.path(tempdir(), "report.Rmd")
+        file.copy("R/report-template.Rmd", tempReport, overwrite = TRUE)
+        withProgress(message = 'Generating report, please wait, this could take up to 20 seconds', {
+          render(tempReport, output_file = file, output_format = 'word_document')
+        })
+      }
+    )
   })
 }
-    
-## To be copied in the UI
-# mod_report_ui("report_ui_1")
-    
-## To be copied in the server
-# mod_report_server("report_ui_1")

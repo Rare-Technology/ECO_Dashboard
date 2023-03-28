@@ -23,6 +23,7 @@ Imports:
     lubridate,
     magrittr,
     pkgload,
+    rmarkdown,
     shiny (>= 1.6.0),
     shinyjs,
     shinyWidgets,

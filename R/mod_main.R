@@ -59,9 +59,9 @@ mainServer <- function(id, rv){
       ui <- tabsetPanel(
         id = ns("tabs"),
         # tabPanel(tr(rv, "Start"), startUI("startUI")),
-        tabPanel(tr(rv, "Visualize data"), plotUI('plotUI'))
+        tabPanel(tr(rv, "Visualize data"), plotUI('plotUI')),
         # tabPanel('Map', mapUI('mapUI')) # currently inactive, will rework soon
-        # tabPanel('Report', reportUI('reportUI')) # one day?
+        tabPanel(tr(rv, "Report"), reportUI('reportUI'))
       )
       ui
     })
