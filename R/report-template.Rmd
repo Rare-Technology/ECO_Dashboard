@@ -12,9 +12,35 @@ pandoc_args:
 - -RTS
 ---
 
-```{r echo=FALSE}
-report_biomass <- "Fish Biomass" %in% input$report_metrics
-report_fish_density <- "Fish Density" %in% input$report_metrics
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+report_metrics <- input$report_metrics
+sel_maa <- rv$sel_maa
+facet_maa <- rv$facet_maa
+y_scale <- rv$sel_yscale
+sel_geom <- rv$sel_geom
+data_filtered <- list()
+p <- list()
+
+if (any(INIT$METRICS$Fish %in% report_metrics)) {
+  sel_family <- rv$sel_family
+  data_filtered[["Fish"]] <- INIT$DATA_FULL[['Fish']] %>%
+    dplyr::filter(
+      ma_name %in% sel_maa,
+      family %in% sel_family
+    )
+  for (metric in INIT$METRICS$Fish) {
+    if (metric %in% report_metrics) {
+      p$Fish[[metric]] <- PLOT_FUN(metric, data_filtered$Fish, sel_geom, facet_maa)
+      p$Fish[[metric]] <- clean_plot(p$Fish[[metric]], facet_maa, y_scale, metric, sel_maa)$p
+    }
+  }
+}
+for (survey in setdiff(names(INIT$METRICS), "Fish")) {
+  if (any(INIT$METRICS[[survey]] %in% report_metrics)) {
+    data_filtered[[survey]] <- INIT$DATA_FULL[[survey]] %>% 
+      dplyr::filter(ma_name %in% sel_maa)
+  }
+}
 ```
 
 \begin{aligned}
@@ -46,16 +72,16 @@ We used underwater visual census (UVC) to monitor reef fish assemblages.
 #### RESULTS AND DISCUSSIONS
 
 ```{r fish_biomass, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-if(report_biomass) print("biomass goes here")
+if ("Fish biomass" %in% report_metrics) p$Fish[["Fish biomass"]]$plot
 ```
-```{asis, echo=report_biomass}
+```{asis, echo="Fish biomass" %in% report_metrics}
 **Figure**. Average fish biomass (± 95% confidence interval) in kg/ha
 ```
 
 ```{r fish_density, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-if(report_fish_density) print("fish density goes here")
+if ("Fish density" %in% report_metrics) p$Fish[["Fish density"]]$plot
 ```
-```{asis echo=report_fish_density}
+```{asis echo="Fish density" %in% report_metrics}
 **Figure**. Average fish density (± 95% confidence interval) in individuals/ha
 ```
 
