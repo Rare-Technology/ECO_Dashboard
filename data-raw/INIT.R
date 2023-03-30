@@ -30,7 +30,8 @@ INIT$DATA_FULL <- list(
   "Coral reefs" = benthic.surveys,
   "Seagrass" = seagrass.surveys,
   "Crabs" = crab.surveys,
-  "Oysters" = oyster.surveys
+  "Oysters" = oyster.surveys,
+  "Geo" = geo
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"
