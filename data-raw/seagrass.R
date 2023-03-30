@@ -1,17 +1,18 @@
-## code to prepare `seagrass` dataset goes here
+library(data.world)
 
-# Mozambique seagrass data
-# From the Seagrass Surveys project from @raremozambique
-# Seagrass_Memba_Ihla_de_Mozambique_Dec2020_clean.csv
-# https://data.world/raremozambique/seagrass-surveys/
-# there is some character or characters that is not parsed by read.csv, but readr's
-# read_csv works
-df <- readr::read_csv("https://query.data.world/s/5o6gw5svmfo7eezkmozxjqlrgwcrge")
+seagrass.surveys <- data.world::query(
+  data.world::qry_sql("SELECT * FROM seagrass_memba_ihla_de_mozambique_dec2020_clean"),
+  "https://data.world/raremozambique/seagrass-surveys"
+)
 
-df$year <- 2020
-df <- df %>% 
+seagrass.surveys <- seagrass.surveys %>% 
+  dplyr::mutate(
+    year = 2020,
+    ma_name = dplyr::recode(
+      ma_name,
+      "Memba" = "Memba-sede"
+    )
+  ) %>% 
   dplyr::rename(location_name = survey_location)
-
-seagrass.surveys <- df
 
 usethis::use_data(seagrass.surveys, overwrite = TRUE)
