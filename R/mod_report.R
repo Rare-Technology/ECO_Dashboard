@@ -25,7 +25,7 @@ reportServer <- function(id, rv){
       ui_out <- append(ui_out, list(checkboxGroupInput(
         ns("report_metrics"),
         strong("Ecological metrics"),
-        choices = c("Fish biomass", "Fish density"),
+        choices = INIT$METRICS$Fish,
         selected = NULL,
         inline = FALSE
       )))
