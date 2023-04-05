@@ -26,6 +26,7 @@ usethis::use_package("stringr")
 usethis::use_package("tidyr")
 usethis::use_package("lubridate")
 usethis::use_package("rmarkdown")
+usethis::use_package("writexl")
 
 ## Add modules ----
 ## Create a module infrastructure in R/

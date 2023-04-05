@@ -1,6 +1,6 @@
 ---
 title: "Ecological Monitoring Summary Data Report"
-author: "RARE Automatic Report Generator"
+author: "**_Author names_**"
 output: word_document
 fontsize: 12pt
 fig.width: 10
@@ -12,44 +12,9 @@ pandoc_args:
 - -RTS
 ---
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-report_metrics <- input$report_metrics
-sel_maa <- rv$sel_maa
-facet_maa <- rv$facet_maa
-y_scale <- rv$sel_yscale
-sel_geom <- rv$sel_geom
-data_filtered <- list()
-p <- list()
-
-if (any(INIT$METRICS$Fish %in% report_metrics)) {
-  sel_family <- rv$sel_family
-  data_filtered[["Fish"]] <- INIT$DATA_FULL[['Fish']] %>%
-    dplyr::filter(
-      ma_name %in% sel_maa,
-      family %in% sel_family
-    )
-  for (metric in INIT$METRICS$Fish) {
-    if (metric %in% report_metrics) {
-      p$Fish[[metric]] <- PLOT_FUN(metric, data_filtered$Fish, sel_geom, facet_maa)
-      p$Fish[[metric]] <- clean_plot(p$Fish[[metric]], facet_maa, y_scale, metric, sel_maa)$p
-    }
-  }
-}
-for (survey in setdiff(names(INIT$METRICS), "Fish")) {
-  if (any(INIT$METRICS[[survey]] %in% report_metrics)) {
-    data_filtered[[survey]] <- INIT$DATA_FULL[[survey]] %>% 
-      dplyr::filter(ma_name %in% sel_maa)
-  }
-}
-```
-
-\begin{aligned}
-Report generated on: `r format(Sys.Date(), "%B %d, %Y")`
-\end{aligned}
-
 #### SUMMARY
 
-{*include a summary based on the results of this report*}
+**_Write a summary based on the results of this report_**
  
 \newpage
 
@@ -63,60 +28,67 @@ Underwater surveys were conducted through partner universities and local organiz
 
 #### *Survey Locations*
 
-We surveyed {*include number of MA+R selected*} managed access and reserves across {*include administrative level*}.
+We surveyed `r length(sel_maa)` managed access and reserves across **_include administrative level_**.
 
 #### *Fish Surveys*
     
 We used underwater visual census (UVC) to monitor reef fish assemblages. 
 
-#### RESULTS AND DISCUSSIONS
+#### RESULTS
 
-```{r fish_biomass, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+```{r fish_biomass, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
 if ("Fish biomass" %in% report_metrics) p$Fish[["Fish biomass"]]$plot
 ```
+
 ```{asis, echo="Fish biomass" %in% report_metrics}
-**Figure**. Average fish biomass (± 95% confidence interval) in kg/ha
+**Figure**. Average fish biomass (± standard error) in kg/ha
 ```
 
-```{r fish_density, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+
+```{r fish_density, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
 if ("Fish density" %in% report_metrics) p$Fish[["Fish density"]]$plot
 ```
+
 ```{asis echo="Fish density" %in% report_metrics}
-**Figure**. Average fish density (± 95% confidence interval) in individuals/ha
+**Figure**. Average fish density (± standard error) in individuals/ha
 ```
 
-```{r fish_size, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-# if("Fish Size Structure" %in% input$metrics) plotFishSize()
+
+```{r fish_size, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Fish size" %in% report_metrics) p$Fish[["Fish size"]]$plot
 ```
 
-**Figure**. Size structure (total length in cm) for most common species
-
-```{r fish_diversity, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-#if("Fish Diversity" %in% input$metrics) plotFishDiversity()
+```{asis echo="Fish size" %in% report_metrics}
+**Figure**. Average total length (TL) of fish (± standard error) in cm
 ```
 
-**Figure**. Averege number of fish species (± 95% confidence interval).
 
-```{r hardcoral_cover, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-# if("Hard Coral Cover" %in% input$metrics)  plot_hardcoral.cover()
+```{r fish_diversity, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Fish diversity" %in% report_metrics) p$Fish[["Fish diversity"]]$plot
 ```
 
-**Figure**. Averege coverage of hard corals (± 95% confidence interval).
-
-```{r hardcoral_diversity, echo=FALSE, fig.height=9, fig.width=9, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
-# if("Habitat Diversity" %in% input$metrics) plot_benthic.diversity()
+```{asis echo="Fish diversity" %in% report_metrics}
+**Figure**. Average number of fish species (± standard error).
 ```
 
-**Figure**. Average number of benthic groups (± 95% confidence interval).
+
+```{r hardcoral_cover, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Coral reef cover" %in% report_metrics) p[["Coral reefs"]][["Coral reef cover"]]$plot
+```
+
+```{asis echo="Coral reef cover" %in% report_metrics}
+**Figure**. Average coverage of hard corals (± standard error).
+```
 
 
+```{r hardcoral_diversity, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Coral reef diversity" %in% report_metrics) p[["Coral reefs"]][["Coral reef cover"]]$plot
+```
 
-
+```{asis echo="Coral reef diversity" %in% report_metrics}
+**Figure**. Average number of benthic groups (± standard error).
+```
 
 #### CONCLUSIONS
 
-```{r, echo=FALSE}
-
-```
-
-For more information check the [Rare Data Portal](https://portal.rare.org/program-data/impacts/ecological-impacts/fisheries-recovery/ecological-data/)
+**_Write a conclusion based on the results_**
