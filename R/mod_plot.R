@@ -70,8 +70,7 @@ plotServer <- function(id, rv){
 
       
       ui_out <- append(ui_out, list(
-        plotOutput(ns('plot')) #%>% 
-          # tagAppendAttributes(style = "margin: 0 auto;")
+        plotOutput(ns('plot'))
       ))
       return(ui_out)
     })
@@ -79,16 +78,20 @@ plotServer <- function(id, rv){
     output$downloadPlot <- downloadHandler(
       filename = function() {paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".zip")},
       content = function(file) {
-        wd <- getwd()
-        setwd(tempdir())
+        # Write out file paths
+        tmpdir <- tempdir()
+        meta_name <- file.path(tmpdir, 'filters.txt')
+        data_name <- file.path(tmpdir, 'data.csv')
+        plot_name <- file.path(tmpdir, paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".png"))
         
-        meta_name <- 'filters.txt'
-        data_name <- 'data.csv'
-        plot_name <- paste0("plot_", tolower(gsub(" ", "_", rv$sel_metric)), ".png")
-        
+        # Save metadata
         filters_text <- display_filters(rv)
         write(filters_text, meta_name)
+        
+        # Save data
         write.csv(rv$current_plot_data, data_name, row.names = FALSE)
+        
+        # Save plots
         plot_height <- rv$current_plot_height
         plot_height <- ifelse(plot_height == "auto", 500, plot_height)
         # Maybe adjust this at some point so plots aren't so large, esp. when
@@ -97,10 +100,9 @@ plotServer <- function(id, rv){
         print(rv$current_plot) # don't delete this !! This is how the graphic data is saved
         dev.off()
         
+        # Set up zip archive
         fs = c(meta_name, data_name, plot_name)
-        zip(zipfile = file, files = fs)
-        
-        setwd(wd)
+        zip(zipfile=file, files=fs, flags="-j")
       },
       contentType = 'application/zip'
     )
