@@ -9,7 +9,6 @@
 #' @importFrom shiny NS tagList
 #' @importFrom shinyWidgets pickerInput multiInput switchInput radioGroupButtons updatePickerInput materialSwitch
 #' @importFrom leaflet providers
-#' @importFrom shinyjs toggleState
 sidebarDisplayUI <- function(id){
   ns <- NS(id)
   uiOutput(ns('display'))
