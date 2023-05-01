@@ -95,6 +95,7 @@ reportServer <- function(id, rv){
         sel_geom <- rv$sel_geom
         data_filtered <- list()
         p <- list()
+        error_metrics <- c()
         
         # Treat fish plots separately since they require family input
         if (any(INIT$METRICS$Fish %in% report_metrics)) {
@@ -106,8 +107,12 @@ reportServer <- function(id, rv){
             )
           for (metric in INIT$METRICS$Fish) {
             if (metric %in% report_metrics) {
-              p$Fish[[metric]] <- PLOT_FUN(metric, data_filtered$Fish, sel_geom, facet_maa)
-              p$Fish[[metric]] <- clean_plot(p$Fish[[metric]], facet_maa, y_scale, metric, sel_maa)$p
+              p_attempt <- try(PLOT_FUN(metric, data_filtered$Fish, sel_geom, facet_maa))
+              if (class(p_attempt) == "try-error") {
+                error_metrics <- c(error_metrics, metric)
+              } else {
+                p$Fish[[metric]] <- clean_plot(p_attempt, facet_maa, y_scale, metric, sel_maa)$p
+              }
             }
           }
         }
@@ -116,11 +121,22 @@ reportServer <- function(id, rv){
           for (metric in intersect(INIT$METRICS[[survey]], report_metrics)) {
             data_filtered[[survey]] <- INIT$DATA_FULL[[survey]] %>% 
               dplyr::filter(ma_name %in% sel_maa)
-            p[[survey]][[metric]] <- PLOT_FUN(metric, data_filtered[[survey]], sel_geom, facet_maa)
-            p[[survey]][[metric]] <- clean_plot(p[[survey]][[metric]], facet_maa, y_scale, metric, sel_maa)$p
+            p_attempt <- try(PLOT_FUN(metric, data_filtered[[survey]], sel_geom, facet_maa))
+            if (class(p_attempt) == "try-error") {
+              error_metrics <- c(error_metrics, metric)
+            } else {
+              p[[survey]][[metric]] <- clean_plot(p_attempt, facet_maa, y_scale, metric, sel_maa)$p
+            }
           }
         }
         
+        report_metrics <- setdiff(report_metrics, error_metrics)
+
+        if(length(error_metrics) > 0) {
+          msg <- paste("Something happened and a plot could not be made for these metrics:", paste(error_metrics, sep=", "))
+          showNotification(msg, duration=30, type="warning")
+        }
+
         # Export word doc
         tmpdir <- tempdir()
         report_path <- file.path(tmpdir, "Ecological_monitoring_summary_report.docx")
