@@ -21,14 +21,22 @@ sidebarGeoServer <- function(id, rv){
   
   moduleServer( id, function(input, output, session){
     output$geo <- renderUI({
+      current_tab <- rv$current_tab
+      
+      ui <- tagList()
+      if (current_tab == tr(rv, "Visualize data")) {
+        ui <- tagList(
+          div(class = "sidetitle", tr(rv, "Data")),
+          selectInput(
+            ns("sel_dataset"),
+            tr(rv, "Data source"),
+            choices = INIT$DATASET$CHOICES,
+            selected = INIT$DATASET$SELECTED
+          )
+        )
+      }
       ui <- tagList(
-        div(class = "sidetitle", tr(rv, "Data")),
-        selectInput(
-          ns("sel_dataset"),
-          tr(rv, "Data source"),
-          choices = INIT$DATASET$CHOICES,
-          selected = INIT$DATASET$SELECTED
-        ),
+        ui,
         div(class="sidetitle", tr(rv, "Geography")),
         selectInput(
           ns('sel_country'),
@@ -82,6 +90,39 @@ sidebarGeoServer <- function(id, rv){
       ui
     })
     
+    observeEvent(rv$current_tab, {
+      # On switch to Report tab, show all geographic options in Geography section
+      # On switch back to Visualize data tab, revert to specifying locations based on survey
+      # Currently, switching back to Visualize data tab resets to defaults, which is OK (at least
+      # it correctly switches to using survey-specific locations) but ideally there should be a
+      # memory of what the last selected locations were
+      if (rv$current_tab == tr(rv, "Report")) {
+        country_choices <- get_geo_choices(
+          INIT$DATA_FULL[["Geo"]],
+          target = "country"
+        )
+        rv$sel_country <- country_choices[1]
+        updateSelectInput(
+          session,
+          "sel_country",
+          choices = country_choices,
+          selected = country_choices[1]
+        )
+      } else {
+        country_choices <- get_geo_choices(
+          INIT$DATA_FULL[[rv$sel_dataset]],
+          target = "country"
+        )
+        rv$sel_country <- country_choices[1]
+        updateSelectInput(
+          session,
+          "sel_country",
+          choices = country_choices,
+          selected = country_choices[1]
+        )
+      }
+    }, ignoreInit=TRUE, ignoreNULL=TRUE)
+    
     observeEvent(input$sel_dataset, {
       if(rv$sel_dataset != input$sel_dataset){
         rv$sel_dataset <- input$sel_dataset
@@ -106,9 +147,19 @@ sidebarGeoServer <- function(id, rv){
       if (rv$sel_country != input$sel_country) {
         rv$sel_country <- input$sel_country
       }
-      subnational_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                             sel_country = input$sel_country,
-                                             target = 'level1_name')
+      if (rv$current_tab == tr(rv, "Visualize data")) {
+        subnational_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[[rv$sel_dataset]],
+          sel_country = input$sel_country,
+          target = 'level1_name'
+        )
+      } else {
+        subnational_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[["Geo"]],
+          sel_country = input$sel_country,
+          target = 'level1_name'
+        )
+      }
       rv$sel_subnational <- subnational_choices
       updatePickerInput(
         session,
@@ -122,10 +173,22 @@ sidebarGeoServer <- function(id, rv){
       if (!setequal(rv$sel_subnational, input$sel_subnational)) {
         rv$sel_subnational <- input$sel_subnational
       }
-      local_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                       sel_country = rv$sel_country,
-                                       sel_subnational = rv$sel_subnational,
-                                       target = 'level2_name')
+      if (rv$current_tab == tr(rv, "Visualize data")) {
+        local_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[[rv$sel_dataset]],
+          sel_country = rv$sel_country,
+          sel_subnational = rv$sel_subnational,
+          target = 'level2_name'
+        )
+      } else {
+        local_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[["Geo"]],
+          sel_country = rv$sel_country,
+          sel_subnational = rv$sel_subnational,
+          target = 'level2_name'
+        )
+      }
+      
       rv$sel_local <- local_choices
       updatePickerInput(
         session,
@@ -139,11 +202,23 @@ sidebarGeoServer <- function(id, rv){
       if (!setequal(rv$sel_local, input$sel_local)) {
         rv$sel_local <- input$sel_local
       }
-      maa_choices <- get_geo_choices(INIT$DATA_FULL[[rv$sel_dataset]],
-                                     sel_country = rv$sel_country,
-                                     sel_subnational = rv$sel_subnational,
-                                     sel_local = rv$sel_local,
-                                     target = 'ma_name')
+      if (rv$current_tab == tr(rv, "Visualize data")) {
+        maa_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[[rv$sel_dataset]],
+          sel_country = rv$sel_country,
+          sel_subnational = rv$sel_subnational,
+          sel_local = rv$sel_local,
+          target = 'ma_name'
+        )
+      } else {
+        maa_choices <- get_geo_choices(
+          dataset = INIT$DATA_FULL[["Geo"]],
+          sel_country = rv$sel_country,
+          sel_subnational = rv$sel_subnational,
+          sel_local = rv$sel_local,
+          target = 'ma_name'
+        )
+      }
       rv$sel_maa <- NULL
       updatePickerInput(
         session,

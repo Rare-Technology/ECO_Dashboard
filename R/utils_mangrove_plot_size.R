@@ -5,7 +5,7 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_tree_size <- function(data_filtered, sel_geom, facet_maa) {
+plot_mangrove_size <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, "dbh_cm")
   data_summary <- summarySE(data_aggreg, "dbh_cm", facet_maa)
   years <- sort(unique(data_summary$year))

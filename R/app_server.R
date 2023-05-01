@@ -16,5 +16,5 @@ app_server <- function( input, output, session ) {
   startServer('startUI', rv)
   plotServer('plotUI', rv)
   # mapServer('mapUI', rv)
-  # reportServer('reportUI') this isn't implemented correctly on the original dashboard
+  reportServer('reportUI', rv)
 }

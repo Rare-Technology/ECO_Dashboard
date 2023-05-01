@@ -1,0 +1,198 @@
+---
+title: "Ecological Monitoring Summary Data Report"
+author: "**_Author names_**"
+output: word_document
+fontsize: 12pt
+fig.width: 10
+sansfont: Calibri Light
+
+pandoc_args:
+- +RTS
+- -K64m
+- -RTS
+---
+
+### SUMMARY
+
+**_Write a summary based on the results of this report_**
+ 
+\newpage
+
+### INTRODUCTION
+
+The ecological monitoring data report provides a basic analysis and interpretation of ecological data collected in coral reefs to detect changes in managed access and reserves (MA+R) across national and subnational levels. Results from ecological monitoring are critical for evaluating trends in ecosystem health and coastal fisheries, and for providing high quality data for decision-making to achieve effective and adaptive management. The ultimate objective of ecological monitoring is to assess the effectiveness of the MA+R approach in increasing fish populations and improving ecosystem health.
+
+### METHODOLOGY
+
+Underwater surveys were conducted through partner universities and local organizations to characterize the marine and coastal ecosystems inside and outside of the MA+R areas. Selected fish and benthic species were recorded within representative survey areas, allowing for estimates of fish biomass and abundance, fish size structure and diversity, percent habitat cover, functional habitat diversity.
+
+#### *Survey Locations*
+
+We surveyed `r length(sel_maa)` managed access and reserves across **_include administrative level_**.
+
+#### *Fish Surveys*
+    
+We used underwater visual census (UVC) to monitor reef fish assemblages. 
+
+### RESULTS
+
+```{asis echo=any(c("Fish biomass", "Fish density", "Fish size", "Fish diversity") %in% report_metrics)}
+#### Fish surveys
+```
+
+```{r fish_biomass, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if ("Fish biomass" %in% report_metrics) p$Fish[["Fish biomass"]]$plot
+```
+
+```{asis echo="Fish biomass" %in% report_metrics}
+**Figure**. Average fish biomass (± standard error) in kg/ha
+```
+
+
+```{r fish_density, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if ("Fish density" %in% report_metrics) p$Fish[["Fish density"]]$plot
+```
+
+```{asis echo="Fish density" %in% report_metrics}
+**Figure**. Average fish density (± standard error) in individuals/ha
+```
+
+
+```{r fish_size, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Fish size" %in% report_metrics) p$Fish[["Fish size"]]$plot
+```
+
+```{asis echo="Fish size" %in% report_metrics}
+**Figure**. Average total length (TL) of fish (± standard error) in cm
+```
+
+
+```{r fish_diversity, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Fish diversity" %in% report_metrics) p$Fish[["Fish diversity"]]$plot
+```
+
+```{asis echo="Fish diversity" %in% report_metrics}
+**Figure**. Average number of fish species (± standard error).
+```
+
+
+```{asis echo=any(c("Coral reef cover", "Coral reef diversity") %in% report_metrics)}
+### Coral reef surveys
+```
+
+```{r coral_cover, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Coral reef cover" %in% report_metrics) p[["Coral reefs"]][["Coral reef cover"]]$plot
+```
+
+```{asis echo="Coral reef cover" %in% report_metrics}
+**Figure**. Average coverage of corals and other benthic categories (± standard error).
+```
+
+
+```{r coral_diversity, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, paged.print=FALSE}
+if("Coral reef diversity" %in% report_metrics) p[["Coral reefs"]][["Coral reef diversity"]]$plot
+```
+
+```{asis echo="Coral reef diversity" %in% report_metrics}
+**Figure**. Average number of benthic groups (± standard error).
+```
+
+
+```{asis echo=any(c("Mangrove sapling density", "Mangrove diversity", "Mangrove size") %in% report_metrics)}
+### Mangrove surveys
+```
+
+```{r mangrove_sapling, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Mangrove sapling density" %in% report_metrics) p[["Mangroves"]][["Mangrove sapling density"]]$plot
+```
+
+```{asis echo="Mangrove sapling density" %in% report_metrics}
+**Figure**. Average mangrove sapling density (± standard error).
+```
+
+
+```{r mangrove_diversity, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Mangrove diversity" %in% report_metrics) p[["Mangroves"]][["Mangrove diversity"]]$plot
+```
+
+```{asis echo="Mangrove diversity" %in% report_metrics}
+**Figure**. Average number of mangrove species (± standard error).
+```
+
+
+```{r mangrove_size, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Mangrove size" %in% report_metrics) p[["Mangroves"]][["Mangrove size"]]$plot
+```
+
+```{asis echo="Mangrove size" %in% report_metrics}
+**Figure**. Average mangrove diameter at breast height (DBH) (± standard error).
+```
+
+
+```{asis echo=any(c("Seagrass cover", "Seagrass height") %in% report_metrics)}
+### Seagrass surveys
+```
+
+```{r seagrass_cover, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Seagrass cover" %in% report_metrics) p[["Seagrass"]][["Seagrass cover"]]$plot
+```
+
+```{asis echo="Seagrass cover" %in% report_metrics}
+**Figure**. Average seagrass cover (± standard error).
+```
+
+
+```{r seagrass_height, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Seagrass height" %in% report_metrics) p[["Seagrass"]][["Seagrass height"]]$plot
+```
+
+```{asis echo="Seagrass height" %in% report_metrics}
+**Figure**. Average seagrass height (± standard error).
+```
+
+
+```{asis echo=any(c("Oyster density", "Oyster size") %in% report_metrics)}
+### Oyster surveys
+```
+
+```{r oyster_density, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Oyster density" %in% report_metrics) p[["Oysters"]][["Oyster density"]]$plot
+```
+
+```{asis echo="Oyster density" %in% report_metrics}
+**Figure**. Average oyster density (± standard error).
+```
+
+
+```{r oyster_size, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Oyster size" %in% report_metrics) p[["Oysters"]][["Oyster size"]]$plot
+```
+
+```{asis echo="Oyster size" %in% report_metrics}
+**Figure**. Average oyster size (± standard error).
+```
+
+```{asis echo=any(c("Crab density", "Crab size") %in% report_metrics)}
+### Crab surveys
+```
+
+```{r crab_density, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Crab density" %in% report_metrics) p[["Crabs"]][["Crab density"]]$plot
+```
+
+```{asis echo="Crab density" %in% report_metrics}
+**Figure**. Average crab density (± standard error).
+```
+
+
+```{r crab_size, echo=FALSE, fig.height=9, fig.width=10, dpi=300, message=FALSE, warning=FALSE, pageed.print=FALSE}
+if("Crab size" %in% report_metrics) p[["Crabs"]][["Crab size"]]$plot
+```
+
+```{asis echo="Crab size" %in% report_metrics}
+**Figure**. Average crab carapace length (± standard error).
+```
+
+### CONCLUSIONS
+
+**_Write a conclusion based on the results_**

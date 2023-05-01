@@ -1,9 +1,11 @@
-get_geo_choices <- function(dataset,
-                            sel_country = NULL,
-                            sel_subnational = NULL,
-                            sel_local = NULL,
-                            sel_maa = NULL,
-                            target = NULL) {
+get_geo_choices <- function(
+  dataset,
+  sel_country = NULL,
+  sel_subnational = NULL,
+  sel_local = NULL,
+  sel_maa = NULL,
+  target = NULL
+) {
   out <- dataset
   if (!is.null(sel_country)) {
     out <- out %>% dplyr::filter(country == sel_country)

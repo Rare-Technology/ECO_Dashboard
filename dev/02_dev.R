@@ -25,6 +25,8 @@ usethis::use_package("hrbrthemes")
 usethis::use_package("stringr")
 usethis::use_package("tidyr")
 usethis::use_package("lubridate")
+usethis::use_package("rmarkdown")
+usethis::use_package("writexl")
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -61,7 +63,7 @@ usethis::use_data_raw( name = "INIT", open = TRUE)
 usethis::use_data_raw( name = "benthic", open = TRUE)
 usethis::use_data_raw( name = "script", open = TRUE)
 usethis::use_data_raw( name = "seagrass", open = TRUE)
-usethis::use_data_raw( name = "geo_levels", open = TRUE)
+usethis::use_data_raw( name = "geography", open = TRUE)
 usethis::use_data_raw( name = "crabs", open = TRUE)
 usethis::use_data_raw( name = "oysters", open = TRUE)
 ## Tests ----

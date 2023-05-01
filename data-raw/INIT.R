@@ -14,7 +14,7 @@ INIT$DATASET <- list(
 )
 INIT$METRICS <- list(
   "Fish" = c('Fish biomass', 'Fish density', 'Fish diversity', 'Fish size'),
-  "Mangroves" = c("Sapling density", "Tree diversity", "Tree size"),
+  "Mangroves" = c("Mangrove sapling density", "Mangrove diversity", "Mangrove size"),
   "Coral reefs" = c("Coral reef diversity", "Coral reef cover"),
   "Seagrass" = c("Seagrass cover", "Seagrass height"),
   "Oysters" = c("Oyster density", "Oyster size"),
@@ -30,7 +30,8 @@ INIT$DATA_FULL <- list(
   "Coral reefs" = benthic.surveys,
   "Seagrass" = seagrass.surveys,
   "Crabs" = crab.surveys,
-  "Oysters" = oyster.surveys
+  "Oysters" = oyster.surveys,
+  "Geo" = geo
 )
 INIT$COUNTRY$CHOICES <- get_geo_choices(INIT$DATA_FULL[["Fish"]], target = "country")
 INIT$COUNTRY$SELECTED <- "Philippines"

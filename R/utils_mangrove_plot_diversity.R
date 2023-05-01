@@ -5,7 +5,7 @@
 #' @return The return value, if any, from executing the utility.
 #'
 #' @noRd
-plot_tree_diversity <- function(data_filtered, sel_geom, facet_maa) {
+plot_mangrove_diversity <- function(data_filtered, sel_geom, facet_maa) {
   data_aggreg <- aggregate_data(data_filtered, 'tree_species')
   data_summary <- summarySE(data_aggreg, 'tree_species', facet_maa)
   years <- sort(unique(data_summary$year))

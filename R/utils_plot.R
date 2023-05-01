@@ -253,3 +253,50 @@ get_plot_height <- function(num_groups) {
   height <- 400 + (nrows - 1)*200
   return(height)
 }
+
+PLOT_FUN <- function(metric, ...) {
+  switch(
+    metric,
+    "Fish biomass" = plot_fish_biomass(...),
+    "Fish density" = plot_fish_density(...),
+    "Fish diversity" = plot_fish_diversity(...),
+    "Fish size" = plot_fish_size(...),
+    "Mangrove sapling density" = plot_mangrove_sapling_density(...),
+    "Mangrove diversity" = plot_mangrove_diversity(...),
+    "Mangrove size" = plot_mangrove_size(...),
+    "Coral reef cover" = plot_reef_cover(...),
+    "Coral reef diversity" = plot_reef_diversity(...),
+    "Seagrass cover" = plot_seagrass_cover(...),
+    "Seagrass diversity" = plot_seagrass_diversity(...),
+    "Seagrass height" = plot_seagrass_height(...),
+    "Oyster density" = plot_oyster_density(...),
+    "Oyster size" = plot_oyster_size(...),
+    "Crab density" = plot_crab_density(...),
+    "Crab size" = plot_crab_size(...)
+  )
+}
+
+clean_plot <- function(p, facet_maa, y_scale, sel_metric, sel_maa) {
+  if (facet_maa) {
+    if (sel_metric == "Coral reef cover") {
+      p$plot <- p$plot + facet_grid(rows = vars(ma_name), cols = vars(location_status))
+      plot_height <- get_plot_height(2*length(sel_maa))
+    } else {
+      p$plot <- p$plot + facet_wrap('ma_name', ncol = 2)
+      plot_height <- get_plot_height(length(sel_maa))
+    }
+  } else {
+    if (sel_metric == "Coral reef cover") {
+      p$plot <- p$plot + facet_wrap("location_status")
+    }
+    plot_height <- 'auto'
+  }
+  p$plot$facet$params$free$y <- !y_scale
+  p$plot <- p$plot + ggplot2::labs(caption = WATERMARK_LABEL)
+  
+  out <- list(
+    p=p,
+    plot_height=plot_height
+  )
+  return(out)
+}

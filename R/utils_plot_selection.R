@@ -85,7 +85,6 @@ aggregate_data <- function(data_filtered, metric) {
     
     groupvars <- c(groupvars, 'plot_no')
     groupvars2 <- groupvars[-length(groupvars)] # drop plot_no
-    cat(groupvars2)
     form <- str_to_formula(metric, groupvars)
     form2 <- str_to_formula(metric, groupvars2)
     

@@ -9,7 +9,6 @@
 #' @importFrom shiny NS tagList
 #' @importFrom shinyWidgets pickerInput multiInput switchInput radioGroupButtons updatePickerInput materialSwitch
 #' @importFrom leaflet providers
-#' @importFrom shinyjs toggleState
 sidebarDisplayUI <- function(id){
   ns <- NS(id)
   uiOutput(ns('display'))
@@ -25,60 +24,54 @@ sidebarDisplayServer <- function(id, rv){
       sel_dataset <- rv$sel_dataset
       current_tab <- rv$current_tab
       
-      ui <- br()
+      ui <- tagList(br(), div(class="sidetitle", tr(rv, "Plot")))
       if (current_tab == tr(rv, "Visualize data")) {
-        ui <- tagList(ui,
-          div(class="sidetitle", tr(rv, "Plot")),
-          selectInput(ns('sel_metric'),
-                      tr(rv, 'Metric'),
-                      choices = INIT$METRICS[["Fish"]]
-          ),
-          radioButtons(ns('sel_geom'),
-                       tr(rv, 'Plot Type'),
-                       choices = c('Bar plots', 'Distribution plots')
-          ),
-          materialSwitch(ns('facet_maa'),
-            label = tr(rv,"Group by MA"), 
-            value = TRUE,
-            status = "primary"
-          ),
-          materialSwitch(
-            ns("sel_yscale"),
-            tr(rv, "Fixed Y-axis"),
-            value = TRUE,
-            width = "100%",
-            status = "primary"
+        ui <- tagList(
+          ui,
+          selectInput(
+            ns('sel_metric'),
+            tr(rv, 'Metric'),
+            choices = INIT$METRICS[["Fish"]]
           )
         )
       }
-      if (sel_dataset == "Fish") {
-        ui <- tagList(ui,
-          pickerInput(ns('sel_family'),
-                      tr(rv, 'Family'),
-                      choices = INIT$FAMILY$CHOICES,
-                      selected = INIT$FAMILY$SELECTED,
-                      options = list(
-                        `actions-box` = TRUE,
-                        `live-search` = TRUE,
-                        `selected-text-format` = "count > 3",
-                        `count-selected-text` = paste("{0}", tr(rv, "items selected")),
-                        `none-selected-text` = tr(rv, "Nothing selected")
-                      ), multiple = TRUE)
+      ui <- tagList(
+        ui,
+        radioButtons(
+          ns('sel_geom'),
+          tr(rv, 'Plot Type'),
+          choices = c('Bar plots', 'Distribution plots')
+        ),
+        materialSwitch(
+          ns('facet_maa'),
+          label = tr(rv,"Group by MA"), 
+          value = TRUE,
+          status = "primary"
+        ),
+        materialSwitch(
+          ns("sel_yscale"),
+          tr(rv, "Fixed Y-axis"),
+          value = TRUE,
+          width = "100%",
+          status = "primary"
         )
-      }
-      if (current_tab == 'Map') {
-        ui <- tagList(ui,
-          div(class="sidetitle", "Map"),
-          selectInput(ns('basemap'),
-            tr(rv, 'Select Basemap'),
-            # R doesn't like it when you try wrapping the choices text in tr()
-            # need to find work around when re-implementing map
-            choices= c("Gray Canvas basemap" = providers$Esri.WorldGrayCanvas,
-                      "National Geographic basemap" = providers$Esri.NatGeoWorldMap,
-                      "Ocean basemap" = providers$Esri.OceanBasemap,
-                      "Satellite basemap" = providers$Esri.WorldImagery,
-                      "World Topo basemap" = providers$Esri.WorldTopoMap),
-            selected = rv$basemap
+      )
+      if (sel_dataset == "Fish" | current_tab == tr(rv, "Report")) {
+        ui <- tagList(
+          ui,
+          pickerInput(
+            ns('sel_family'),
+            tr(rv, 'Family'),
+            choices = INIT$FAMILY$CHOICES,
+            selected = INIT$FAMILY$SELECTED,
+            options = list(
+              `actions-box` = TRUE,
+              `live-search` = TRUE,
+              `selected-text-format` = "count > 3",
+              `count-selected-text` = paste("{0}", tr(rv, "items selected")),
+              `none-selected-text` = tr(rv, "Nothing selected")
+            ),
+            multiple = TRUE
           )
         )
       }
